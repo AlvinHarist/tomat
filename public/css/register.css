@@ -1,0 +1,83 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+.container {
+    display: flex;
+    width: 900px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+.left-panel {
+    flex: 1;
+    margin-top: 100px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+.right-panel {
+    flex: 1;
+    padding: 40px;
+    background-color: #fdfdfd;
+    border-left: 1px solid #eee;
+}
+.logo {
+    font-size: 32px;
+    font-weight: bold;
+    color: #4CAF50;
+    text-align: center;
+    margin-bottom: 20px;
+}
+.form-group {
+    margin-bottom: 15px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+.form-group input, .form-group textarea, .form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.error-message {
+    color: red;
+    font-size: 0.9em;
+    display: none;
+    margin-top: 5px;
+}
+
+input.interacted:invalid,
+textarea.interacted:invalid,
+select.interacted:invalid {
+    border-color: red;
+}
+
+input.interacted:invalid + .error-message,
+textarea.interacted:invalid + .error-message,
+select.interacted:invalid + .error-message {
+    display: block;
+}
+
+input.interacted:valid,
+textarea.interacted:valid,
+select.interacted:valid {
+    border-color: green;
+}
+
+button:disabled {
+    background-color: #cccccc;
+    color: #666666;
+    cursor: not-allowed;
+}

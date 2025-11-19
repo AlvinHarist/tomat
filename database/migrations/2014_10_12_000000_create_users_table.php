@@ -17,8 +17,12 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->enum('role', ['platform', 'penjual'])->default('penjual');
+            $table->enum('status', ['aktif', 'tidak_aktif', 'pending'])->default('pending');
+            // ------------------------------------
+
             $table->rememberToken();
-            $table->timestamps();
+            $table->timestamps(); 
         });
     }
 
