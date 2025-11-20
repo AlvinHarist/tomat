@@ -23,3 +23,15 @@ Route::get('/', [RegisterController::class, 'showRegistrationForm'])->name('regi
 
 // Rute untuk memproses data saat formulir di-submit
 Route::post('/', [RegisterController::class, 'store'])->name('register.store');
+
+use App\Http\Controllers\Auth\LoginController;
+
+// Rute Login
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [LoginController::class, 'login'])->name('login.submit');
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+// Rute Dashboard Sementara (untuk tes setelah login)
+// Route::get('/dashboard', function () {
+//     return "Halo, " . Auth::user()->name . "! Anda berhasil login.";
+// })->middleware('auth')->name('dashboard');
