@@ -34,78 +34,69 @@
                 
                 <div class="form-group">
                     <label>Nama Toko</label>
-                    <input type="text" name="store_name" value="{{ old('store_name') }}" placeholder="Masukkan nama toko"
-                           required> <span class="error-message">Nama toko wajib diisi.</span>
+                    <input id="store_input" type="text" name="store_name" value="{{ old('store_name') }}" placeholder="Masukkan nama toko"
+                           required> <span id="store_error" class="error-message">Nama toko wajib diisi.</span>
                 </div>
 
                 <div class="form-group">
                     <label>Deskripsi</label>
-                    <textarea name="description" placeholder="Masukkan deskripsi toko">{{ old('description') }}</textarea>
+                    <textarea id="deskripsi_input" name="description" placeholder="Masukkan deskripsi toko">{{ old('description') }}</textarea>
                 </div>
                 
                 <div class="form-group">
                     <label>Nama PIC</label>
-                    <input type="text" name="name" value="{{ old('name') }}" placeholder="Masukkan nama PIC"
-                    required> <span class="error-message">Nama PIC wajib diisi.</span>
+                    <input id="nama_pic_input" type="text" name="name" value="{{ old('name') }}" placeholder="Masukkan nama PIC"
+                    required> <span id="nama_pic_error" class="error-message">Nama PIC wajib diisi.</span>
                 </div>
                 
                 <div class="form-group">
                     <label>Nomor Telepon</label>
-                    <input type="text" name="phone" value="{{ old('phone') }}" placeholder="Masukkan nomor telepon" 
-                            required pattern="[0-9]{10,20}"> <span class="error-message">Nomor telepon wajib diisi.</span>
+                    <input id="nomor_telepon_input" type="text" name="phone" value="{{ old('phone') }}" placeholder="Masukkan nomor telepon" 
+                            required pattern="[0-9]{10,20}"> <span id="nomor_telepon_error" class="error-message">Nomor telepon wajib diisi.</span>
                 </div>
 
                 <div class="form-group">
                     <label>Email</label>
-                    <input type="email" name="email" value="{{ old('email') }}" placeholder="Masukkan email PIC"
-                           required> <span class="error-message">Masukkan format email yang valid.</span>
+                    <input id="email_input" type="email" name="email" value="{{ old('email') }}" placeholder="Masukkan email PIC"
+                           required> <span id="email_error" class="error-message">Masukkan format email yang valid.</span>
                 </div>
 
                 <div class="form-group">
                     <label>Alamat Jalan</label>
-                    <input type="text" name="jalan" value="{{ old('jalan') }}" placeholder="Masukkan nama jalan"
-                    required> <span class="error-message">Nama Jalan wajib diisi.</span>
+                    <input id="jalan_input" type="text" name="jalan" value="{{ old('jalan') }}" placeholder="Masukkan nama jalan"
+                    required> <span id="jalan_error" class="error-message">Nama Jalan wajib diisi.</span>
                 </div>
 
                 <div class="form-group">
                     <label>Alamat RT</label>
-                    <input type="text" name="rt" value="{{ old('rt') }}" placeholder="Masukkan RT"
-                    required> <span class="error-message">RT wajib diisi.</span>
+                    <input id="rt_input" type="text" name="rt" value="{{ old('rt') }}" placeholder="Masukkan RT"
+                    required> <span id="rt_error" class="error-message">RT wajib diisi.</span>
                 </div>
                 
                 <div class="form-group">
                     <label>Alamat RW</label>
-                    <input type="text" name="rw" value="{{ old('rw') }}" placeholder="Masukkan RW"
-                    required> <span class="error-message">RW wajib diisi.</span>
+                    <input id="rw_input" type="text" name="rw" value="{{ old('rw') }}" placeholder="Masukkan RW"
+                    required> <span id="rw_error" class="error-message">RW wajib diisi.</span>
                 </div>
 
                 <div class="form-group">
                     <label>Alamat Kelurahan</label>
-                    <input type="text" name="kelurahan" value="{{ old('kelurahan') }}" placeholder="Masukkan nama kelurahan"
-                    required> <span class="error-message">Nama kelurahan wajib diisi.</span>
+                    <input id="kelurahan_input" type="text" name="kelurahan" value="{{ old('kelurahan') }}" placeholder="Masukkan nama kelurahan"
+                    required> <span id="kelurahan_error" class="error-message">Nama kelurahan wajib diisi.</span>
                 </div>
 
                 <div class="form-group">
                     <label>Alamat Kabupaten/Kota</label>
-                    <input type="text" name="kabupatenkota" value="{{ old('kabupatenkota') }}" placeholder="Masukkan nama kabupaten/kota"
-                    required> <span class="error-message">Nama kabupaten/kota wajib diisi.</span>
+                    <input id="kabupaten_kota_input" type="text" name="kabupatenkota" value="{{ old('kabupatenkota') }}" placeholder="Masukkan nama kabupaten/kota"
+                    required> <span id="kabupaten_kota_error" class="error-message">Nama kabupaten/kota wajib diisi.</span>
                 </div>
 
                 <div class="form-group">
                     <label>Alamat Provinsi</label>
-                    <input type="text" name="provinsi" value="{{ old('provinsi') }}" placeholder="Masukkan nama provinsi"
-                    required> <span class="error-message">Nama provinsi wajib diisi.</span>
+                    <input id="provinsi_input" type="text" name="provinsi" value="{{ old('provinsi') }}" placeholder="Masukkan nama provinsi"
+                    required> <span id="provinsi_error" class="error-message">Nama provinsi wajib diisi.</span>
                 </div>
-
-                
-                <input type="hidden" name="pic_address" value="Alamat PIC default">
-                <input type="hidden" name="pic_rt" value="001">
-                <input type="hidden" name="pic_rw" value="001">
-                <input type="hidden" name="pic_village" value="Kelurahan PIC default">
-
-
-
-
+                             
                 <div class="form-group">
                     <label>Password</label>
                     <div style="position: relative;">
@@ -140,21 +131,9 @@
 
                 <div class="form-group">
                     <label>Nomor PIC KTP</label>
-                    <input type="text" name="ktp_number" value="{{ old('ktp_number') }}" placeholder="Masukkan 16 digit nomor KTP"
-                           required pattern="[0-9]{16}"> <span class="error-message">KTP harus 16 digit angka.</span>
+                    <input id="ktp_input" type="text" name="ktp_number" value="{{ old('ktp_number') }}" placeholder="Masukkan 16 digit nomor KTP"
+                           required pattern="[0-9]{16}"> <span id="ktp_error" class="error-message">KTP harus 16 digit angka.</span>
                 </div>
-
-                <!-- <div class="form-group">
-                    <label>Unggah foto PIC</label>
-                    <input type="file" name="photo"
-                           required> <span class="error-message">Foto PIC wajib di-upload.</span>
-                </div>
-                
-                <div class="form-group">
-                    <label>Unggah Foto KTP</label>
-                    <input type="file" name="ktp_file"
-                           required> <span class="error-message">Foto KTP wajib di-upload.</span>
-                </div> -->
 
                 <div class="form-group file-upload-wrapper">
                     <label class="main-label">Unggah foto PIC</label>
@@ -200,7 +179,168 @@
             const form = document.querySelector('form');
             const submitButton = document.querySelector('#submit-button'); // Pastikan ID ini ada di tombol submit
             const passwordInput = document.querySelector('#password');
+
+            const storeInput = document.getElementById('store_input');
+            const storeError = document.getElementById('store_error');
+
+            const namaPICInput = document.getElementById('nama_pic_input');
+            const namaPICError = document.getElementById('nama_pic_error');
+
+            const nomorTeleponInput = document.getElementById('nomor_telepon_input');
+            const nomorTeleponError = document.getElementById('nomor_telepon_error');
+
+            const emailInput = document.getElementById('email_input');
+            const emailError = document.getElementById('email_error');
+
+            const jalanInput = document.getElementById('jalan_input');
+            const jalanError = document.getElementById('jalan_error');
+
+            const rtInput = document.getElementById('rt_input');
+            const rtError = document.getElementById('rt_error');
+
+            const rwInput = document.getElementById('rw_input');
+            const rwError = document.getElementById('rw_error');
             
+            const kelurahanInput = document.getElementById('kelurahan_input');
+            const kelurahanError = document.getElementById('kelurahan_error');
+            
+            const kabupatenKotaInput = document.getElementById('kabupaten_kota_input');
+            const kabupatenKotaError = document.getElementById('kabupaten_kota_error');
+            
+            const provinsiInput = document.getElementById('provinsi_input');
+            const provinsiError = document.getElementById('provinsi_error');
+            
+            const ktpInput = document.getElementById('ktp_input');
+            const ktpError = document.getElementById('ktp_error');
+
+            function toggleError() {
+                console.log("terisi");
+                if (storeInput.value.trim() !== "") {
+                    storeError.style.display = 'none';
+                }
+                else {
+                    storeError.style.display = 'inline';
+                }
+                
+                if (namaPICInput.value.trim() !== "") {
+                    namaPICError.style.display = 'none';
+                }
+                else {
+                    namaPICError.style.display = 'inline';
+                }
+
+                if (nomorTeleponInput.value.trim() !== "") {
+                    nomorTeleponError.style.display = 'none';
+                }
+                else {
+                    nomorTeleponError.style.display = 'inline';
+                }
+
+                if (emailInput.value.trim() !== "") {
+                    emailError.style.display = 'none';
+                }
+                else {
+                    emailError.style.display = 'inline';
+                }
+
+                if (jalanInput.value.trim() !== "") {
+                    jalanError.style.display = 'none';
+                }
+                else {
+                    jalanError.style.display = 'inline';
+                }
+
+                if (rtInput.value.trim() !== "") {
+                    rtError.style.display = 'none';
+                }
+                else {
+                    rtError.style.display = 'inline';
+                }
+
+                if (rwInput.value.trim() !== "") {
+                    rwError.style.display = 'none';
+                }
+                else {
+                    rwError.style.display = 'inline';
+                }
+
+                if (kelurahanInput.value.trim() !== "") {
+                    kelurahanError.style.display = 'none';
+                }
+                else {
+                    kelurahanError.style.display = 'inline';
+                }
+
+                if (kabupatenKotaInput.value.trim() !== "") {
+                    kabupatenKotaError.style.display = 'none';
+                }
+                else {
+                    kabupatenKotaError.style.display = 'inline';
+                }
+
+                if (provinsiInput.value.trim() !== "") {
+                    provinsiError.style.display = 'none';
+                }
+                else {
+                    provinsiError.style.display = 'inline';
+                }
+
+                if (ktpInput.value.trim() !== "") {
+                    ktpError.style.display = 'none';
+                }
+                else {
+                    ktpError.style.display = 'inline';
+                }
+            }
+
+            // Cek Logika
+            toggleError();
+
+            storeInput.addEventListener('input', function() {
+                toggleError();
+            })
+
+            namaPICInput.addEventListener('input', function() {
+                toggleError();
+            })
+
+            nomorTeleponInput.addEventListener('input', function() {
+                toggleError();
+            })
+
+            emailInput.addEventListener('input', function() {
+                toggleError();
+            })
+
+            jalanInput.addEventListener('input', function() {
+                toggleError();
+            })
+
+            rtInput.addEventListener('input', function() {
+                toggleError();
+            })
+
+            rwInput.addEventListener('input', function() {
+                toggleError();
+            })
+
+            kelurahanInput.addEventListener('input', function() {
+                toggleError();
+            })
+
+            kabupatenKotaInput.addEventListener('input', function() {
+                toggleError();
+            })
+
+            provinsiInput.addEventListener('input', function() {
+                toggleError();
+            })
+
+            ktpInput.addEventListener('input', function() {
+                toggleError();
+            })
+
+
             // Elemen opsional (jika belum dibuat di HTML, biar script tidak error)
             const confirmPasswordInput = document.querySelector('#password_confirmation');
             const confirmPasswordError = document.querySelector('#error-password-confirm');
@@ -216,6 +356,7 @@
             };
 
             let isPasswordComplex = false;
+
 
             // --- FUNGSI 1: Validasi Password ---
             function validatePassword() {
@@ -233,16 +374,19 @@
                         element.style.display = 'none'; // MENGHILANG
                         element.classList.remove('invalid');
                         element.classList.add('valid');
+                        console.log("password valid");
                     } else {
                         element.style.display = 'list-item'; // MUNCUL KEMBALI (Penting: pakai list-item untuk LI)
                         element.style.color = 'red'; 
                         element.classList.remove('valid');
                         element.classList.add('invalid');
                         allValid = false;
+                        console.log("password in");
                     }
                 };
 
-                // Cek Logika
+                
+
                 toggleDisplay(feedbackItems.length, value.length >= 8);
                 toggleDisplay(feedbackItems.uppercase, /[A-Z]/.test(value));
                 toggleDisplay(feedbackItems.lowercase, /[a-z]/.test(value));
