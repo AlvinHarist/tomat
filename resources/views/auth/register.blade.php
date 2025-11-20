@@ -17,8 +17,8 @@
 
         <div class="right-panel">
             <div class="logo">ToMaT</div>
-            <h2>Register</h2>
-            <p>Already have ToMaT account? <br> <a href="#">Login</a></p>
+            <h2>Registrasi</h2>
+            <p>Sudah punya akun? <br> <a href="#">Masuk</a></p>
             
             <form method="POST" action="{{ route('register.store') }}" enctype="multipart/form-data">                
                 @csrf @if ($errors->any())
@@ -33,30 +33,22 @@
                 @endif
                 
                 <div class="form-group">
-                    <label>Shop name</label>
-                    <input type="text" name="store_name" value="{{ old('store_name') }}" placeholder="Enter shop name"
+                    <label>Nama Toko</label>
+                    <input type="text" name="store_name" value="{{ old('store_name') }}" placeholder="Masukkan nama toko"
                            required> <span class="error-message">Nama toko wajib diisi.</span>
                 </div>
 
                 <div class="form-group">
-                    <label>Description</label>
-                    <textarea name="description" placeholder="Enter shop description">{{ old('description') }}</textarea>
+                    <label>Deskripsi</label>
+                    <textarea name="description" placeholder="Masukkan deskripsi toko">{{ old('description') }}</textarea>
                 </div>
-
-                <input type="hidden" name="province" value="Jawa Barat">
-                <input type="hidden" name="city" value="Bandung">
-
+                
                 <div class="form-group">
-                    <label>District</label>
-                    <input type="text" name="district" value="{{ old('district') }}" placeholder="District"
-                           required> <span class="error-message">Distrik wajib diisi.</span>
+                    <label>Nama PIC</label>
+                    <input type="text" name="name" value="{{ old('name') }}" placeholder="Masukkan nama PIC"
+                    required> <span class="error-message">Nama PIC wajib diisi.</span>
                 </div>
-
-                <input type="hidden" name="pic_address" value="Alamat PIC default">
-                <input type="hidden" name="pic_rt" value="001">
-                <input type="hidden" name="pic_rw" value="001">
-                <input type="hidden" name="pic_village" value="Kelurahan PIC default">
-
+                
                 <div class="form-group">
                     <label>Phone Number</label>
                     <input type="text" name="phone" value="{{ old('phone') }}" placeholder="Enter phone number (min 10 digit)" 
@@ -64,21 +56,66 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Name of PIC</label>
-                    <input type="text" name="name" value="{{ old('name') }}" placeholder="Enter PIC name"
-                           required> <span class="error-message">Nama PIC wajib diisi.</span>
-                </div>
-
-                <div class="form-group">
                     <label>Email</label>
-                    <input type="email" name="email" value="{{ old('email') }}" placeholder="Enter login email"
+                    <input type="email" name="email" value="{{ old('email') }}" placeholder="Masukkan email PIC"
                            required> <span class="error-message">Masukkan format email yang valid.</span>
                 </div>
 
                 <div class="form-group">
+                    <label>Alamat Jalan</label>
+                    <input type="text" name="jalan" value="{{ old('jalan') }}" placeholder="Masukkan nama jalan"
+                    required> <span class="error-message">Nama Jalan wajib diisi.</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Alamat RT</label>
+                    <input type="text" name="rt" value="{{ old('rt') }}" placeholder="Masukkan RT"
+                    required> <span class="error-message">RT wajib diisi.</span>
+                </div>
+                
+                <div class="form-group">
+                    <label>Alamat RW</label>
+                    <input type="text" name="rw" value="{{ old('rw') }}" placeholder="Masukkan RW"
+                    required> <span class="error-message">RW wajib diisi.</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Alamat Kelurahan</label>
+                    <input type="text" name="kelurahan" value="{{ old('kelurahan') }}" placeholder="Masukkan nama kelurahan"
+                    required> <span class="error-message">Nama kelurahan wajib diisi.</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Alamat Kabupaten/Kota</label>
+                    <input type="text" name="kabupatenkota" value="{{ old('kabupatenkota') }}" placeholder="Masukkan nama kabupaten/kota"
+                    required> <span class="error-message">Nama kabupaten/kota wajib diisi.</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Alamat Provinsi</label>
+                    <input type="text" name="provinsi" value="{{ old('provinsi') }}" placeholder="Masukkan nama provinsi"
+                    required> <span class="error-message">Nama provinsi wajib diisi.</span>
+                </div>
+
+                
+                <input type="hidden" name="pic_address" value="Alamat PIC default">
+                <input type="hidden" name="pic_rt" value="001">
+                <input type="hidden" name="pic_rw" value="001">
+                <input type="hidden" name="pic_village" value="Kelurahan PIC default">
+
+
+
+
+                <div class="form-group">
                     <label>Password</label>
-                    <input type="password" name="password" placeholder="Enter password"
-                           id="password" required minlength="8">
+                    <div style="position: relative;">
+                        <input type="password" name="password" placeholder="Masukkan password"
+                               id="password" required minlength="8" style="padding-right: 40px;">
+                        <button type="button" id="toggle-password" 
+                                style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 18px;">
+                            👁️
+                        </button>
+                    </div>
                     <ul id="password-feedback" class="error-message" style="color: red; font-size: 0.9em; margin-top: 5px;">
                         <li id="length" class="invalid">Minimal 8 karakter</li>
                         <li id="uppercase" class="invalid">Mengandung huruf besar</li>
@@ -89,32 +126,38 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Confirm Password</label>
-                    <input type="password" name="password_confirmation" placeholder="Confirm password"
-                           id="password_confirmation" required>
+                    <label>Konfirmasi Password</label>
+                    <div style="position: relative;">
+                        <input type="password" name="password_confirmation" placeholder="Konfirmasi password"
+                               id="password_confirmation" required style="padding-right: 40px;">
+                        <button type="button" id="toggle-password-confirm" 
+                                style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 18px;">
+                            👁️
+                        </button>
+                    </div>
                     <span class="error-message" id="error-password-confirm">Password tidak cocok.</span>
                 </div>
 
                 <div class="form-group">
-                    <label>PIC KTP Number</label>
-                    <input type="text" name="ktp_number" value="{{ old('ktp_number') }}" placeholder="Enter 16-digit KTP number"
+                    <label>Nomor PIC KTP</label>
+                    <input type="text" name="ktp_number" value="{{ old('ktp_number') }}" placeholder="Masukkan 16 digit nomor KTP"
                            required pattern="[0-9]{16}"> <span class="error-message">KTP harus 16 digit angka.</span>
                 </div>
 
                 <div class="form-group">
-                    <label>Upload photo of PIC</label>
+                    <label>Unggah foto PIC</label>
                     <input type="file" name="photo"
                            required> <span class="error-message">Foto PIC wajib di-upload.</span>
                 </div>
                 
                 <div class="form-group">
-                    <label>Upload photo of PIC KTP</label>
+                    <label>Unggah Foto KTP</label>
                     <input type="file" name="ktp_file"
                            required> <span class="error-message">Foto KTP wajib di-upload.</span>
                 </div>
 
                 <button type="submit" id="submit-button" disabled style="width: 100%; padding: 12px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">
-                    Register
+                    Daftar
                 </button>
 
             </form>
@@ -124,15 +167,17 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            
+
+            // 1. AMBIL ELEMEN (Gunakan try-catch atau check null agar aman)
             const form = document.querySelector('form');
-            const submitButton = document.querySelector('#submit-button');
+            const submitButton = document.querySelector('#submit-button'); // Pastikan ID ini ada di tombol submit
             const passwordInput = document.querySelector('#password');
+            
+            // Elemen opsional (jika belum dibuat di HTML, biar script tidak error)
             const confirmPasswordInput = document.querySelector('#password_confirmation');
             const confirmPasswordError = document.querySelector('#error-password-confirm');
-            const inputs = form.querySelectorAll('input, textarea, select');
             
-            // --- Referensi untuk List Password ---
+            // Elemen List Validasi
             const passwordFeedback = document.querySelector('#password-feedback');
             const feedbackItems = {
                 length: document.querySelector('#length'),
@@ -141,95 +186,123 @@
                 number: document.querySelector('#number'),
                 symbol: document.querySelector('#symbol')
             };
-            let isPasswordComplex = false; // Flag untuk melacak kompleksitas password
-        
-            // --- PERBAIKAN 1: Buat fungsi validasi password terpisah ---
+
+            let isPasswordComplex = false;
+
+            // --- FUNGSI 1: Validasi Password ---
             function validatePassword() {
+                // Jika input password tidak ditemukan, stop
+                if (!passwordInput) return;
+
                 const value = passwordInput.value;
-                let allValid = true; // Anggap semua valid
-            
-                // Cek 1: Panjang
-                if (value.length >= 8) {
-                    feedbackItems.length.className = 'valid';
-                } else {
-                    feedbackItems.length.className = 'invalid';
-                    allValid = false;
+                let allValid = true;
+
+                // Helper: Sembunyikan jika valid, Tampilkan jika invalid
+                const toggleDisplay = (element, isValid) => {
+                    if (!element) return; // Safety check jika ID salah ketik
+
+                    if (isValid) {
+                        element.style.display = 'none'; // MENGHILANG
+                        element.classList.remove('invalid');
+                        element.classList.add('valid');
+                    } else {
+                        element.style.display = 'list-item'; // MUNCUL KEMBALI (Penting: pakai list-item untuk LI)
+                        element.style.color = 'red'; 
+                        element.classList.remove('valid');
+                        element.classList.add('invalid');
+                        allValid = false;
+                    }
+                };
+
+                // Cek Logika
+                toggleDisplay(feedbackItems.length, value.length >= 8);
+                toggleDisplay(feedbackItems.uppercase, /[A-Z]/.test(value));
+                toggleDisplay(feedbackItems.lowercase, /[a-z]/.test(value));
+                toggleDisplay(feedbackItems.number, /\d/.test(value));
+                toggleDisplay(feedbackItems.symbol, /[@$!%*?&#+_-]/.test(value));
+
+                isPasswordComplex = allValid;
+
+                // Atur visibilitas container UL (Feedback list)
+                if (passwordFeedback) {
+                    if (allValid) {
+                        passwordFeedback.style.display = 'none'; // Sembunyikan kotak jika semua benar
+                    } else {
+                        passwordFeedback.style.display = 'block'; // Tampilkan kotak jika masih ada salah
+                    }
                 }
-                // Cek 2: Huruf Besar
-                if (/[A-Z]/.test(value)) {
-                    feedbackItems.uppercase.className = 'valid';
-                } else {
-                    feedbackItems.uppercase.className = 'invalid';
-                    allValid = false;
-                }
-                // Cek 3: Huruf Kecil
-                if (/[a-z]/.test(value)) {
-                    feedbackItems.lowercase.className = 'valid';
-                } else {
-                    feedbackItems.lowercase.className = 'invalid';
-                    allValid = false;
-                }
-                // Cek 4: Angka
-                if (/\d/.test(value)) {
-                    feedbackItems.number.className = 'valid';
-                } else {
-                    feedbackItems.number.className = 'invalid';
-                    allValid = false;
-                }
-                // Cek 5: Simbol
-                if (/[@$!%*?&]/.test(value)) {
-                    feedbackItems.symbol.className = 'valid';
-                } else {
-                    feedbackItems.symbol.className = 'invalid';
-                    allValid = false;
-                }
-                
-                isPasswordComplex = allValid; // Update flag
             }
-        
-            // --- PERBAIKAN 2: Pindahkan Event Listener ke luar fungsi ---
-            
-            // Tampilkan/sembunyikan list saat fokus
-            passwordInput.addEventListener('focus', function() {
-                passwordFeedback.style.display = 'block';
-            });
-            
-            // Jalankan validasi password setiap kali mengetik di box password
-            passwordInput.addEventListener('input', function() {
-                validatePassword();
-                checkFormValidity(); // Cek ulang tombol submit
-            });
-        
-            // Cek validasi untuk tombol submit
+
+            // --- FUNGSI 2: Cek Seluruh Form (termasuk Confirm Password) ---
             function checkFormValidity() {
-                let isFormValid = form.checkValidity(); // Cek aturan HTML5
+                // Jika elemen pendukung tidak lengkap, bypass saja biar tidak error
+                if (!submitButton) return;
+
+                let isFormValid = form ? form.checkValidity() : false;
                 let isPasswordMatch = true;
-            
-                // Cek konfirmasi password
-                if (passwordInput.value !== confirmPasswordInput.value && confirmPasswordInput.value.length > 0) {
-                    isPasswordMatch = false;
-                    confirmPasswordError.style.display = 'block';
-                    confirmPasswordInput.classList.add('interacted');
-                } else {
-                    confirmPasswordError.style.display = 'none';
+
+                // Cek Konfirmasi Password (hanya jika fieldnya ada)
+                if (confirmPasswordInput && confirmPasswordError) {
+                    if (passwordInput.value !== confirmPasswordInput.value && confirmPasswordInput.value.length > 0) {
+                        isPasswordMatch = false;
+                        confirmPasswordError.style.display = 'block';
+                    } else {
+                        confirmPasswordError.style.display = 'none';
+                    }
                 }
-                
-                // Tombol Aktif JIKA: Form HTML5 valid DAN Password kompleks DAN Password cocok
+
+                // Aktifkan/Matikan Tombol
                 if (isFormValid && isPasswordMatch && isPasswordComplex) {
                     submitButton.disabled = false;
                 } else {
                     submitButton.disabled = true;
                 }
             }
-        
-            // Jalankan checkFormValidity setiap kali user mengetik DI MANA SAJA
-            inputs.forEach(function(input) {
-                input.addEventListener('input', function() {
-                    input.classList.add('interacted');
+
+            // --- EVENT LISTENER ---
+
+            if (passwordInput) {
+                // 1. Saat user klik kolom password (Focus)
+                passwordInput.addEventListener('focus', function() {
+                    validatePassword(); // Jalankan validasi langsung agar status terkini muncul
+                });
+
+                // 2. Saat user mengetik (Input)
+                passwordInput.addEventListener('input', function() {
+                    validatePassword();
                     checkFormValidity();
                 });
+            }
+
+            // Listener untuk input lain di form
+            const inputs = form ? form.querySelectorAll('input, textarea, select') : [];
+            inputs.forEach(function(input) {
+                input.addEventListener('input', checkFormValidity);
             });
+
+            // Listener Toggle Mata (Password)
+            const togglePassword = document.querySelector('#toggle-password');
+            if (togglePassword && passwordInput) {
+                togglePassword.addEventListener('click', function() {
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+                    this.textContent = type === 'password' ? '👁️' : '🙈';
+                });
+            }
+
+            // Listener Toggle Mata (Confirm Password)
+            const togglePasswordConfirm = document.querySelector('#toggle-password-confirm');
+            if (togglePasswordConfirm && confirmPasswordInput) {
+                togglePasswordConfirm.addEventListener('click', function() {
+                    const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    confirmPasswordInput.setAttribute('type', type);
+                    this.textContent = type === 'password' ? '👁️' : '🙈';
+                });
+            }
+
+            // Jalankan sekali di awal untuk reset tombol
+            checkFormValidity();
         });
-    </script>
+        </script>
 </body>
 </html>
