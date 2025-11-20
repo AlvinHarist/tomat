@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register ToMaT</title>
+    <title>Registrasi ToMaT</title>
 
     <link rel="stylesheet" href="{{ asset('css/register.css') }}">
 
@@ -50,9 +50,9 @@
                 </div>
                 
                 <div class="form-group">
-                    <label>Phone Number</label>
-                    <input type="text" name="phone" value="{{ old('phone') }}" placeholder="Enter phone number (min 10 digit)" 
-                            required pattern="[0-9]{10,20}"> <span class="error-message">Nomor HP wajib diisi (hanya angka, min. 10 digit).</span>
+                    <label>Nomor Telepon</label>
+                    <input type="text" name="phone" value="{{ old('phone') }}" placeholder="Masukkan nomor telepon" 
+                            required pattern="[0-9]{10,20}"> <span class="error-message">Nomor telepon wajib diisi.</span>
                 </div>
 
                 <div class="form-group">
