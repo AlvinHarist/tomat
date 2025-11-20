@@ -144,7 +144,7 @@
                            required pattern="[0-9]{16}"> <span class="error-message">KTP harus 16 digit angka.</span>
                 </div>
 
-                <div class="form-group">
+                <!-- <div class="form-group">
                     <label>Unggah foto PIC</label>
                     <input type="file" name="photo"
                            required> <span class="error-message">Foto PIC wajib di-upload.</span>
@@ -154,6 +154,34 @@
                     <label>Unggah Foto KTP</label>
                     <input type="file" name="ktp_file"
                            required> <span class="error-message">Foto KTP wajib di-upload.</span>
+                </div> -->
+
+                <div class="form-group file-upload-wrapper">
+                    <label class="main-label">Unggah foto PIC</label>
+                    <div class="custom-file-input">
+                        <input type="file" name="photo" id="file-pic" required onchange="updateFileName(this, 'text-pic')">
+                        
+                        <label for="file-pic" class="file-button">
+                            <span class="icon">📂</span> Pilih File
+                        </label>
+                        
+                        <span id="text-pic" class="file-name">Belum ada file dipilih</span>
+                    </div>
+                    <span class="error-message">Foto PIC wajib di-upload.</span>
+                </div>
+
+                <div class="form-group file-upload-wrapper">
+                    <label class="main-label">Unggah Foto KTP</label>
+                    <div class="custom-file-input">
+                        <input type="file" name="ktp_file" id="file-ktp" required onchange="updateFileName(this, 'text-ktp')">
+                        
+                        <label for="file-ktp" class="file-button">
+                            <span class="icon">📂</span> Pilih KTP
+                        </label>
+                        
+                        <span id="text-ktp" class="file-name">Belum ada file dipilih</span>
+                    </div>
+                    <span class="error-message">Foto KTP wajib di-upload.</span>
                 </div>
 
                 <button type="submit" id="submit-button" disabled style="width: 100%; padding: 12px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">
@@ -303,6 +331,22 @@
             // Jalankan sekali di awal untuk reset tombol
             checkFormValidity();
         });
+
+        function updateFileName(input, textId) {
+                const fileNameDisplay = document.getElementById(textId);
+                
+                if (input.files && input.files.length > 0) {
+                    // Jika file dipilih, tampilkan namanya
+                    fileNameDisplay.textContent = input.files[0].name;
+                    fileNameDisplay.style.color = "#333"; // Warna teks jadi hitam (normal)
+                    fileNameDisplay.style.fontStyle = "normal";
+                } else {
+                    // Jika batal pilih
+                    fileNameDisplay.textContent = "Belum ada file dipilih";
+                    fileNameDisplay.style.color = "#666";
+                    fileNameDisplay.style.fontStyle = "italic";
+                }
+            }
         </script>
 </body>
 </html>
