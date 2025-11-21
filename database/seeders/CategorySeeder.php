@@ -14,11 +14,11 @@ class CategorySeeder extends Seeder
         $baseTime = Carbon::parse('2025-10-02 09:00:00'); // Mulai hari berikutnya
 
         $categories = [
-            ['id' => 1, 'name' => 'Elektronik'],
-            ['id' => 2, 'name' => 'Pakaian Pria'],
-            ['id' => 3, 'name' => 'Pakaian Wanita'],
-            ['id' => 4, 'name' => 'Kebutuhan Dapur'],
-            ['id' => 5, 'name' => 'Olahraga & Outdoor'],
+            ['id' => 1, 'name' => 'Elektronik', 'icon' => '💡'],
+            ['id' => 2, 'name' => 'Pakaian Pria', 'icon' => '👗'],
+            ['id' => 3, 'name' => 'Pakaian Wanita', 'icon' => '👗'],
+            ['id' => 4, 'name' => 'Kebutuhan Dapur', 'icon' => '🏠'],
+            ['id' => 5, 'name' => 'Olahraga & Outdoor', 'icon' => '🏃'],
         ];
 
         $data = [];
