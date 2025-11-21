@@ -21,17 +21,6 @@
             <p>Sudah punya akun? <br> <a href="#">Masuk</a></p>
             
             <form method="POST" action="{{ route('register.store') }}" enctype="multipart/form-data">                
-                @csrf @if ($errors->any())
-                    <div style="color: red; margin-bottom: 15px; background: #ffebee; padding: 10px; border-radius: 5px;">
-                        <strong>Whoops! Something went wrong.</strong>
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-                
                 <div class="form-group">
                     <label>Nama Toko</label>
                     <input id="store_input" type="text" name="store_name" value="{{ old('store_name') }}" placeholder="Masukkan nama toko"
@@ -177,7 +166,7 @@
 
             // 1. AMBIL ELEMEN (Gunakan try-catch atau check null agar aman)
             const form = document.querySelector('form');
-            const submitButton = document.querySelector('#submit-button'); // Pastikan ID ini ada di tombol submit
+            const submitButton = document.querySelector('#submit-button');
             const passwordInput = document.querySelector('#password');
 
             const storeInput = document.getElementById('store_input');

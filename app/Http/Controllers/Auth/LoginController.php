@@ -26,32 +26,24 @@ class LoginController extends Controller
         ]);
 
         $inputType = $request->input('login_identifier');
-        $password = $request->input('password');
-        $remember = $request->boolean('remember');
+    $password = $request->input('password');
+    $remember = $request->boolean('remember');
 
-        // Cek apakah inputnya format Email
-        if (filter_var($inputType, FILTER_VALIDATE_EMAIL)) {
-            // --- LOGIKA LOGIN VIA EMAIL ---
-            if (Auth::attempt(['email' => $inputType, 'password' => $password], $remember)) {
-                $request->session()->regenerate();
-                return redirect()->intended('dashboard'); // Ganti 'dashboard' sesuai kebutuhan
-            }
-        } else {
-            // --- LOGIKA LOGIN VIA NO HP ---
-            // 1. Cari di tabel seller_profiles dulu
-            $seller = Seller::where('phone', $inputType)->first();
-
-            if ($seller) {
-                // 2. Jika ketemu, ambil user_id-nya
-                $user = User::find($seller->user_id);
-
-                // 3. Cek password manual & login
-                if ($user && Auth::attempt(['email' => $user->email, 'password' => $password], $remember)) {
-                    $request->session()->regenerate();
-                    return redirect()->intended('dashboard');
-                }
-            }
+    // 1. Cek Login via Email (pic_email)
+    if (filter_var($inputType, FILTER_VALIDATE_EMAIL)) {
+        if (Auth::attempt(['pic_email' => $inputType, 'password' => $password], $remember)) {
+            $request->session()->regenerate();
+            return redirect()->intended('dashboard');
         }
+    } 
+    // 2. Cek Login via No HP (pic_phone)
+    else {
+        // Auth::attempt mencari kolom password otomatis, kita cuma perlu kasih 'identifier' yang benar
+        if (Auth::attempt(['pic_phone' => $inputType, 'password' => $password], $remember)) {
+            $request->session()->regenerate();
+            return redirect()->intended('dashboard');
+        }
+    }
 
         // Jika gagal login (email/hp atau password salah)
         return back()->withErrors([

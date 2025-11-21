@@ -2,22 +2,48 @@
 
 namespace App\Models;
 
+// Ganti pewarisan dari Model biasa menjadi Authenticatable
+use Illuminate\Foundation\Auth\User as Authenticatable; 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo; // <-- Tambahkan
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Concerns\HasUuids; // Agar ID otomatis UUID
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 
-class Seller extends Model
+class Seller extends Authenticatable implements MustVerifyEmail
 {
-    use HasFactory;
+    use HasFactory, Notifiable, HasUuids;
 
-    // Tambahkan ini agar bisa diisi
-    protected $guarded = [];
+    protected $table = 'sellers';
+    protected $primaryKey = 'id';
+    public $incrementing = false; // Karena UUID bukan integer auto-increment
+    protected $keyType = 'string';
 
-    /**
-     * Mendapatkan user yang memiliki profil ini.
-     */
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
+    // Sesuai Class Diagram (ditambah password untuk login teknis)
+    protected $fillable = [
+        'store_name',
+        'store_description',
+        'pic_name',
+        'pic_phone',
+        'pic_email',
+        'password', // Wajib ada untuk login, meski tidak eksplisit di diagram
+        'pic_street',
+        'pic_rt',
+        'pic_rw',
+        'pic_village',
+        'pic_city',
+        'pic_province',
+        'pic_ktp_number',
+        'pic_photo_path',
+        'pic_ktp_file_path',
+        'status',
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    protected $casts = [
+        'password' => 'hashed',
+    ];
 }
