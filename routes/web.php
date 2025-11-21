@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,3 +25,23 @@ Route::get('/', [RegisterController::class, 'showRegistrationForm'])->name('regi
 
 // Rute untuk memproses data saat formulir di-submit
 Route::post('/', [RegisterController::class, 'store'])->name('register.store');
+
+// Rute Login (Placeholder agar tidak error saat redirect)
+Route::get('/login', function () {
+    return "Halaman Login (Belum dibuat)";
+})->name('login');
+
+// Rute Verifikasi Email
+Route::get('/email/verify', function () {
+    return "Halaman Verifikasi Email (Belum dibuat)";
+})->middleware('auth')->name('verification.notice');
+
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+    return redirect('/');
+})->middleware(['auth', 'signed'])->name('verification.verify');
+
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+    return back()->with('message', 'Verification link sent!');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
