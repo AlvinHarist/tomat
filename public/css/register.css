@@ -81,3 +81,62 @@ button:disabled {
     color: #666666;
     cursor: not-allowed;
 }
+
+/* Style Dasar Label Judul */
+.main-label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+/* Wrapper agar rapi */
+.custom-file-input {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Jarak antara tombol dan teks */
+}
+
+/* 1. Sembunyikan Input Asli yang jelek */
+.custom-file-input input[type="file"] {
+    display: none;
+}
+
+/* 2. Buat Tombol Kustom (Hijau) */
+.file-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #28a745; /* Warna Hijau Sukses */
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: sans-serif;
+    font-size: 14px;
+    transition: background 0.3s;
+    border: 1px solid #218838;
+}
+
+/* Efek saat mouse di atas tombol */
+.file-button:hover {
+    background-color: #218838; /* Hijau lebih gelap */
+}
+
+/* 3. Style Teks Nama File (Bahasa Indonesia) */
+.file-name {
+    color: #666;
+    font-style: italic;
+    font-size: 0.9em;
+}
+
+/* Pesan Error (bawaan Anda) */
+.error-message {
+    display: block;
+    margin-top: 5px;
+    color: red;
+    font-size: 0.85em;
+}
+
+/* Tambahkan di style css Anda */
+input[name="err_msg"]:valid + .error-message {
+    display: none;
+}
