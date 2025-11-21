@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\HomeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,3 +25,18 @@ Route::get('/', [RegisterController::class, 'showRegistrationForm'])->name('regi
 
 // Rute untuk memproses data saat formulir di-submit
 Route::post('/', [RegisterController::class, 'store'])->name('register.store');
+
+Route::get('/login', function () {
+  return view('auth.register');
+})->name('login');
+
+Route::get('/home', [ProductController::class, 'index'])->name('home.index');
+
+Route::get('/product', function () {
+  return view('product.index');
+});
+
+// Product CRUD (resource)
+Route::resource('products', ProductController::class);
+
+Route::resource('products', ProductController::class);
