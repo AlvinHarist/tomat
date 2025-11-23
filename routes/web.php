@@ -7,7 +7,8 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ProductController;
-
+use App\Http\Controllers\Owner\Auth\LoginController as OwnerLoginController;
+use App\Http\Controllers\Owner\DashboardController as OwnerDashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,6 +48,21 @@ Route::middleware(['auth'])->group(function () {
                
     })->name('seller.dashboard'); // <--- PENTING: Nama ini harus sama dengan di LoginController
 
+});
+
+Route::prefix('owner')->name('owner.')->group(function () {
+    
+    // Login & Logout
+    Route::get('/login', [OwnerLoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [OwnerLoginController::class, 'login'])->name('login.submit');
+    Route::post('/logout', [OwnerLoginController::class, 'logout'])->name('logout');
+
+    // Dashboard (Protected by auth:owner middleware)
+    Route::get('/dashboard', [OwnerDashboardController::class, 'index'])->name('dashboard')->middleware('auth:owner');
+
+    Route::get('/sellers', [App\Http\Controllers\Owner\SellerController::class, 'index'])->name('sellers.index');
+    Route::get('/sellers/{id}', [App\Http\Controllers\Owner\SellerController::class, 'show'])->name('sellers.show');
+    Route::post('/sellers/{id}/status', [App\Http\Controllers\Owner\SellerController::class, 'updateStatus'])->name('sellers.updateStatus');
 });
 
 // Rute Verifikasi Email

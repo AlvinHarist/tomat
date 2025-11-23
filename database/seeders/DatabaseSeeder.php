@@ -17,15 +17,19 @@ class DatabaseSeeder extends Seeder
         DB::table('visitors')->truncate();
         DB::table('products')->truncate();
         DB::table('categories')->truncate();
+        DB::table('owners')->truncate();
         DB::table('sellers')->truncate();
 
         Schema::enableForeignKeyConstraints();
 
         // Panggil seeder individual (urutan dari 'induk' ke 'anak')
         $this->call([
-            SellerSeeder::class,
+            OwnerSeeder::class,
             CategorySeeder::class,
+            SellerSeeder::class,
             ProductSeeder::class,
+            VisitorSeeder::class,
+            CommentRatingSeeder::class,
         ]);
     }
 }
