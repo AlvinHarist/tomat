@@ -29,6 +29,9 @@ Route::post('/', [RegisterController::class, 'store'])->name('register.store');
 
 // Rute Login (Placeholder agar tidak error saat redirect)
 Route::get('/login', function () {
+    if (session('status')) {
+        return "<h1>" . session('status') . "</h1><p>Halaman Login (Belum dibuat)</p>";
+    }
     return "Halaman Login (Belum dibuat)";
 })->name('login');
 
