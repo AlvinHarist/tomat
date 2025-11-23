@@ -18,7 +18,7 @@
         <div class="right-panel">
             <div class="logo">ToMaT</div>
             <h2>Registrasi</h2>
-            <p>Sudah punya akun? <br> <a href="#">Masuk</a></p>
+            <p>Sudah punya akun? <br> <a href="/login">Masuk</a></p>
             
             <form method="POST" action="{{ route('register.store') }}" enctype="multipart/form-data">                
                 @csrf @if ($errors->any())
