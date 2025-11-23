@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('comment_ratings', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('product_id')->constrained('products')->onDelete('cascade');
-            $table->foreignUuid('visitor_id')->constrained('visitors')->onDelete('cascade');
+            $table->foreignUuid('visitor_id')->nullable()->constrained('visitors')->onDelete('cascade');
             
             $table->text('comment')->nullable();
             $table->integer('rating');

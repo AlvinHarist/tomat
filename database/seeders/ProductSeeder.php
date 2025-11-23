@@ -3,52 +3,94 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Carbon\Carbon; // <-- TAMBAHKAN INI
+use Illuminate\Support\Str;
+use App\Models\Product;
+use App\Models\Review;
+use App\Models\Category;
 
 class ProductSeeder extends Seeder
 {
     public function run(): void
     {
-        // (Data produk tetap sama persis seperti sebelumnya)
-        $products1 = [
-            ['id' => 1, 'store_id' => 1, 'category_id' => 1, 'name' => 'Laptop Super Cepat', 'description' => 'Laptop untuk gaming dan kerja.', 'price' => 15000000, 'stock' => 10],
-            ['id' => 2, 'store_id' => 1, 'category_id' => 2, 'name' => 'Kemeja Batik Premium', 'description' => 'Batik tulis asli Jogja.', 'price' => 250000, 'stock' => 50],
-            ['id' => 3, 'store_id' => 1, 'category_id' => 1, 'name' => 'Mouse Gaming RGB', 'description' => 'Mouse dengan 8 tombol macro.', 'price' => 450000, 'stock' => 25],
-            ['id' => 4, 'store_id' => 1, 'category_id' => 5, 'name' => 'Tenda Camping 4 Orang', 'description' => 'Tenda dome anti air.', 'price' => 750000, 'stock' => 15],
-            ['id' => 5, 'store_id' => 1, 'category_id' => 4, 'name' => 'Pisau Set Dapur (Isi 5)', 'description' => 'Pisau stainless steel anti karat.', 'price' => 200000, 'stock' => 30],
-            ['id' => 6, 'store_id' => 1, 'category_id' => 1, 'name' => 'Headphone Bluetooth V5.2', 'description' => 'Noise cancelling, bass mantap.', 'price' => 800000, 'stock' => 20],
-            ['id' => 7, 'store_id' => 1, 'category_id' => 5, 'name' => 'Sepatu Lari Pria', 'description' => 'Sol empuk, ringan dipakai.', 'price' => 550000, 'stock' => 40],
-        ];
-        $products2 = [
-            ['id' => 8, 'store_id' => 2, 'category_id' => 3, 'name' => 'Blouse Wanita Korea', 'description' => 'Bahan katun rayon adem.', 'price' => 150000, 'stock' => 100],
-            ['id' => 9, 'store_id' => 2, 'category_id' => 3, 'name' => 'Dress Pesta Brokat', 'description' => 'Tampil elegan di acara formal.', 'price' => 450000, 'stock' => 30],
-            ['id' => 10, 'store_id' => 2, 'category_id' => 3, 'name' => 'Celana Kulot Linen', 'description' => 'Nyaman untuk dipakai sehari-hari.', 'price' => 180000, 'stock' => 80],
-            ['id' => 11, 'store_id' => 2, 'category_id' => 3, 'name' => 'Tunik Muslimah Modern', 'description' => 'Desain simpel dan elegan.', 'price' => 220000, 'stock' => 50],
-            ['id' => 12, 'store_id' => 2, 'category_id' => 2, 'name' => 'Kaos Polos Pria (Putih)', 'description' => 'Cotton combed 30s.', 'price' => 75000, 'stock' => 200],
-            ['id' => 13, 'store_id' => 2, 'category_id' => 2, 'name' => 'Jaket Denim Pria', 'description' => 'Jaket jeans tebal dan awet.', 'price' => 350000, 'stock' => 40],
-            ['id' => 14, 'store_id' => 2, 'category_id' => 3, 'name' => 'Pashmina Ceruty Baby Doll', 'description' => 'Bahan jatuh dan mudah diatur.', 'price' => 45000, 'stock' => 150],
-            ['id' => 15, 'store_id' => 2, 'category_id' => 3, 'name' => 'Tas Selempang Wanita', 'description' => 'Tas kulit sintetis premium.', 'price' => 190000, 'stock' => 60],
-        ];
-        $products3 = [
-            ['id' => 16, 'store_id' => 3, 'category_id' => 4, 'name' => 'Set Spatula Silikon (Isi 3)', 'description' => 'Tahan panas dan aman untuk teflon.', 'price' => 90000, 'stock' => 70],
-            ['id' => 17, 'store_id' => 3, 'category_id' => 4, 'name' => 'Panci Presto 8 Liter', 'description' => 'Mengempukkan daging dalam 15 menit.', 'price' => 380000, 'stock' => 25],
-            ['id' => 18, 'store_id' => 3, 'category_id' => 4, 'name' => 'Bumbu Giling Lengkuas', 'description' => '100% lengkuas asli, kemasan 250gr.', 'price' => 25000, 'stock' => 100],
-            ['id' => 19, 'store_id' => 3, 'category_id' => 4, 'name' => 'Kopi Arabika Gayo 200gr', 'description' => 'Biji kopi fresh roast.', 'price' => 80000, 'stock' => 50],
-            ['id' => 20, 'store_id' => 3, 'category_id' => 1, 'name' => 'Blender Mini Portable', 'description' => 'Blender jus praktis, USB charge.', 'price' => 120000, 'stock' => 60],
-        ];
+        // Ambil hanya kategori yang tidak punya child (kategori akhir)
+        $leafCategories = Category::whereDoesntHave('children')->get();
 
-        $allProducts = array_merge($products1, $products2, $products3);
-        $data = [];
-        $baseTime = Carbon::parse('2025-10-05 08:00:00'); // Produk mulai dibuat
-
-        foreach ($allProducts as $index => $product) {
-            // Setiap produk dibuat dengan jeda 6 jam
-            $product['created_at'] = $baseTime->copy()->addHours($index * 6);
-            $product['updated_at'] = $product['created_at'];
-            $data[] = $product;
+        if ($leafCategories->count() === 0) {
+            $this->command->warn("Tidak ditemukan kategori leaf. Jalankan CategorySeeder dulu.");
+            return;
         }
 
-        DB::table('products')->insert($data);
+        $productNames = [
+            'Monitor Portabel 8 Inch IPS USB Display',
+            'Headphone Wireless Bluetooth HD Audio',
+            'Keyboard Mechanical RGB 87 Keys',
+            'Tas Selempang Kanvas Waterproof',
+            'Smartwatch Fitness Tracker OLED Display',
+            'Kamera Mini HD 1080p Motion Detection',
+            'Bluetooth Speaker Bass Boost',
+            'Tripod Kamera Portable Aluminium',
+            'Webcam Full HD 1080p Autofocus',
+            'Charger USB Fast Charging 3A',
+            'Powerbank 20000mAh Quickcharge',
+            'Lampu LED Smart RGB Wifi Control',
+            'Flashdisk 64GB USB 3.0 High Speed',
+            'Mouse Wireless Ergonomic Silent Click',
+            'Router Wifi Dual Band High Speed',
+            'SSD NVMe 256GB Ultra Fast',
+            'Microphone Podcast Condenser USB',
+            'Gaming Mousepad XXL Anti Slip',
+            'Cooling Pad Laptop 5 Fan RGB',
+            'Drone Mini Camera 4K Ultra HD',
+            'Printer Inkjet Wireless Home Office',
+            'TV Box Android 4K Streaming Player',
+            'Kipas Angin Portable Rechargeable',
+            'Mesin Pembuat Kopi Mini Travel',
+            'Timbangan Digital Portable Akurat',
+        ];
+
+        $sampleComments = [
+            "Barangnya bagus, sesuai deskripsi!",
+            "Kualitas oke, harga terjangkau.",
+            "Pengiriman cepat dan rapi.",
+            "Lumayan, tapi ada sedikit cacat.",
+            "Sangat puas! Produk premium.",
+            "Seller responsif, rekomendasi.",
+            "Performa bagus, sesuai ekspektasi.",
+            "Barang ori, packing aman.",
+            "Sesuai harga, tidak mengecewakan.",
+            "Top banget, akan beli lagi!",
+        ];
+
+        foreach ($productNames as $name) {
+
+            // Pilih kategori leaf secara acak
+            $category = $leafCategories->random();
+
+            // Buat produk
+            $product = Product::create([
+                'id'          => Str::uuid(),
+                'name'        => $name,
+                'description' => "Deskripsi produk: {$name}. Produk berkualitas tinggi.",
+                'price'       => rand(50000, 500000),
+                'stock'       => rand(5, 100),
+
+                'category_id' => $category->id,
+                'seller_id'   => null,
+                'images'      => null,
+            ]);
+
+            // Generate antara 1–5 komentar
+            $totalComments = rand(1, 5);
+
+            for ($i = 0; $i < $totalComments; $i++) {
+                Review::create([
+                    'id'         => Str::uuid(),
+                    'product_id' => $product->id,
+                    'visitor_id' => null,
+                    'comment'    => $sampleComments[array_rand($sampleComments)],
+                    'rating'     => rand(3, 5),
+                ]);
+            }
+        }
     }
 }

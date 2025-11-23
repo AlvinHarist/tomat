@@ -1,0 +1,37 @@
+@import url("https://fonts.googleapis.com/css2?family=Pacifico&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --font-pacifico: "Pacifico", cursive;
+}
+
+/* Tombol default: berada di tengah sedikit */
+#banner-slider .banner-nav-btn {
+    @apply absolute top-1/2 -translate-y-1/2 bg-white/80 text-gray-700 
+           rounded-full p-2 shadow-md opacity-0 transition-all duration-500
+           hover:bg-white hover:shadow-lg cursor-pointer;
+
+    transform: translateY(0) translateX(0);
+}
+
+/* Prev awalnya di tengah sedikit → bergerak ke kiri */
+#banner-slider:hover #banner-prev {
+    transform: translateY(0) translateX(-10px);
+    opacity: 1;
+}
+
+/* Next awalnya di tengah sedikit → bergerak ke kanan */
+#banner-slider:hover #banner-next {
+    transform: translateY(0) translateX(10px);
+    opacity: 1;
+}
+
+.cat-btn {
+    @apply absolute top-1/2 -translate-y-1/2 bg-white/80 text-gray-700 
+           rounded-full p-2 shadow-md opacity-0 transition-all duration-300
+           hover:bg-white hover:shadow-lg cursor-pointer z-10;
+}
+
+.relative:hover .cat-btn {
+    @apply opacity-100;
+}

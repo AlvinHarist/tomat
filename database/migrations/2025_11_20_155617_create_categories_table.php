@@ -11,8 +11,20 @@ return new class extends Migration
         Schema::create('categories', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name');
+            $table->string('slug')->unique();
             $table->text('description')->nullable();
+            $table->uuid('parent_id')->nullable();
+            $table->integer('level')->default(1);
+            $table->integer('sort_order')->default(0);
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
+
+            // Foreign key constraint untuk parent_id
+            $table->foreign('parent_id')
+                  ->references('id')
+                  ->on('categories')
+                  ->onDelete('cascade')
+                  ->onUpdate('cascade');
         });
     }
 
