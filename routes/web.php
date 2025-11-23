@@ -1,12 +1,14 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\RegisterController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ProductController;
+use App\Mail\SendTestEmail;
 
 
 /*
@@ -63,6 +65,12 @@ Route::post('/email/verification-notification', function (Request $request) {
     $request->user()->sendEmailVerificationNotification();
     return back()->with('message', 'Verification link sent!');
 })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+
+
+Route::get('send-mail', function() {
+    $message = 'Salam Tomat';
+    Mail::to('alvin.harist502@gmail.com')->send(new SendTestEmail($message));
+});
 
 Route::get('/home', [ProductController::class, 'index'])->name('home');
 Route::resource('product', ProductController::class)->except(['index']);
