@@ -13,13 +13,17 @@ class DatabaseSeeder extends Seeder
         Schema::disableForeignKeyConstraints();
 
         // Kosongkan tabel (urutan dari 'anak' ke 'induk')
+        DB::table('comment_ratings')->truncate();
+        DB::table('visitors')->truncate();
         DB::table('products')->truncate();
         DB::table('categories')->truncate();
+        DB::table('sellers')->truncate();
 
         Schema::enableForeignKeyConstraints();
 
         // Panggil seeder individual (urutan dari 'induk' ke 'anak')
         $this->call([
+            SellerSeeder::class,
             CategorySeeder::class,
             ProductSeeder::class,
         ]);
