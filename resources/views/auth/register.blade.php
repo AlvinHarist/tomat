@@ -6,7 +6,12 @@
     <title>Registrasi ToMaT</title>
 
     <link rel="stylesheet" href="{{ asset('css/register.css') }}">
-
+    <style>
+        #submit-button:disabled {
+            background-color: #cccccc !important;
+            cursor: not-allowed;
+        }
+    </style>
     </head>
 <body>
     <div class="container">
@@ -163,7 +168,7 @@
                     <span class="error-message">Foto KTP wajib di-upload.</span>
                 </div>
 
-                <button type="submit" id="submit-button" disabled style="width: 100%; padding: 12px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">
+                <button type="submit" id="submit-button" style="width: 100%; padding: 12px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">
                     Daftar
                 </button>
 
@@ -422,16 +427,30 @@
                         confirmPasswordError.style.display = 'none';
                     }
                 }
-
-                // Aktifkan/Matikan Tombol
-                if (isFormValid && isPasswordMatch && isPasswordComplex) {
-                    submitButton.disabled = false;
-                } else {
-                    submitButton.disabled = true;
-                }
             }
 
             // --- EVENT LISTENER ---
+
+            // Tambahkan listener submit untuk validasi akhir
+            if (form) {
+                form.addEventListener('submit', function(event) {
+                    // Cek Password Complexity
+                    if (!isPasswordComplex) {
+                        event.preventDefault();
+                        alert('Password belum memenuhi syarat (Minimal 8 karakter, Huruf besar, kecil, angka, dan simbol).');
+                        passwordInput.focus();
+                        return;
+                    }
+                    
+                    // Cek Password Match
+                    if (passwordInput.value !== confirmPasswordInput.value) {
+                        event.preventDefault();
+                        alert('Konfirmasi password tidak cocok.');
+                        confirmPasswordInput.focus();
+                        return;
+                    }
+                });
+            }
 
             if (passwordInput) {
                 // 1. Saat user klik kolom password (Focus)
@@ -450,6 +469,7 @@
             const inputs = form ? form.querySelectorAll('input, textarea, select') : [];
             inputs.forEach(function(input) {
                 input.addEventListener('input', checkFormValidity);
+                input.addEventListener('change', checkFormValidity); // Tambahkan listener change untuk file upload
             });
 
             // Listener Toggle Mata (Password)

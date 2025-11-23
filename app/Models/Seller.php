@@ -10,6 +10,9 @@ class Seller extends Model
 {
     use HasFactory;
 
+    public $incrementing = false;
+    protected $keyType = 'string';
+
     // Tambahkan ini agar bisa diisi
     protected $guarded = [];
 
