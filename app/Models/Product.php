@@ -2,39 +2,41 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class Product extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuids;
 
+    // penamaan tabel di database
     protected $table = 'products';
 
+    // kolom dapat diisi insert
     protected $fillable = [
-        'store_id',
+        'seller_id',
         'category_id',
         'name',
         'description',
         'price',
         'stock',
-        'main_image',
+        'images',
     ];
 
+    // casting sesuai migrasi tabel
     protected $casts = [
-        'price' => 'integer',
-        'stock' => 'integer',
+        'images' => 'array',
+        'price'  => 'double',
     ];
 
-    protected $guarded = [];
-
-    public function store(): BelongsTo
+    // relasi model lain
+    public function seller()
     {
-        return $this->belongsTo(Store::class);
+        return $this->belongsTo(Seller::class);
     }
 
-    public function category(): BelongsTo
+    public function category()
     {
         return $this->belongsTo(Category::class);
     }

@@ -1,4 +1,17 @@
 @php
+    use Illuminate\Support\Collection;
+
+    $categories = collect([
+        (object) ['id' => 1, 'name' => 'Elektronik', 'products_count' => 58],
+        (object) ['id' => 2, 'name' => 'Fashion', 'products_count' => 45],
+        (object) ['id' => 3, 'name' => 'Olahraga', 'products_count' => 22],
+        (object) ['id' => 4, 'name' => 'Kecantikan', 'products_count' => 37],
+        (object) ['id' => 5, 'name' => 'Rumah Tangga', 'products_count' => 19],
+        (object) ['id' => 6, 'name' => 'Aksesoris', 'products_count' => 24],
+    ]);
+@endphp
+
+@php
     // Contoh data banner (boleh diganti dari DB)
     $banners = [
         'https://picsum.photos/id/1015/1200/400',
@@ -47,108 +60,134 @@
             <button
                 type="button"
                 id="banner-prev"
-                class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white rounded-full p-2 shadow-md backdrop-blur flex items-center justify-center"
+                class="banner-nav-btn left-3"
                 aria-label="Sebelumnya"
             >
-                ‹
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
             </button>
 
             {{-- Tombol Kanan --}}
             <button
                 type="button"
                 id="banner-next"
-                class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white rounded-full p-2 shadow-md backdrop-blur flex items-center justify-center"
+                class="banner-nav-btn right-3"
                 aria-label="Berikutnya"
             >
-                ›
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
             </button>
+
+            {{-- DOT INDICATORS --}}
+            <div id="banner-dots" class="absolute bottom-3 left-3 flex gap-1.5 z-10">
+                @foreach ($banners as $banner)
+                    <span class="w-2.5 h-2.5 rounded-full bg-white/40 backdrop-blur-sm"></span>
+                @endforeach
+            </div>
         </div>
     </div>
 
-    {{-- CATEGORY SECTION --}}
-    <section class="max-w-5xl mx-auto space-y-6 mb-10">
-        {{-- Baris 1: Title "Category" --}}
-        <div>
-            <h2 class="text-2xl font-semibold text-gray-800">Category</h2>
-        </div>
+    {{-- KATEGORI PILIHAN (ala Tokopedia) --}}
+    <section class="max-w-7xl mx-auto mb-10">
+        <div class="bg-white rounded-2xl shadow-md p-5 space-y-5">
 
-        {{-- Baris 2: Card category spesifik (dummy, gambar di atas, teks di bawah) --}}
-        <div class="space-y-3">
-            <p class="text-sm text-gray-500">Category spesifik</p>
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                @foreach ($specificCategories as $category)
-                    <div class="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-                        <img
-                            src="{{ $category['image'] }}"
-                            alt="{{ $category['name'] }}"
-                            class="w-full h-28 sm:h-32 object-cover"
-                        >
-                        <div class="p-3 text-center">
-                            <span class="text-sm font-medium text-gray-800">
-                                {{ $category['name'] }}
-                            </span>
+            {{-- Header --}}
+            <div class="flex items-center justify-between">
+                <h2 class="text-2xl font-bold text-gray-800">
+                    Selected Category
+                </h2>
+                <a href="#" class="text-xs sm:text-sm text-green-600 hover:underline">Lihat Semua</a>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+                @foreach ($specificCategories as $item)
+                    <div
+                        class="bg-white rounded-xl border border-gray-200
+                              hover:shadow-sm flex flex-col items-center p-3 cursor-pointer
+                              transition-all duration-200"
+                    >
+                        <div class="w-20 h-20 sm:w-24 sm:h-24 mb-2">
+                            <img
+                                src="{{ $item['image'] }}"
+                                alt="{{ $item['name'] }}"
+                                class="w-full h-full object-cover rounded-lg"
+                            >
                         </div>
+                        <p class="text-xs sm:text-sm font-medium text-gray-800 text-center leading-tight">
+                            {{ $item['name'] }}
+                        </p>
                     </div>
                 @endforeach
             </div>
-        </div>
 
-        {{-- Baris 3: Card category general (dari DB, icon kiri, teks kanan, rounded) --}}
-        <div class="space-y-3">
-            <p class="text-sm text-gray-500">Category general</p>
+            <div class="pt-3">
+              <div class="flex flex-wrap gap-2 sm:gap-3 justify-center">
 
-            <div class="flex flex-wrap gap-3">
-                {{-- Tombol "Semua Kategori" --}}
-                <a
-                    href="{{ route('home.index', [
-                        'q'        => request('q'),
-                        'province' => request('province'),
-                    ]) }}"
-                    class="flex items-center gap-2 px-4 py-2 rounded-full text-sm shadow-sm
-                        {{ request('category') ? 'bg-white text-gray-800' : 'bg-blue-600 text-white' }}"
-                >
-                    <span class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100">
-                        🔄
-                    </span>
-                    <span>Semua Kategori</span>
-                </a>
+                  {{-- Chip "Semua Kategori" --}}
+                  <a
+                      href="{{ route('home', [
+                          'q'        => request('q'),
+                          'province' => request('province'),
+                      ]) }}"
+                      class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm
+                            border border-gray-200 bg-white text-gray-800 shadow-sm
+                            hover:bg-gray-50 transition-all duration-200"
+                  >
+                      <span class="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 text-gray-500">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h10M4 18h6" />
+                          </svg>
+                      </span>
+                      <span class="font-medium whitespace-nowrap">Kategori</span>
+                  </a>
 
-                {{-- Daftar kategori dari DB --}}
-                @foreach ($categories as $category)
-                    @php
-                        $active = (int) request('category') === $category->id;
-                    @endphp
+                  {{-- Chip kategori dari DB --}}
+                  @foreach ($categories as $category)
+                      @php
+                          $active = (int) request('category') === $category->id;
+                      @endphp
 
-                    <a
-                        href="{{ route('home.index', [
-                            'category' => $category->id,
-                            'q'        => request('q'),
-                            'province' => request('province'),
-                        ]) }}"
-                        class="flex items-center gap-2 px-4 py-2 rounded-full text-sm shadow-sm
-                            {{ $active ? 'bg-blue-600 text-white' : 'bg-white text-gray-800 hover:bg-gray-50' }}"
-                    >
-                        <span class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-xs font-semibold">
-                            {{ strtoupper(mb_substr($category->name, 0, 1)) }}
-                        </span>
-                        <span>{{ $category->name }}</span>
+                      <a
+                          href="{{ route('home', [
+                              'category' => $category->id,
+                              'q'        => request('q'),
+                              'province' => request('province'),
+                          ]) }}"
+                          class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm
+                                shadow-sm transition-all duration-200
 
-                        @if(isset($category->products_count))
-                            <span class="text-[11px] text-gray-400">
-                                ({{ $category->products_count }})
-                            </span>
-                        @endif
-                    </a>
-                @endforeach
+                                {{-- ACTIVE: Hijau premium (jika ingin putih juga bisa saya ubah) --}}
+                                {{ $active
+                                      ? 'bg-green-600 text-white border-green-600 hover:bg-green-700'
+                                      : 'bg-white text-gray-800 border border-gray-200 hover:bg-gray-50' }}"
+                      >
+
+                          <span class="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 text-xs font-semibold text-gray-700">
+                              {{ strtoupper(mb_substr($category->name, 0, 1)) }}
+                          </span>
+
+                          <span class="font-medium whitespace-nowrap">{{ $category->name }}</span>
+
+                          @if(isset($category->products_count))
+                              <span class="text-[11px] text-gray-400">({{ $category->products_count }})</span>
+                          @endif
+
+                      </a>
+                  @endforeach
+
+              </div>
             </div>
+
         </div>
     </section>
 
     {{-- PRODUCT SECTION --}}
-    <section class="max-w-5xl mx-auto space-y-4 mb-12">
+    <section class="max-w-7xl mx-auto space-y-4 mb-2">
         <div class="flex items-center justify-between">
             <div>
-                <h2 class="text-2xl font-semibold text-gray-800">Produk</h2>
+                <h2 class="text-2xl font-bold text-gray-800">Product</h2>
 
                 @if(request('q') || request('category') || request('province'))
                     <p class="text-xs text-gray-500 mt-1">
@@ -169,92 +208,162 @@
                 @endif
             </div>
 
-            <a href="{{ route('home.index') }}" class="text-sm text-blue-600 hover:underline">
+            <a href="{{ route('home') }}" class="text-sm text-green-600 hover:underline">
                 Reset filter
             </a>
         </div>
 
         {{-- Grid produk: max 6 kolom, tumbuh ke bawah --}}
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
-            @forelse ($products as $product)
-                <a href="{{ route('products.show', $product) }}"
-                   class="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col">
-                    {{-- Gambar produk --}}
-                    <div class="w-full h-32 sm:h-36 md:h-40 overflow-hidden">
-                        <img
-                            src="{{ asset($product->main_image) }}"
-                            alt="{{ $product->name }}"
-                            class="w-full h-full object-cover"
-                        >
-                    </div>
-
-                    {{-- Detail produk --}}
-                    <div class="p-3 flex flex-col gap-1 flex-1">
-                        {{-- Nama --}}
-                        <h3 class="text-sm font-semibold text-gray-900 line-clamp-2">
-                            {{ $product->name }}
-                        </h3>
-
-                        {{-- Harga --}}
-                        <div class="text-sm font-bold text-orange-600 mt-1">
-                            Rp {{ number_format($product->price, 0, ',', '.') }}
-                        </div>
-
-                        {{-- (opsional) Rating & lokasi bisa ditambahkan di sini --}}
-                    </div>
-                </a>
-            @empty
+        <div id="product-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
+            @if($products->count() > 0)
+              @include('components.product-cards', ['products' => $products])
+            @else
                 <p class="text-gray-500 text-sm col-span-full">
                     Tidak ada produk yang cocok dengan filter.
                 </p>
-            @endforelse
+            @endif
         </div>
 
-        <div>
-            {{ $products->links() }}
-        </div>
+        @if ($products instanceof \Illuminate\Pagination\AbstractPaginator && $products->hasMorePages())
+            <div class="flex justify-center mt-6">
+                <button
+                    id="load-more"
+                    class="px-6 py-2 text-sm font-medium 
+                          bg-white text-green-600 
+                          border border-green-600 
+                          rounded-full shadow-sm
+                          hover:bg-green-50 hover:shadow-md 
+                          transition"
+                    data-next-page="{{ $products->currentPage() + 1 }}"
+                >
+                    Show more
+                </button>
+            </div>
+        @endif
     </section>
 @endsection
 
 @push('scripts')
-<script>
+  <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const track = document.getElementById('banner-track');
-        const prevBtn = document.getElementById('banner-prev');
-        const nextBtn = document.getElementById('banner-next');
-        const slides = track.children;
-        const total = slides.length;
+    const track    = document.getElementById('banner-track');
+    const prevBtn  = document.getElementById('banner-prev');
+    const nextBtn  = document.getElementById('banner-next');
+    const slides   = track.children;
+    const total    = slides.length;
 
-        let index = 0;
+    const dotsContainer = document.getElementById('banner-dots');
+    const dots = dotsContainer.children;
 
-        function updateSlide() {
-            track.style.transform = `translateX(-${index * 100}%)`;
+    let index = 0;
+    let autoSlide = null;
+
+    function updateSlide() {
+        track.style.transform = `translateX(-${index * 100}%)`;
+        updateDots();
+    }
+
+    function updateDots() {
+        for (let i = 0; i < dots.length; i++) {
+            dots[i].classList.remove('bg-white');
+            dots[i].classList.remove('opacity-100');
+
+            dots[i].classList.add('bg-white/40'); // default
         }
 
-        if (total <= 1) {
-            prevBtn.classList.add('hidden');
-            nextBtn.classList.add('hidden');
-        }
+        dots[index].classList.remove('bg-white/40');
+        dots[index].classList.add('bg-white');     // dot aktif
+        dots[index].classList.add('opacity-100');
+    }
 
-        prevBtn.addEventListener('click', function () {
-            index = (index - 1 + total) % total;
-            updateSlide();
-        });
+    function startAutoSlide() {
+        if (total <= 1) return;
 
-        nextBtn.addEventListener('click', function () {
+        if (autoSlide) clearInterval(autoSlide);
+
+        autoSlide = setInterval(() => {
             index = (index + 1) % total;
             updateSlide();
-        });
+        }, 5000);
+    }
 
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'ArrowLeft') {
+    if (total > 1) startAutoSlide();
+    updateDots(); // inisialisasi dot pertama
+
+    prevBtn.addEventListener('click', function () {
+        index = (index - 1 + total) % total;
+        updateSlide();
+        startAutoSlide();
+    });
+
+    nextBtn.addEventListener('click', function () {
+        index = (index + 1) % total;
+        updateSlide();
+        startAutoSlide();
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowLeft') {
                 index = (index - 1 + total) % total;
                 updateSlide();
+                startAutoSlide();
             } else if (e.key === 'ArrowRight') {
                 index = (index + 1) % total;
                 updateSlide();
+                startAutoSlide();
             }
         });
+
+    const loadMoreBtn = document.getElementById('load-more');
+    const productGrid = document.getElementById('product-grid');
+
+    if (loadMoreBtn && productGrid) {
+        loadMoreBtn.addEventListener('click', function () {
+            const button = this;
+            const nextPage = button.dataset.nextPage;
+
+            // optional: state loading
+            button.disabled = true;
+            button.textContent = 'Loading...';
+
+            const url = new URL("{{ route('home') }}", window.location.origin);
+            url.searchParams.set('page', nextPage);
+
+            @if(request('q'))
+                url.searchParams.set('q', "{{ request('q') }}");
+            @endif
+            @if(request('category'))
+                url.searchParams.set('category', "{{ request('category') }}");
+            @endif
+            @if(request('province'))
+                url.searchParams.set('province', "{{ request('province') }}");
+            @endif
+
+            fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                productGrid.insertAdjacentHTML('beforeend', data.html);
+
+                if (data.has_more) {
+                    button.dataset.nextPage = data.next_page;
+                    button.disabled = false;
+                    button.textContent = 'Show more';
+                } else {
+                    button.remove();
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                button.disabled = false;
+                button.textContent = 'Show more';
+            });
+        });
+    }
     });
-</script>
+  </script>
 @endpush

@@ -11,8 +11,8 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->uuid('id')->primary();
             
-            $table->foreignUuid('seller_id')->constrained('sellers')->onDelete('cascade');
-            $table->foreignUuid('category_id')->constrained('categories')->onDelete('cascade');
+            $table->foreignUuid('seller_id')->nullable()->constrained('sellers')->onDelete('cascade');
+            $table->foreignUuid('category_id')->nullable()->constrained('categories')->onDelete('cascade');
             
             $table->string('name');
             $table->text('description')->nullable();

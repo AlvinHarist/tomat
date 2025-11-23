@@ -1,7 +1,10 @@
-@extends('layouts.simple-template')
+@extends('layouts.app')
 
 @section('content')
-<div class="max-w-6xl mx-auto space-y-10">
+<div class="max-w-6xl mx-auto space-y-10 mt-12">
+    <div class="max-w-6xl mx-auto mt-6">
+        <x-breadcrumb :items="$breadcrumbs" />
+    </div>
 
     {{-- CONTAINER 1: gambar + deskripsi + spesifikasi --}}
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -25,7 +28,16 @@
                 </div>
 
                 @php
+                    // rata-rata dari semua ulasan
                     $avgRating = $product->reviews->avg('rating');
+
+                    // rating yang sedang difilter (misal ?rating=5)
+                    $selectedRating = request('rating');
+
+                    // ulasan yang akan ditampilkan (filtered)
+                    $filteredReviews = $selectedRating
+                        ? $product->reviews->where('rating', (int) $selectedRating)
+                        : $product->reviews;
                 @endphp
 
                 @if ($avgRating)
@@ -69,24 +81,55 @@
         <h2 class="text-xl font-semibold">Ulasan & Rating</h2>
 
         @if ($avgRating)
-            <div class="flex items-center gap-4">
-                <div class="text-4xl font-bold text-yellow-500">
-                    {{ number_format($avgRating, 1) }}
+            <div class="flex items-center justify-between flex-wrap gap-4">
+                {{-- Rata-rata rating --}}
+                <div class="flex items-center gap-4">
+                    <div class="text-4xl font-bold text-yellow-500">
+                        {{ number_format($avgRating, 1) }}
+                    </div>
+
+                    <div>
+                        <div class="flex">
+                            @for ($i = 1; $i <= 5; $i++)
+                                @if ($i <= floor($avgRating))
+                                    <span class="text-yellow-400 text-xl">★</span>
+                                @else
+                                    <span class="text-gray-300 text-xl">★</span>
+                                @endif
+                            @endfor
+                        </div>
+                        <p class="text-sm text-gray-500">
+                            Dari {{ $product->reviews->count() }} ulasan
+                            @if($selectedRating)
+                                <span class="text-gray-400">
+                                    • Menampilkan hanya bintang {{ $selectedRating }}
+                                    ({{ $filteredReviews->count() }} ulasan)
+                                </span>
+                            @endif
+                        </p>
+                    </div>
                 </div>
 
-                <div>
-                    <div class="flex">
-                        @for ($i = 1; $i <= 5; $i++)
-                            @if ($i <= floor($avgRating))
-                                <span class="text-yellow-400 text-xl">★</span>
-                            @else
-                                <span class="text-gray-300 text-xl">★</span>
-                            @endif
-                        @endfor
-                    </div>
-                    <p class="text-sm text-gray-500">
-                        Dari {{ $product->reviews->count() }} ulasan
-                    </p>
+                {{-- FILTER BERDASARKAN BINTANG --}}
+                <div class="flex items-center gap-2">
+                    {{-- Tombol "Semua" --}}
+                    <a href="{{ route('product.show', $product->id) }}"
+                      class="px-3 py-1.5 text-xs sm:text-sm rounded-full border
+                              {{ $selectedRating ? 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50' : 'bg-green-600 text-white border-green-600' }}">
+                        Semua
+                    </a>
+
+                    {{-- Tombol 5 → 1 bintang --}}
+                    @for ($star = 5; $star >= 1; $star--)
+                        <a href="{{ request()->fullUrlWithQuery(['rating' => $star]) }}"
+                          class="px-3 py-1.5 text-xs sm:text-sm rounded-full border inline-flex items-center gap-1
+                                  {{ (int)$selectedRating === $star
+                                        ? 'bg-green-600 text-white border-green-600'
+                                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50' }}">
+                            <span>{{ $star }}</span>
+                            <span class="text-yellow-400">★</span>
+                        </a>
+                    @endfor
                 </div>
             </div>
         @else
@@ -95,8 +138,9 @@
 
         <hr>
 
+        {{-- DAFTAR ULASAN (TERFILTER) --}}
         <div class="space-y-4">
-            @forelse ($product->reviews as $review)
+            @forelse ($filteredReviews as $review)
                 <div class="border rounded-lg p-4 bg-gray-50">
                     <div class="flex items-center justify-between">
                         <strong>{{ $review->user->name ?? 'User' }}</strong>
@@ -118,7 +162,13 @@
                     <p class="text-gray-700 mt-2">{{ $review->comment }}</p>
                 </div>
             @empty
-                <p class="text-gray-500">Belum ada ulasan.</p>
+                <p class="text-gray-500">
+                    @if($selectedRating)
+                        Belum ada ulasan dengan rating {{ $selectedRating }} bintang.
+                    @else
+                        Belum ada ulasan.
+                    @endif
+                </p>
             @endforelse
         </div>
     </div>
@@ -129,7 +179,7 @@
 
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
             @foreach ($recommendations as $item)
-                <a href="{{ route('products.show', $item->id) }}"
+                <a href="{{ route('product.show', $item->id) }}"
                    class="bg-white rounded-xl shadow-sm hover:shadow-md transition p-3 block">
                     <img src="{{ asset($item->main_image) }}"
                          class="w-full h-32 object-cover rounded-lg"

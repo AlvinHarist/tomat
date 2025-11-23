@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
-use App\Models\Store;
+use App\Models\Seller;
 use App\Models\Category;
 use Illuminate\Support\Facades\Storage;
 
@@ -12,11 +12,11 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $search     = $request->input('q');
+        $search = $request->input('q');
         $categoryId = $request->input('category');
-        $province    = $request->input('province');
+        $province = $request->input('province');
 
-        $query = Product::with(['category', 'store', 'reviews']);
+        $query = Product::with(['category', 'seller']);
 
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
@@ -30,12 +30,24 @@ class ProductController extends Controller
         }
 
         if (!empty($province)) {
-            $query->whereHas('store', function ($q) use ($province) {
-                $q->where('province', $province);
+            $query->whereHas('seller', function ($q) use ($province) {
+                $q->where('pic_province', $province);
             });
         }
 
         $products = $query->latest()->paginate(12)->withQueryString();
+
+        if ($request->ajax()) {
+            $html = view('components.product-cards', [
+                'products' => $products,
+            ])->render();
+
+            return response()->json([
+                'html'      => $html,
+                'next_page' => $products->currentPage() + 1,
+                'has_more'  => $products->hasMorePages(),
+            ]);
+        }
 
         $categories = Category::withCount('products')
             ->orderBy('name')
@@ -81,14 +93,54 @@ class ProductController extends Controller
 
     public function show(Product $product)
     {
-        $product->load(['store', 'category', 'reviews']);
+        // eager load category + parent chain biar nggak N+1
+        $product->load([
+            'category.parent.parent', // sesuaikan kedalaman
+            'reviews',                // kalau dipakai
+        ]);
 
-        $recommendations = Product::where('category_id', $product->category_id)
-            ->where('id', '!=', $product->id)
+        // Kumpulkan jejak kategori dari root → current category
+        $categoryBreadcrumbs = $product->category
+            ? $product->category->getBreadcrumbs()   // method dari model Category kamu
+            : collect();
+
+        // Susun array untuk komponen breadcrumb
+        $breadcrumbs = [];
+
+        // 1) Home
+        $breadcrumbs[] = [
+            'label' => 'Home',
+            'url'   => route('home'),
+        ];
+
+        // 2) Setiap kategori dari root sampai kategori produk
+        //    Link-nya aku arahkan ke home dengan filter ?category=...
+        foreach ($categoryBreadcrumbs as $cat) {
+            $breadcrumbs[] = [
+                'label' => $cat->name,
+                'url'   => route('home', [
+                    'category' => $cat->id,
+                ]),
+            ];
+        }
+
+        // 3) Terakhir: nama produk (tanpa URL)
+        $breadcrumbs[] = [
+            'label' => $product->name,
+            'url'   => null,
+        ];
+
+        // contoh rekomendasi saja, sesuaikan punyamu
+        $recommendations = Product::where('id', '!=', $product->id)
+            ->inRandomOrder()
             ->limit(6)
             ->get();
 
-        return view('product.index', compact('product', 'recommendations'));
+        return view('product.index', [
+            'product'         => $product,
+            'recommendations' => $recommendations,
+            'breadcrumbs'     => $breadcrumbs,
+        ]);
     }
 
     public function edit(Product $product)
