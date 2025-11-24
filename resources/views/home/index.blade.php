@@ -33,27 +33,15 @@
             'name' => 'Camera',
             'image' => 'https://picsum.photos/id/301/400/250',
         ],
-        [
-            'name' => 'Camera',
-            'image' => 'https://picsum.photos/id/301/400/250',
-        ],
-        [
-            'name' => 'Camera',
-            'image' => 'https://picsum.photos/id/301/400/250',
-        ],
-        [
-            'name' => 'Camera',
-            'image' => 'https://picsum.photos/id/301/400/250',
-        ]
     ];
 @endphp
 
-@extends('layouts.app')
+@extends('layouts.simple-template')
 
 @section('content')
     {{-- BANNER SLIDER --}}
-    <div class="w-full flex justify-center mb-8 mt-12">
-        <div class="relative w-full max-w-7xl overflow-hidden rounded-xl shadow" id="banner-slider">
+    <div class="w-full flex justify-center mb-8">
+        <div class="relative w-full max-w-5xl overflow-hidden rounded-xl shadow" id="banner-slider">
 
             {{-- Track semua slide --}}
             <div class="flex transition-transform duration-500 ease-out" id="banner-track">
