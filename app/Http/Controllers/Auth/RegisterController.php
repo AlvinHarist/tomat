@@ -22,6 +22,18 @@ class RegisterController extends Controller
 
     public function store(Request $request)
     {
+        // Check if seller with this email was previously rejected - allow re-registration
+        $existingSeller = Seller::where('pic_email', $request->email)->first();
+        if ($existingSeller && $existingSeller->status === 'REJECTED') {
+            // Delete old rejected seller and user records
+            $existingSeller->delete();
+            
+            $existingUser = User::where('email', $request->email)->first();
+            if ($existingUser) {
+                $existingUser->delete();
+            }
+        }
+
         $rules = [
             'store_name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
@@ -98,11 +110,12 @@ class RegisterController extends Controller
 
             // Store::create(...) removed because stores table does not exist.
 
-            event(new Registered($user));
+            // DO NOT send email verification yet - it will be sent after owner approval
+            // event(new Registered($user));
 
             DB::commit();
 
-            return redirect()->route('login')->with('status', 'Registrasi berhasil! Silakan cek email Anda untuk verifikasi.');
+            return redirect()->route('seller.login')->with('status', 'Registrasi berhasil! Mohon tunggu verifikasi dari admin.');
 
         } catch (\Exception $e) {
             DB::rollBack();
