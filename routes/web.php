@@ -51,4 +51,5 @@ Route::post('/email/verification-notification', function (Request $request) {
 })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
 Route::get('/home', [ProductController::class, 'index'])->name('home');
+Route::get('/search', [ProductController::class, 'search'])->name('search');
 Route::resource('product', ProductController::class)->except(['index']);
