@@ -5,6 +5,10 @@ namespace App\Http\Controllers\Owner;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Seller;
+use App\Models\User;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Auth\Events\Registered;
 
 class SellerController extends Controller
 {
@@ -39,9 +43,35 @@ class SellerController extends Controller
             'status' => $request->status
         ]);
 
-        // TODO: Di sini nanti kita tambahkan kirim email notifikasi (SRS-02)
+        // Send email verification ONLY when APPROVED
+        if ($request->status == 'ACTIVE') {
+            // Find user for this seller
+            $user = User::where('email', $seller->pic_email)->first();
+            
+            if ($user && !$user->hasVerifiedEmail()) {
+                // Generate verification URL
+                $verificationUrl = URL::temporarySignedRoute(
+                    'verification.verify',
+                    now()->addMinutes(60),
+                    [
+                        'id' => $user->id,
+                        'hash' => sha1($user->email)
+                    ]
+                );
 
-        $message = $request->status == 'ACTIVE' ? 'Penjual berhasil diaktifkan!' : 'Penjual berhasil ditolak.';
+                // Send email
+                Mail::send('emails.seller-verification', [
+                    'sellerName' => $seller->pic_name,
+                    'storeName' => $seller->store_name,
+                    'verificationUrl' => $verificationUrl
+                ], function ($message) use ($seller) {
+                    $message->to($seller->pic_email)
+                            ->subject('Verifikasi Toko ToMaT - ' . $seller->store_name);
+                });
+            }
+        }
+
+        $message = $request->status == 'ACTIVE' ? 'Penjual berhasil diaktifkan! Email verifikasi telah dikirim.' : 'Penjual berhasil ditolak.';
         return redirect()->route('owner.sellers.index')->with('success', $message);
     }
 }

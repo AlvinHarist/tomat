@@ -15,6 +15,12 @@ class Seller extends Authenticatable
     public $incrementing = false; // UUID
     protected $keyType = 'string';
 
+    // Override email column for authentication
+    public function getAuthIdentifierName()
+    {
+        return 'pic_email';
+    }
+
     protected $fillable = [
         'store_name',
         'store_description',

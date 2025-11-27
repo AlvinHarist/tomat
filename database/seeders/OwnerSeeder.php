@@ -26,5 +26,18 @@ class OwnerSeeder extends Seeder
                 ]
             ]);
         }
+        // Cek dulu biar tidak duplikat
+        if (DB::table('owners')->where('email', 'owner2@tomat.com')->doesntExist()) {
+            DB::table('owners')->insert([
+                [
+                    'id' => 'b1111111-1111-1111-1111-111111111111',
+                    'name' => 'Tom', // Sesuai gambar dashboard
+                    'email' => 'owner2@tomat.com',
+                    'password' => Hash::make('12345678'), // Password login
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ]
+            ]);
+        }
     }
 }

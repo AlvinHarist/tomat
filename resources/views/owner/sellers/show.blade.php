@@ -16,8 +16,17 @@
         .info-label { font-size: 0.85rem; color: #888; display: block; margin-bottom: 5px; }
         .info-value { font-size: 1rem; color: #333; font-weight: 500; }
 
-        .doc-preview { width: 100%; height: 200px; background-color: #f9f9f9; border-radius: 8px; display: flex; align-items: center; justify-content: center; border: 2px dashed #ddd; margin-bottom: 20px; overflow: hidden; }
+        .doc-preview { width: 100%; height: 200px; background-color: #f9f9f9; border-radius: 8px; display: flex; align-items: center; justify-content: center; border: 2px dashed #ddd; margin-bottom: 20px; overflow: hidden; cursor: pointer; transition: 0.3s; }
+        .doc-preview:hover { border-color: #4CAF50; box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2); }
         .doc-preview img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+        /* Modal Styles */
+        .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); }
+        .modal-content { margin: auto; display: block; max-width: 90%; max-height: 90%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); animation: zoom 0.3s; }
+        @keyframes zoom { from {transform: translate(-50%, -50%) scale(0.7);} to {transform: translate(-50%, -50%) scale(1);} }
+        .close-modal { position: absolute; top: 20px; right: 40px; color: #fff; font-size: 40px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .close-modal:hover { color: #ccc; }
+        .modal-caption { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); color: #fff; font-size: 18px; background: rgba(0,0,0,0.7); padding: 10px 20px; border-radius: 5px; }
 
         .action-buttons { margin-top: 30px; display: flex; gap: 15px; }
         .btn { padding: 12px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; text-decoration: none; color: white; display: inline-block; }
@@ -93,7 +102,7 @@
                 <h3>Dokumen Pendukung</h3>
                 
                 <span class="info-label">Foto KTP</span>
-                <div class="doc-preview">
+                <div class="doc-preview" onclick="openModal('{{ asset('storage/' . $seller->pic_ktp_file_path) }}', 'Foto KTP - {{ $seller->pic_name }}')">
                     @if($seller->pic_ktp_file_path)
                         <img src="{{ asset('storage/' . $seller->pic_ktp_file_path) }}" alt="Foto KTP">
                     @else
@@ -102,7 +111,7 @@
                 </div>
 
                 <span class="info-label">Foto PIC</span>
-                <div class="doc-preview">
+                <div class="doc-preview" onclick="openModal('{{ asset('storage/' . $seller->pic_photo_path) }}', 'Foto PIC - {{ $seller->pic_name }}')">
                     @if($seller->pic_photo_path)
                         <img src="{{ asset('storage/' . $seller->pic_photo_path) }}" alt="Foto PIC">
                     @else
@@ -131,6 +140,36 @@
 
         </div>
     </main>
+
+    <!-- Modal for Image Preview -->
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <span class="close-modal">&times;</span>
+        <img class="modal-content" id="modalImage">
+        <div class="modal-caption" id="modalCaption"></div>
+    </div>
+
+    <script>
+        function openModal(imageSrc, caption) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            const modalCaption = document.getElementById('modalCaption');
+            
+            modal.style.display = 'block';
+            modalImg.src = imageSrc;
+            modalCaption.textContent = caption;
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+
+        // Close modal with ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
 
 </body>
 </html>

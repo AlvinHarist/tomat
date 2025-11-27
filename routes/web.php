@@ -34,23 +34,24 @@ Route::get('/', [RegisterController::class, 'showRegistrationForm'])->name('regi
 // Rute untuk memproses data saat formulir di-submit
 Route::post('/', [RegisterController::class, 'store'])->name('register.store');
 
-// Rute Login
-Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [LoginController::class, 'login'])->name('login.submit');
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard', function () {
-        
-        $user = Auth::user();
-        return "<h1>Dashboard Penjual (Coming Soon)</h1>" .
-               "<p>Halo, <b>" . $user->pic_name . "</b>!</p>" .
-               "<p>Bagian ini sedang dikerjakan oleh teman.</p>" .
-               "<form action='" . route('logout') . "' method='POST'>" . 
-               csrf_field() . 
-               "<button type='submit'>Logout</button></form>";
-               
-    })->name('seller.dashboard'); // <--- PENTING: Nama ini harus sama dengan di LoginController
-
+// Seller Routes
+Route::prefix('seller')->name('seller.')->group(function () {
+    // Login & Logout
+    Route::get('/login', [App\Http\Controllers\Seller\Auth\LoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [App\Http\Controllers\Seller\Auth\LoginController::class, 'login'])->name('login.submit');
+    Route::post('/logout', [App\Http\Controllers\Seller\Auth\LoginController::class, 'logout'])->name('logout');
+    
+    // Status Page
+    Route::get('/status/{status}', function ($status) {
+        return view('seller.status', ['status' => strtoupper($status)]);
+    })->name('status');
+    
+    // Protected Routes
+    Route::middleware(['auth', 'verified'])->group(function () {
+        Route::get('/dashboard', function () {
+            return view('seller.dashboard');
+        })->name('dashboard');
+    });
 });
 
 Route::prefix('owner')->name('owner.')->group(function () {
