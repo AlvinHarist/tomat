@@ -12,21 +12,31 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $search = $request->input('q');
+        $search     = $request->input('q');
         $categoryId = $request->input('category');
-        $province = $request->input('province');
+        $province   = $request->input('province');
 
         $query = Product::with(['category', 'seller']);
 
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
         if (!empty($categoryId)) {
-            $query->where('category_id', $categoryId);
+            // Ambil kategori yang dipilih
+            $category = Category::with('children')->find($categoryId);
+
+            if ($category) {
+                // Ambil semua ID descendant (tak terbatas)
+                $categoryIds = $category->descendantsIdsRecursive();
+                $query->whereIn('category_id', $categoryIds);
+            } else {
+                // Kalau ID kategori tidak ditemukan, paksa kosong
+                $query->whereRaw('1 = 0');
+            }
         }
 
         if (!empty($province)) {
@@ -54,6 +64,64 @@ class ProductController extends Controller
             ->get();
 
         return view('home.index', [
+            'products'        => $products,
+            'categories'      => $categories,
+            'currentSearch'   => $search,
+            'currentCategory' => $categoryId,
+        ]);
+    }
+
+    public function search(Request $request)
+    {
+        $search     = $request->input('q');
+        $categoryId = $request->input('category');
+        $province   = $request->input('province');
+
+        $query = Product::with(['category', 'seller']);
+
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        if (!empty($categoryId)) {
+            $category = Category::with('children')->find($categoryId);
+
+            if ($category) {
+                $categoryIds = $category->descendantsIdsRecursive();
+                $query->whereIn('category_id', $categoryIds);
+            } else {
+                $query->whereRaw('1 = 0');
+            }
+        }
+
+        if (!empty($province)) {
+            $query->whereHas('seller', function ($q) use ($province) {
+                $q->where('pic_province', $province);
+            });
+        }
+
+        $products = $query->latest()->paginate(12)->withQueryString();
+
+        if ($request->ajax()) {
+            $html = view('components.product-cards', [
+                'products' => $products,
+            ])->render();
+
+            return response()->json([
+                'html'      => $html,
+                'next_page' => $products->currentPage() + 1,
+                'has_more'  => $products->hasMorePages(),
+            ]);
+        }
+
+        $categories = Category::withCount('products')
+            ->orderBy('name')
+            ->get();
+
+        return view('search.index', [
             'products'        => $products,
             'categories'      => $categories,
             'currentSearch'   => $search,

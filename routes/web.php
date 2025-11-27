@@ -91,4 +91,5 @@ Route::get('send-mail', function() {
 });
 
 Route::get('/home', [ProductController::class, 'index'])->name('home');
+Route::get('/search', [ProductController::class, 'search'])->name('search');
 Route::resource('product', ProductController::class)->except(['index']);

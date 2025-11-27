@@ -47,6 +47,17 @@ class Category extends Model
         return $this->children()->with('allDescendants');
     }
 
+    public function descendantsIdsRecursive()
+    {
+        $ids = collect([$this->id]);
+
+        foreach ($this->children as $child) {
+            $ids = $ids->merge($child->descendantsIdsRecursive());
+        }
+
+        return $ids->unique()->values();
+    }
+
     // Relasi ke produk
     public function products()
     {

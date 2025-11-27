@@ -1,14 +1,13 @@
 @php
-    use Illuminate\Support\Collection;
+    // Parent (general category)
+    $parentCategories = $categories->whereNull('parent_id');
+    $parentIds = $categories->pluck('parent_id')->filter()->unique();
+    $leafCategories = $categories->whereNotIn('id', $parentIds);
 
-    $categories = collect([
-        (object) ['id' => 1, 'name' => 'Elektronik', 'products_count' => 58],
-        (object) ['id' => 2, 'name' => 'Fashion', 'products_count' => 45],
-        (object) ['id' => 3, 'name' => 'Olahraga', 'products_count' => 22],
-        (object) ['id' => 4, 'name' => 'Kecantikan', 'products_count' => 37],
-        (object) ['id' => 5, 'name' => 'Rumah Tangga', 'products_count' => 19],
-        (object) ['id' => 6, 'name' => 'Aksesoris', 'products_count' => 24],
-    ]);
+    $generalCategories = $parentCategories->random(min(5, $parentCategories->count()));
+    $specificCategories = $leafCategories->random(min(5, $leafCategories->count()));
+
+    $groupedCategories = $categories->groupBy('parent_id');
 @endphp
 
 @php
@@ -18,30 +17,14 @@
         'https://picsum.photos/id/1025/1200/400',
         'https://picsum.photos/id/1035/1200/400',
     ];
-
-    // Contoh data category spesifik (gambar di atas, teks di bawah)
-    $specificCategories = [
-        [
-            'name' => 'Laptop',
-            'image' => 'https://picsum.photos/id/180/400/250',
-        ],
-        [
-            'name' => 'Smartphone',
-            'image' => 'https://picsum.photos/id/250/400/250',
-        ],
-        [
-            'name' => 'Camera',
-            'image' => 'https://picsum.photos/id/301/400/250',
-        ],
-    ];
 @endphp
 
-@extends('layouts.simple-template')
+@extends('layouts.app')
 
 @section('content')
     {{-- BANNER SLIDER --}}
-    <div class="w-full flex justify-center mb-8">
-        <div class="relative w-full max-w-5xl overflow-hidden rounded-xl shadow" id="banner-slider">
+    <div class="w-full flex justify-center mb-8 mt-12">
+        <div class="relative w-full max-w-7xl overflow-hidden rounded-xl shadow" id="banner-slider">
 
             {{-- Track semua slide --}}
             <div class="flex transition-transform duration-500 ease-out" id="banner-track">
@@ -89,7 +72,7 @@
         </div>
     </div>
 
-    {{-- KATEGORI PILIHAN (ala Tokopedia) --}}
+    {{-- KATEGORI PILIHAN --}}
     <section class="max-w-7xl mx-auto mb-10">
         <div class="bg-white rounded-2xl shadow-md p-5 space-y-5">
 
@@ -98,15 +81,21 @@
                 <h2 class="text-2xl font-bold text-gray-800">
                     Selected Category
                 </h2>
-                <a href="#" class="text-xs sm:text-sm text-green-600 hover:underline">Lihat Semua</a>
+                <button 
+                    id="open-category-modal"
+                    class="text-xs sm:text-sm text-green-600 hover:underline"
+                >
+                    Lihat Semua
+                </button>
             </div>
 
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
                 @foreach ($specificCategories as $item)
                     <div
                         class="bg-white rounded-xl border border-gray-200
-                              hover:shadow-sm flex flex-col items-center p-3 cursor-pointer
-                              transition-all duration-200"
+                              hover:shadow-sm flex flex-col items-center justify-center 
+                              p-3 cursor-pointer transition-all duration-200
+                              min-h-[150px]"
                     >
                         <div class="w-20 h-20 sm:w-24 sm:h-24 mb-2">
                             <img
@@ -115,6 +104,7 @@
                                 class="w-full h-full object-cover rounded-lg"
                             >
                         </div>
+
                         <p class="text-xs sm:text-sm font-medium text-gray-800 text-center leading-tight">
                             {{ $item['name'] }}
                         </p>
@@ -122,35 +112,18 @@
                 @endforeach
             </div>
 
+
             <div class="pt-3">
               <div class="flex flex-wrap gap-2 sm:gap-3 justify-center">
 
                   {{-- Chip "Semua Kategori" --}}
-                  <a
-                      href="{{ route('home', [
-                          'q'        => request('q'),
-                          'province' => request('province'),
-                      ]) }}"
-                      class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm
-                            border border-gray-200 bg-white text-gray-800 shadow-sm
-                            hover:bg-gray-50 transition-all duration-200"
-                  >
-                      <span class="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 text-gray-500">
-                          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h10M4 18h6" />
-                          </svg>
-                      </span>
-                      <span class="font-medium whitespace-nowrap">Kategori</span>
-                  </a>
-
-                  {{-- Chip kategori dari DB --}}
-                  @foreach ($categories as $category)
+                  @foreach ($generalCategories as $category)
                       @php
                           $active = (int) request('category') === $category->id;
                       @endphp
 
                       <a
-                          href="{{ route('home', [
+                          href="{{ route('search', [
                               'category' => $category->id,
                               'q'        => request('q'),
                               'province' => request('province'),
@@ -183,6 +156,108 @@
         </div>
     </section>
 
+    {{-- MODAL SEMUA KATEGORI (STYLED) --}}
+    <div 
+        id="category-modal"
+        class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"
+    >
+        <div class="bg-white w-full max-w-5xl rounded-3xl shadow-2xl p-6 md:p-7 relative max-h-[80vh] overflow-y-auto">
+
+            {{-- Close button --}}
+            <button 
+                id="close-category-modal"
+                class="absolute top-4 right-4 w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition"
+            >
+                <span class="text-gray-500 text-sm">✕</span>
+            </button>
+
+            {{-- Title --}}
+            <div class="mb-5 flex items-center justify-between gap-3">
+                <div>
+                    <h2 class="text-xl md:text-2xl font-bold text-gray-900">Semua Kategori</h2>
+                    <p class="text-xs md:text-sm text-gray-500 mt-1">
+                        Jelajahi kategori berdasarkan jenis dan subkategori.
+                    </p>
+                </div>
+            </div>
+
+            @php
+                $groupedCategories = $categories->groupBy('parent_id');
+            @endphp
+
+            <div class="space-y-4">
+                {{-- Level 0: Parent (root, parent_id = null) --}}
+                @foreach ($groupedCategories[null] ?? [] as $parent)
+                    @php
+                        $children = $groupedCategories[$parent->id] ?? collect();
+                        $subCount = $children->count();
+                    @endphp
+
+                    <div class="bg-gray-50/70 border border-gray-200 rounded-2xl p-4 md:p-5 hover:shadow-md transition">
+
+                        {{-- Parent header --}}
+                        <div class="flex items-center justify-between gap-3 mb-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center text-sm font-semibold text-green-700">
+                                    {{ strtoupper(mb_substr($parent->name, 0, 1)) }}
+                                </div>
+                                <div>
+                                    <a href="{{ route('search', ['category' => $parent->id]) }}"
+                                      class="font-semibold text-gray-900 hover:text-green-600">
+                                        {{ $parent->name }}
+                                    </a>
+                                    @if($subCount > 0)
+                                        <p class="text-[11px] text-gray-500">
+                                            {{ $subCount }} subkategori
+                                        </p>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Level 1 & 2 --}}
+                        @if ($children->isNotEmpty())
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                @foreach ($children as $child)
+                                    @php
+                                        $grandChildren = $groupedCategories[$child->id] ?? collect();
+                                    @endphp
+
+                                    <div class="bg-white rounded-xl border border-gray-100 p-3">
+                                        {{-- Child --}}
+                                        <a href="{{ route('search', ['category' => $child->id]) }}"
+                                          class="text-sm font-medium text-gray-800 hover:text-green-600 flex items-center gap-2">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                                            {{ $child->name }}
+                                        </a>
+
+                                        {{-- Grandchild (max depth 3) --}}
+                                        @if ($grandChildren->isNotEmpty())
+                                            <div class="mt-2 flex flex-wrap gap-1.5 ml-4">
+                                                @foreach ($grandChildren as $grand)
+                                                    <a href="{{ route('search', ['category' => $grand->id]) }}"
+                                                      class="px-2.5 py-0.5 rounded-full border border-gray-200 bg-gray-50
+                                                              text-[11px] text-gray-700 hover:border-green-500 hover:text-green-700 transition">
+                                                        {{ $grand->name }}
+                                                    </a>
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <p class="text-xs text-gray-500 italic">
+                                Belum ada subkategori.
+                            </p>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+
+
     {{-- PRODUCT SECTION --}}
     <section class="max-w-7xl mx-auto space-y-4 mb-2">
         <div class="flex items-center justify-between">
@@ -207,10 +282,6 @@
                     </p>
                 @endif
             </div>
-
-            <a href="{{ route('home') }}" class="text-sm text-green-600 hover:underline">
-                Reset filter
-            </a>
         </div>
 
         {{-- Grid produk: max 6 kolom, tumbuh ke bawah --}}
@@ -364,6 +435,23 @@
             });
         });
     }
+
+    const modal = document.getElementById('category-modal');
+    const openBtn = document.getElementById('open-category-modal');
+    const closeBtn = document.getElementById('close-category-modal');
+
+    // Open modal
+    openBtn.addEventListener('click', () => modal.classList.remove('hidden'));
+
+    // Close modal
+    closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
+
+    // Close when clicking outside modal content
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            modal.classList.add('hidden');
+        }
+    });
     });
   </script>
 @endpush

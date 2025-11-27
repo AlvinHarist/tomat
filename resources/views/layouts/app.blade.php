@@ -26,7 +26,7 @@
 
             <!-- Search Bar -->
             <div class="flex-1 max-w-2xl">
-                <form action="{{ route('home') }}" method="GET" class="w-full">
+                <form action="{{ route('search') }}" method="GET" class="w-full">
                     <div class="relative">
                         <input
                             type="text"
@@ -133,7 +133,7 @@
                   class="mt-2 w-48 max-h-64 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow absolute right-0 z-20"
               >
                   <a
-                      href="{{ route('home', Arr::except(request()->query(), ['province'])) }}"
+                      href="{{ route('search', Arr::except(request()->query(), ['province'])) }}"
                       class="block px-4 py-2 text-sm hover:bg-gray-100
                           {{ request('province') ? '' : 'bg-gray-100 font-semibold' }}"
                   >
@@ -142,7 +142,7 @@
 
                   @foreach ($provinces as $prov)
                       <a 
-                          href="{{ route('home', array_merge(request()->query(), ['province' => $prov])) }}"
+                          href="{{ route('search', array_merge(request()->query(), ['province' => $prov])) }}"
                           class="block px-4 py-2 text-sm hover:bg-gray-100
                               {{ request('province') === $prov ? 'bg-gray-100 font-semibold' : '' }}"
                       >
