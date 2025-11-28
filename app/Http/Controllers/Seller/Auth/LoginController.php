@@ -46,13 +46,14 @@ class LoginController extends Controller
         if (Auth::attempt($credentials, $request->filled('remember'))) {
             $request->session()->regenerate();
 
-            // Check if email is verified
-            if (!Auth::user()->hasVerifiedEmail()) {
+            // Check if email is verified (via users table)
+            $user = Auth::user();
+            if (!$user->email_verified_at) {
                 Auth::logout();
                 return back()->withErrors(['email' => 'Email Anda belum diverifikasi. Silakan cek email untuk link verifikasi.'])->withInput();
             }
 
-            // Redirect to seller dashboard (create this later)
+            // Redirect to seller dashboard
             return redirect()->intended(route('seller.dashboard'));
         }
 
