@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Produk Berdasarkan Stock</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            margin: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h2 {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+        .header p {
+            margin: 3px 0;
+            font-size: 11px;
+        }
+        .info-section {
+            margin-bottom: 20px;
+        }
+        .info-section p {
+            margin: 3px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        table th, table td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+        }
+        table th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+            text-align: center;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .text-right {
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>LAPORAN DAFTAR PRODUK BERDASARKAN STOCK</h2>
+        <p>SRS-MartPlace-12</p>
+    </div>
+
+    <div class="info-section">
+        <p><strong>Nama Seller:</strong> {{ $seller->pic_name }}</p>
+        <p><strong>Tanggal Cetak:</strong> {{ $date }}</p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 5%;">No</th>
+                <th style="width: 25%;">Nama Produk</th>
+                <th style="width: 20%;">Kategori</th>
+                <th style="width: 20%;">Harga</th>
+                <th style="width: 15%;">Stock</th>
+                <th style="width: 15%;">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($products as $index => $product)
+            <tr>
+                <td class="text-center">{{ $index + 1 }}</td>
+                <td>{{ $product->name }}</td>
+                <td>{{ $product->category->name ?? '-' }}</td>
+                <td class="text-right">Rp {{ number_format($product->price, 0, ',', '.') }}</td>
+                <td class="text-center">{{ $product->stock }}</td>
+                <td class="text-center">
+                    @if($product->stock < 10)
+                        <span style="color: red; font-weight: bold;">Stok Menipis</span>
+                    @elseif($product->stock < 50)
+                        <span style="color: orange;">Stok Sedang</span>
+                    @else
+                        <span style="color: green;">Stok Aman</span>
+                    @endif
+                </td>
+            </tr>
+            @empty
+            <tr>
+                <td colspan="6" class="text-center">Tidak ada data produk</td>
+            </tr>
+            @endforelse
+        </tbody>
+    </table>
+
+    <div style="margin-top: 40px;">
+        <p><strong>Total Produk:</strong> {{ $products->count() }}</p>
+    </div>
+</body>
+</html>
