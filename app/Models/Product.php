@@ -26,7 +26,6 @@ class Product extends Model
 
     // casting sesuai migrasi tabel
     protected $casts = [
-        'images' => 'array',
         'price'  => 'double',
     ];
 

@@ -63,7 +63,15 @@ class ProductController extends Controller
             ->orderBy('name')
             ->get();
 
+        $banners = [
+            'images/banners/banner1.png',
+            'images/banners/banner2.jpg',
+            'images/banners/banner3.png',
+            'images/banners/banner4.jpg',
+        ];
+
         return view('home.index', [
+            'banners'         => $banners,
             'products'        => $products,
             'categories'      => $categories,
             'currentSearch'   => $search,
@@ -184,13 +192,14 @@ class ProductController extends Controller
     {
         // eager load category + parent chain biar nggak N+1
         $product->load([
-            'category.parent.parent', // sesuaikan kedalaman
-            'reviews',                // kalau dipakai
+            'category.parent.parent',
+            'reviews',
+            'seller',
         ]);
 
         // Kumpulkan jejak kategori dari root → current category
         $categoryBreadcrumbs = $product->category
-            ? $product->category->getBreadcrumbs()   // method dari model Category kamu
+            ? $product->category->getBreadcrumbs()
             : collect();
 
         // Susun array untuk komponen breadcrumb
@@ -202,8 +211,7 @@ class ProductController extends Controller
             'url'   => route('home'),
         ];
 
-        // 2) Setiap kategori dari root sampai kategori produk
-        //    Link-nya aku arahkan ke home dengan filter ?category=...
+        // 2) Kategori dari root sampai kategori produk
         foreach ($categoryBreadcrumbs as $cat) {
             $breadcrumbs[] = [
                 'label' => $cat->name,
@@ -213,14 +221,15 @@ class ProductController extends Controller
             ];
         }
 
-        // 3) Terakhir: nama produk (tanpa URL)
+        // 3) Produk sekarang
         $breadcrumbs[] = [
             'label' => $product->name,
             'url'   => null,
         ];
 
-        // contoh rekomendasi saja, sesuaikan punyamu
+        // Rekomendasi: produk lain dari seller / toko yang sama
         $recommendations = Product::where('id', '!=', $product->id)
+            ->where('seller_id', $product->seller_id)
             ->inRandomOrder()
             ->limit(6)
             ->get();
@@ -229,6 +238,7 @@ class ProductController extends Controller
             'product'         => $product,
             'recommendations' => $recommendations,
             'breadcrumbs'     => $breadcrumbs,
+            'seller'          => $product->seller,
         ]);
     }
 

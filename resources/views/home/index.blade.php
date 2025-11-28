@@ -10,15 +10,6 @@
     $groupedCategories = $categories->groupBy('parent_id');
 @endphp
 
-@php
-    // Contoh data banner (boleh diganti dari DB)
-    $banners = [
-        'https://picsum.photos/id/1015/1200/400',
-        'https://picsum.photos/id/1025/1200/400',
-        'https://picsum.photos/id/1035/1200/400',
-    ];
-@endphp
-
 @extends('layouts.app')
 
 @section('content')
@@ -91,15 +82,20 @@
 
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
                 @foreach ($specificCategories as $item)
-                    <div
+                    <a
+                        href="{{ route('search', [
+                            'category' => $item->id,
+                            'q'        => request('q'),
+                            'province' => request('province'),
+                        ]) }}"
                         class="bg-white rounded-xl border border-gray-200
-                              hover:shadow-sm flex flex-col items-center justify-center 
-                              p-3 cursor-pointer transition-all duration-200
-                              min-h-[150px]"
+                            hover:shadow-sm flex flex-col items-center justify-center 
+                            p-3 cursor-pointer transition-all duration-200
+                            min-h-[150px]"
                     >
                         <div class="w-20 h-20 sm:w-24 sm:h-24 mb-2">
                             <img
-                                src="{{ $item['image'] }}"
+                                src="{{ asset($item['image']) }}"
                                 alt="{{ $item['name'] }}"
                                 class="w-full h-full object-cover rounded-lg"
                             >
@@ -108,7 +104,7 @@
                         <p class="text-xs sm:text-sm font-medium text-gray-800 text-center leading-tight">
                             {{ $item['name'] }}
                         </p>
-                    </div>
+                    </a>
                 @endforeach
             </div>
 
@@ -290,7 +286,7 @@
               @include('components.product-cards', ['products' => $products])
             @else
                 <p class="text-gray-500 text-sm col-span-full">
-                    Tidak ada produk yang cocok dengan filter.
+                    Tidak ada produk.
                 </p>
             @endif
         </div>

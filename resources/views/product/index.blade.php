@@ -11,7 +11,7 @@
 
         {{-- gambar --}}
         <div class="md:col-span-1 bg-white rounded-xl shadow p-4 flex items-center justify-center">
-            <img src="{{ asset($product->main_image) }}"
+            <img src="{{ asset($product->images) }}"
                  alt="{{ $product->name }}"
                  class="rounded-lg object-cover w-full">
         </div>
@@ -54,7 +54,7 @@
 
                         <span>{{ number_format($avgRating, 1) }}</span>
                         <span class="text-gray-400">•</span>
-                        <span>{{ optional($product->store)->province ?? 'Lokasi tidak diketahui' }}</span>
+                        <span>{{ optional($product->seller)->pic_province ?? 'Lokasi tidak diketahui' }}</span>
                     </div>
                 @endif
             </div>
@@ -66,6 +66,51 @@
                     {{ $product->description }}
                 </p>
             </div>
+
+            {{-- Info penjual: kontak jika tertarik --}}
+            @if ($product->seller)
+                <div class="mt-4 p-4 border rounded-lg bg-gray-50">
+                    <h3 class="text-sm font-semibold text-gray-800 mb-1">
+                        Tertarik dengan produk ini?
+                    </h3>
+                    <p class="text-xs text-gray-500 mb-3">
+                        Hubungi penjual untuk tanya stok, nego harga, atau detail lainnya.
+                    </p>
+
+                    <div class="space-y-1 text-sm">
+                        <div>
+                            <span class="font-medium text-gray-700">No. HP / WhatsApp:</span>
+                            <span class="ml-1 text-gray-800">
+                                {{ $product->seller->pic_phone }}
+                            </span>
+                            {{-- Kalau mau langsung ke WhatsApp, bisa pakai link ini --}}
+                            {{-- 
+                            <a
+                                href="https://wa.me/62{{ ltrim($product->seller->pic_phone, '0') }}"
+                                target="_blank"
+                                class="ml-2 text-green-600 hover:underline text-xs"
+                            >
+                                Chat via WhatsApp
+                            </a>
+                            --}}
+                        </div>
+
+                        <div>
+                            <span class="font-medium text-gray-700">Email:</span>
+                            <a
+                                href="mailto:{{ $product->seller->pic_email }}"
+                                class="ml-1 text-blue-600 hover:underline"
+                            >
+                                {{ $product->seller->pic_email }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            @else
+                <div class="mt-4 text-xs text-gray-400">
+                    Informasi penjual tidak tersedia.
+                </div>
+            @endif
 
         </div>
     </div>
@@ -374,25 +419,12 @@
 
     {{-- CONTAINER 3: PRODUK REKOMENDASI --}}
     <div class="space-y-4">
-        <h2 class="text-xl font-semibold text-gray-800">Produk Rekomendasi</h2>
+        <h2 class="text-xl font-semibold text-gray-800">Lainnya di toko ini</h2>
 
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
-            @foreach ($recommendations as $item)
-                <a href="{{ route('product.show', $item->id) }}"
-                   class="bg-white rounded-xl shadow-sm hover:shadow-md transition p-3 block">
-                    <img src="{{ asset($item->main_image) }}"
-                         class="w-full h-32 object-cover rounded-lg"
-                         alt="{{ $item->name }}">
-
-                    <div class="mt-2 space-y-1">
-                        <h3 class="text-sm font-semibold line-clamp-2">{{ $item->name }}</h3>
-
-                        <div class="text-sm font-bold text-orange-600">
-                            Rp {{ number_format($item->price, 0, ',', '.') }}
-                        </div>
-                    </div>
-                </a>
-            @endforeach
+            @if($recommendations->count() > 0)
+              @include('components.product-cards', ['products' => $recommendations])
+            @endif
         </div>
     </div>
 

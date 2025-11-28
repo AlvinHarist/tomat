@@ -3,13 +3,13 @@
 class="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col">
 
   {{-- Gambar produk --}}
-  <div class="w-full h-32 sm:h-36 md:h-40 overflow-hidden rounded-b-none">
-      <img
-          src="{{ asset($product->main_image) }}"
-          alt="{{ $product->name }}"
-          class="w-full h-full object-cover"
-      >
-  </div>
+    <div class="w-full h-32 sm:h-36 md:h-40 p-2">
+        <img
+            src="{{ asset($product->images) }}"
+            alt="{{ $product->name }}"
+            class="w-full h-full object-cover rounded-lg"
+        >
+    </div>
 
   {{-- Detail produk --}}
   <div class="p-3 flex flex-col flex-1">
