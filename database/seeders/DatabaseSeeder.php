@@ -12,9 +12,7 @@ class DatabaseSeeder extends Seeder
     {
         Schema::disableForeignKeyConstraints();
 
-        // Kosongkan tabel (urutan dari 'anak' ke 'induk')
-        DB::table('comment_ratings')->truncate();
-        DB::table('visitors')->truncate();
+        DB::table('reviews')->truncate();
         DB::table('products')->truncate();
         DB::table('categories')->truncate();
         DB::table('owners')->truncate();
@@ -22,14 +20,12 @@ class DatabaseSeeder extends Seeder
 
         Schema::enableForeignKeyConstraints();
 
-        // Panggil seeder individual (urutan dari 'induk' ke 'anak')
         $this->call([
             OwnerSeeder::class,
             CategorySeeder::class,
             SellerSeeder::class,
             ProductSeeder::class,
-            VisitorSeeder::class,
-            CommentRatingSeeder::class,
+            ReviewSeeder::class,
         ]);
     }
 }

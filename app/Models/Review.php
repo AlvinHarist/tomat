@@ -2,57 +2,41 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class Review extends Model
 {
     use HasFactory;
 
-    protected $table = 'comment_ratings';
-
-    public $incrementing = false;     // UUID
+    protected $table = 'reviews';
     protected $keyType = 'string';
+    public $incrementing = false;
 
     protected $fillable = [
+        'name',
+        'phone',
+        'email',
+        'province',
         'product_id',
-        'visitor_id',
         'comment',
         'rating',
     ];
 
-    protected $casts = [
-        'rating' => 'integer',
-    ];
-
-    /**
-     * Auto generate UUID for ID
-     */
     protected static function boot()
     {
         parent::boot();
 
         static::creating(function ($model) {
-            if (! $model->getKey()) {
+            if (empty($model->{$model->getKeyName()})) {
                 $model->{$model->getKeyName()} = (string) Str::uuid();
             }
         });
     }
 
-    /**
-     * Relasi ke produk
-     */
     public function product()
     {
         return $this->belongsTo(Product::class);
     }
-
-    /**
-     * Relasi ke visitor
-     */
-    // public function visitor()
-    // {
-    //     return $this->belongsTo(Visitor::class);
-    // }
 }

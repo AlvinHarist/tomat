@@ -87,22 +87,66 @@ input[type=number] {
         <div class="pt-2 border-t border-gray-100">
             <h2 class="text-lg font-semibold text-gray-800 mb-3 mt-3">Lokasi Toko</h2>
 
-            <div class="space-y-1.5 max-h-56 overflow-y-auto pr-1 text-xs sm:text-sm">
-                {{-- Semua lokasi --}}
-                <a href="{{ route('search', array_merge(request()->query(), ['province' => null])) }}"
-                   class="block px-2 py-1 rounded hover:bg-gray-50
-                          {{ request('province') ? 'text-gray-700' : 'font-semibold text-green-600 bg-green-50' }}">
-                    Semua lokasi
-                </a>
+            <form action="{{ route('search') }}" method="GET" class="space-y-2 text-xs sm:text-sm">
+                {{-- Pertahankan filter lain --}}
+                <input type="hidden" name="q" value="{{ request('q') }}">
+                <input type="hidden" name="category" value="{{ request('category') }}">
+                <input type="hidden" name="min_price" value="{{ request('min_price') }}">
+                <input type="hidden" name="max_price" value="{{ request('max_price') }}">
+                <input type="hidden" name="rating" value="{{ request('rating') }}">
 
-                @foreach ($locations ?? [] as $loc)
-                    <a href="{{ route('search', array_merge(request()->query(), ['province' => $loc])) }}"
-                       class="block px-2 py-1 rounded hover:bg-gray-50
-                              {{ request('province') === $loc ? 'font-semibold text-green-600 bg-green-50' : 'text-gray-700' }}">
-                        {{ $loc }}
-                    </a>
-                @endforeach
-            </div>
+                <select
+                    name="province"
+                    class="w-full border-gray-300 rounded-lg px-3 py-2 text-xs sm:text-sm
+                        focus:outline-none focus:ring focus:ring-green-200"
+                    onchange="this.form.submit()"
+                >
+                    <option value="" {{ request('province') ? '' : 'selected' }}>
+                        Semua lokasi
+                    </option>
+
+                    {{-- 34 Provinsi Indonesia --}}
+                    <option value="Aceh" {{ request('province') === 'Aceh' ? 'selected' : '' }}>Aceh</option>
+                    <option value="Sumatera Utara" {{ request('province') === 'Sumatera Utara' ? 'selected' : '' }}>Sumatera Utara</option>
+                    <option value="Sumatera Barat" {{ request('province') === 'Sumatera Barat' ? 'selected' : '' }}>Sumatera Barat</option>
+                    <option value="Riau" {{ request('province') === 'Riau' ? 'selected' : '' }}>Riau</option>
+                    <option value="Jambi" {{ request('province') === 'Jambi' ? 'selected' : '' }}>Jambi</option>
+                    <option value="Sumatera Selatan" {{ request('province') === 'Sumatera Selatan' ? 'selected' : '' }}>Sumatera Selatan</option>
+                    <option value="Bengkulu" {{ request('province') === 'Bengkulu' ? 'selected' : '' }}>Bengkulu</option>
+                    <option value="Lampung" {{ request('province') === 'Lampung' ? 'selected' : '' }}>Lampung</option>
+                    <option value="Kepulauan Bangka Belitung" {{ request('province') === 'Kepulauan Bangka Belitung' ? 'selected' : '' }}>Kepulauan Bangka Belitung</option>
+                    <option value="Kepulauan Riau" {{ request('province') === 'Kepulauan Riau' ? 'selected' : '' }}>Kepulauan Riau</option>
+
+                    <option value="DKI Jakarta" {{ request('province') === 'DKI Jakarta' ? 'selected' : '' }}>DKI Jakarta</option>
+                    <option value="Jawa Barat" {{ request('province') === 'Jawa Barat' ? 'selected' : '' }}>Jawa Barat</option>
+                    <option value="Jawa Tengah" {{ request('province') === 'Jawa Tengah' ? 'selected' : '' }}>Jawa Tengah</option>
+                    <option value="D.I. Yogyakarta" {{ request('province') === 'D.I. Yogyakarta' ? 'selected' : '' }}>D.I. Yogyakarta</option>
+                    <option value="Jawa Timur" {{ request('province') === 'Jawa Timur' ? 'selected' : '' }}>Jawa Timur</option>
+                    <option value="Banten" {{ request('province') === 'Banten' ? 'selected' : '' }}>Banten</option>
+
+                    <option value="Bali" {{ request('province') === 'Bali' ? 'selected' : '' }}>Bali</option>
+                    <option value="Nusa Tenggara Barat" {{ request('province') === 'Nusa Tenggara Barat' ? 'selected' : '' }}>Nusa Tenggara Barat</option>
+                    <option value="Nusa Tenggara Timur" {{ request('province') === 'Nusa Tenggara Timur' ? 'selected' : '' }}>Nusa Tenggara Timur</option>
+
+                    <option value="Kalimantan Barat" {{ request('province') === 'Kalimantan Barat' ? 'selected' : '' }}>Kalimantan Barat</option>
+                    <option value="Kalimantan Tengah" {{ request('province') === 'Kalimantan Tengah' ? 'selected' : '' }}>Kalimantan Tengah</option>
+                    <option value="Kalimantan Selatan" {{ request('province') === 'Kalimantan Selatan' ? 'selected' : '' }}>Kalimantan Selatan</option>
+                    <option value="Kalimantan Timur" {{ request('province') === 'Kalimantan Timur' ? 'selected' : '' }}>Kalimantan Timur</option>
+                    <option value="Kalimantan Utara" {{ request('province') === 'Kalimantan Utara' ? 'selected' : '' }}>Kalimantan Utara</option>
+
+                    <option value="Sulawesi Utara" {{ request('province') === 'Sulawesi Utara' ? 'selected' : '' }}>Sulawesi Utara</option>
+                    <option value="Sulawesi Tengah" {{ request('province') === 'Sulawesi Tengah' ? 'selected' : '' }}>Sulawesi Tengah</option>
+                    <option value="Sulawesi Selatan" {{ request('province') === 'Sulawesi Selatan' ? 'selected' : '' }}>Sulawesi Selatan</option>
+                    <option value="Sulawesi Tenggara" {{ request('province') === 'Sulawesi Tenggara' ? 'selected' : '' }}>Sulawesi Tenggara</option>
+                    <option value="Gorontalo" {{ request('province') === 'Gorontalo' ? 'selected' : '' }}>Gorontalo</option>
+                    <option value="Sulawesi Barat" {{ request('province') === 'Sulawesi Barat' ? 'selected' : '' }}>Sulawesi Barat</option>
+
+                    <option value="Maluku" {{ request('province') === 'Maluku' ? 'selected' : '' }}>Maluku</option>
+                    <option value="Maluku Utara" {{ request('province') === 'Maluku Utara' ? 'selected' : '' }}>Maluku Utara</option>
+                    <option value="Papua" {{ request('province') === 'Papua' ? 'selected' : '' }}>Papua</option>
+                    <option value="Papua Barat" {{ request('province') === 'Papua Barat' ? 'selected' : '' }}>Papua Barat</option>
+                </select>
+            </form>
         </div>
 
         {{-- FILTER RATING --}}

@@ -76,9 +76,12 @@ class ProductController extends Controller
         $search     = $request->input('q');
         $categoryId = $request->input('category');
         $province   = $request->input('province');
+        $minPrice   = $request->input('min_price');
+        $maxPrice   = $request->input('max_price');
 
         $query = Product::with(['category', 'seller']);
 
+        // 🔍 Filter pencarian teks
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
@@ -86,6 +89,7 @@ class ProductController extends Controller
             });
         }
 
+        // 🔍 Filter kategori (berjenjang)
         if (!empty($categoryId)) {
             $category = Category::with('children')->find($categoryId);
 
@@ -97,14 +101,26 @@ class ProductController extends Controller
             }
         }
 
+        // 🔍 Filter provinsi (dari seller)
         if (!empty($province)) {
             $query->whereHas('seller', function ($q) use ($province) {
                 $q->where('pic_province', $province);
             });
         }
 
+        // 🔍 FILTER HARGA BARU
+        if (!empty($minPrice)) {
+            $query->where('price', '>=', (int) $minPrice);
+        }
+
+        if (!empty($maxPrice)) {
+            $query->where('price', '<=', (int) $maxPrice);
+        }
+
+        // 🔍 Ambil data
         $products = $query->latest()->paginate(12)->withQueryString();
 
+        // 🔁 Jika AJAX (infinite scroll)
         if ($request->ajax()) {
             $html = view('components.product-cards', [
                 'products' => $products,
@@ -117,6 +133,7 @@ class ProductController extends Controller
             ]);
         }
 
+        // Untuk sidebar filter
         $categories = Category::withCount('products')
             ->orderBy('name')
             ->get();
@@ -126,8 +143,12 @@ class ProductController extends Controller
             'categories'      => $categories,
             'currentSearch'   => $search,
             'currentCategory' => $categoryId,
+            'currentProvince' => $province,
+            'currentMinPrice' => $minPrice,
+            'currentMaxPrice' => $maxPrice,
         ]);
     }
+
 
     public function create()
     {
@@ -186,7 +207,7 @@ class ProductController extends Controller
         foreach ($categoryBreadcrumbs as $cat) {
             $breadcrumbs[] = [
                 'label' => $cat->name,
-                'url'   => route('home', [
+                'url'   => route('search', [
                     'category' => $cat->id,
                 ]),
             ];

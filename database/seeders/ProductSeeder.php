@@ -48,18 +48,18 @@ class ProductSeeder extends Seeder
             'Timbangan Digital Portable Akurat',
         ];
 
-        $sampleComments = [
-            "Barangnya bagus, sesuai deskripsi!",
-            "Kualitas oke, harga terjangkau.",
-            "Pengiriman cepat dan rapi.",
-            "Lumayan, tapi ada sedikit cacat.",
-            "Sangat puas! Produk premium.",
-            "Seller responsif, rekomendasi.",
-            "Performa bagus, sesuai ekspektasi.",
-            "Barang ori, packing aman.",
-            "Sesuai harga, tidak mengecewakan.",
-            "Top banget, akan beli lagi!",
-        ];
+        // $sampleComments = [
+        //     "Barangnya bagus, sesuai deskripsi!",
+        //     "Kualitas oke, harga terjangkau.",
+        //     "Pengiriman cepat dan rapi.",
+        //     "Lumayan, tapi ada sedikit cacat.",
+        //     "Sangat puas! Produk premium.",
+        //     "Seller responsif, rekomendasi.",
+        //     "Performa bagus, sesuai ekspektasi.",
+        //     "Barang ori, packing aman.",
+        //     "Sesuai harga, tidak mengecewakan.",
+        //     "Top banget, akan beli lagi!",
+        // ];
 
         foreach ($productNames as $name) {
 
@@ -79,18 +79,18 @@ class ProductSeeder extends Seeder
                 'images'      => null,
             ]);
 
-            // Generate antara 1–5 komentar
-            $totalComments = rand(1, 5);
+            // // Generate antara 1–5 komentar
+            // $totalComments = rand(1, 5);
 
-            for ($i = 0; $i < $totalComments; $i++) {
-                Review::create([
-                    'id'         => Str::uuid(),
-                    'product_id' => $product->id,
-                    'visitor_id' => null,
-                    'comment'    => $sampleComments[array_rand($sampleComments)],
-                    'rating'     => rand(3, 5),
-                ]);
-            }
+            // for ($i = 0; $i < $totalComments; $i++) {
+            //     Review::create([
+            //         'id'         => Str::uuid(),
+            //         'product_id' => $product->id,
+            //         'visitor_id' => null,
+            //         'comment'    => $sampleComments[array_rand($sampleComments)],
+            //         'rating'     => rand(3, 5),
+            //     ]);
+            // }
         }
     }
 }

@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\Owner\Auth\LoginController as OwnerLoginController;
 use App\Http\Controllers\Owner\DashboardController as OwnerDashboardController;
 use App\Mail\SendTestEmail;
@@ -93,3 +94,5 @@ Route::get('send-mail', function() {
 Route::get('/home', [ProductController::class, 'index'])->name('home');
 Route::get('/search', [ProductController::class, 'search'])->name('search');
 Route::resource('product', ProductController::class)->except(['index']);
+
+Route::post('/review', [ReviewController::class, 'store'])->name('review.store');

@@ -6,22 +6,30 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
-        Schema::create('comment_ratings', function (Blueprint $table) {
+        Schema::create('reviews', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            $table->string('name');
+            $table->string('phone');
+            $table->string('email');
+            $table->string('province');
+
             $table->foreignUuid('product_id')->constrained('products')->onDelete('cascade');
-            $table->foreignUuid('visitor_id')->nullable()->constrained('visitors')->onDelete('cascade');
-            
             $table->text('comment')->nullable();
             $table->integer('rating');
-            
             $table->timestamps();
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
-        Schema::dropIfExists('comment_ratings');
+        Schema::dropIfExists('reviews');
     }
 };

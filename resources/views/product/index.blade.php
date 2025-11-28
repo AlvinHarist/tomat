@@ -67,18 +67,22 @@
                 </p>
             </div>
 
-            {{-- Di sini kalau kamu punya tabel spesifikasi sendiri,
-                 bisa loop dari relasi. Untuk sekarang, placeholder saja. --}}
-            {{-- <div>
-                <h2 class="text-lg font-semibold mb-2">Spesifikasi</h2>
-                ...
-            </div> --}}
         </div>
     </div>
 
     {{-- CONTAINER 2: REVIEW & RATING --}}
     <div class="bg-white rounded-xl shadow p-6 space-y-6">
-        <h2 class="text-xl font-semibold">Ulasan & Rating</h2>
+        <div class="flex items-center justify-between gap-4">
+            <h2 class="text-xl font-semibold">Ulasan & Rating</h2>
+
+            {{-- Tombol buka modal tambah ulasan --}}
+            <button
+                id="openReviewModal"
+                class="inline-flex items-center px-4 py-2 rounded-lg bg-green-600 text-white text-sm font-semibold hover:bg-green-700 transition"
+            >
+                + Tulis Ulasan
+            </button>
+        </div>
 
         @if ($avgRating)
             <div class="flex items-center justify-between flex-wrap gap-4">
@@ -143,7 +147,7 @@
             @forelse ($filteredReviews as $review)
                 <div class="border rounded-lg p-4 bg-gray-50">
                     <div class="flex items-center justify-between">
-                        <strong>{{ $review->user->name ?? 'User' }}</strong>
+                        <strong>{{ $review->name ?? 'User' }}</strong>
                         <span class="text-xs text-gray-500">
                             {{ $review->created_at->format('Y-m-d') }}
                         </span>
@@ -173,6 +177,201 @@
         </div>
     </div>
 
+    {{-- MODAL TAMBAH ULASAN --}}
+    <div
+        id="reviewModal"
+        class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden"
+    >
+        <div class="bg-white rounded-xl shadow-lg w-full max-w-lg mx-4 relative">
+            {{-- Tombol close --}}
+            <button
+                type="button"
+                id="closeReviewModal"
+                class="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
+            >
+                ✕
+            </button>
+
+            <div class="p-6 space-y-4">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">
+                    Tulis Ulasan untuk {{ $product->name }}
+                </h3>
+
+                <form
+                    action="{{ route('review.store') }}"
+                    method="POST"
+                    class="space-y-4"
+                    autocomplete="off"
+                >
+                    @csrf
+
+                    {{-- hidden product id --}}
+                    <input type="hidden" name="product_id" value="{{ $product->id }}">
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            Nama Lengkap
+                        </label>
+                        <input
+                            type="text"
+                            name="name"
+                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm
+                                focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                            required
+                            autocomplete="off"
+                        >
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            No. Handphone / WhatsApp
+                        </label>
+                        <input
+                            type="text"
+                            name="phone"
+                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm
+                                focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                            required
+                            autocomplete="off"
+                        >
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            Email
+                        </label>
+                        <input
+                            type="email"
+                            name="email"
+                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm
+                                focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                            required
+                            autocomplete="off"
+                        >
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            Provinsi
+                        </label>
+
+                        <select
+                            name="province"
+                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm
+                                focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                            required
+                        >
+                            <option value="" disabled selected>Pilih provinsi</option>
+
+                            {{-- 34 Provinsi Indonesia --}}
+                            <option value="Aceh">Aceh</option>
+                            <option value="Sumatera Utara">Sumatera Utara</option>
+                            <option value="Sumatera Barat">Sumatera Barat</option>
+                            <option value="Riau">Riau</option>
+                            <option value="Jambi">Jambi</option>
+                            <option value="Sumatera Selatan">Sumatera Selatan</option>
+                            <option value="Bengkulu">Bengkulu</option>
+                            <option value="Lampung">Lampung</option>
+                            <option value="Kepulauan Bangka Belitung">Kepulauan Bangka Belitung</option>
+                            <option value="Kepulauan Riau">Kepulauan Riau</option>
+
+                            <option value="DKI Jakarta">DKI Jakarta</option>
+                            <option value="Jawa Barat">Jawa Barat</option>
+                            <option value="Jawa Tengah">Jawa Tengah</option>
+                            <option value="D.I. Yogyakarta">D.I. Yogyakarta</option>
+                            <option value="Jawa Timur">Jawa Timur</option>
+                            
+                            <option value="Banten">Banten</option>
+                            <option value="Bali">Bali</option>
+                            <option value="Nusa Tenggara Barat">Nusa Tenggara Barat</option>
+                            <option value="Nusa Tenggara Timur">Nusa Tenggara Timur</option>
+
+                            <option value="Kalimantan Barat">Kalimantan Barat</option>
+                            <option value="Kalimantan Tengah">Kalimantan Tengah</option>
+                            <option value="Kalimantan Selatan">Kalimantan Selatan</option>
+                            <option value="Kalimantan Timur">Kalimantan Timur</option>
+                            <option value="Kalimantan Utara">Kalimantan Utara</option>
+
+                            <option value="Sulawesi Utara">Sulawesi Utara</option>
+                            <option value="Sulawesi Tengah">Sulawesi Tengah</option>
+                            <option value="Sulawesi Selatan">Sulawesi Selatan</option>
+                            <option value="Sulawesi Tenggara">Sulawesi Tenggara</option>
+                            <option value="Gorontalo">Gorontalo</option>
+                            <option value="Sulawesi Barat">Sulawesi Barat</option>
+
+                            <option value="Maluku">Maluku</option>
+                            <option value="Maluku Utara">Maluku Utara</option>
+                            <option value="Papua">Papua</option>
+                            <option value="Papua Barat">Papua Barat</option>
+                            <option value="Papua Tengah">Papua Tengah</option>
+                            <option value="Papua Pegunungan">Papua Pegunungan</option>
+                            <option value="Papua Selatan">Papua Selatan</option>
+                            <option value="Papua Barat Daya">Papua Barat Daya</option>
+                        </select>
+                    </div>
+
+                    {{-- RATING: BINTANG KLIKABLE --}}
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            Rating
+                        </label>
+
+                        {{-- input hidden yang dikirim ke server --}}
+                        <input type="hidden" name="rating" id="ratingInput">
+
+                        <div id="ratingStars" class="flex items-center gap-1 text-2xl">
+                            @for ($i = 1; $i <= 5; $i++)
+                                <button
+                                    type="button"
+                                    class="rating-star text-gray-300 hover:text-yellow-400 transition
+                                        focus:outline-none"
+                                    data-value="{{ $i }}"
+                                >
+                                    ★
+                                </button>
+                            @endfor
+                        </div>
+
+                        <p class="text-xs text-gray-500 mt-1" id="ratingHint">
+                            Klik jumlah bintang untuk memberi rating.
+                        </p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            Komentar
+                        </label>
+                        <textarea
+                            name="comment"
+                            rows="4"
+                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm
+                                focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                            placeholder="Ceritakan pengalamanmu dengan produk ini..."
+                            autocomplete="off"
+                        ></textarea>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-2 pt-2">
+                        <button
+                            type="button"
+                            id="cancelReviewModal"
+                            class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 text-sm hover:bg-gray-50"
+                        >
+                            Batal
+                        </button>
+                        <button
+                            type="submit"
+                            class="px-4 py-2 rounded-lg bg-green-600 text-white text-sm font-semibold hover:bg-green-700"
+                        >
+                            Kirim Ulasan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
     {{-- CONTAINER 3: PRODUK REKOMENDASI --}}
     <div class="space-y-4">
         <h2 class="text-xl font-semibold text-gray-800">Produk Rekomendasi</h2>
@@ -199,3 +398,127 @@
 
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const openBtn   = document.getElementById('openReviewModal');
+        const closeBtn  = document.getElementById('closeReviewModal');
+        const cancelBtn = document.getElementById('cancelReviewModal');
+        const modal     = document.getElementById('reviewModal');
+        const form      = modal ? modal.querySelector('form') : null;
+
+        // rating
+        const ratingInput     = document.getElementById('ratingInput');
+        const ratingStarsWrap = document.getElementById('ratingStars');
+        const ratingHint      = document.getElementById('ratingHint');
+        const stars           = ratingStarsWrap
+            ? ratingStarsWrap.querySelectorAll('.rating-star')
+            : [];
+
+        function setRating(value) {
+            if (!ratingInput) return;
+
+            ratingInput.value = value;
+
+            stars.forEach(star => {
+                const starValue = parseInt(star.dataset.value, 10);
+                if (starValue <= value) {
+                    star.classList.add('text-yellow-400');
+                    star.classList.remove('text-gray-300');
+                } else {
+                    star.classList.add('text-gray-300');
+                    star.classList.remove('text-yellow-400');
+                }
+            });
+
+            if (ratingHint) {
+                ratingHint.textContent = value
+                    ? `Kamu memberi rating ${value} bintang.`
+                    : 'Klik jumlah bintang untuk memberi rating.';
+            }
+        }
+
+        // event klik bintang
+        stars.forEach(star => {
+            star.addEventListener('click', () => {
+                const value = parseInt(star.dataset.value, 10);
+                setRating(value);
+            });
+        });
+
+        function openModal() {
+            if (!modal) return;
+            modal.classList.remove('hidden');
+        }
+
+        function clearForm() {
+            if (form) {
+                form.reset();
+            }
+            // reset rating visual & value
+            setRating(0);
+        }
+
+        function closeModal() {
+            if (!modal) return;
+            modal.classList.add('hidden');
+            clearForm();
+        }
+
+        if (openBtn)   openBtn.addEventListener('click', openModal);
+        if (closeBtn)  closeBtn.addEventListener('click', closeModal);
+        if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+        // Tutup modal kalau klik di area overlay
+        if (modal) {
+            modal.addEventListener('click', function (e) {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+        }
+
+        // SWEETALERT lokal (window.Swal dari app.js)
+
+        // sukses
+        @if (session('success'))
+        if (window.Swal) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil',
+                text: '{{ session('success') }}',
+                timer: 3000,
+                showConfirmButton: false
+            });
+        }
+        @endif
+
+        // error server
+        @if (session('error'))
+        if (window.Swal) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: '{{ session('error') }}',
+            }).then(() => {
+                openModal();
+            });
+        }
+        @endif
+
+        // error validasi (ambil pesan pertama)
+        @if ($errors->any())
+        if (window.Swal) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Form tidak valid',
+                text: '{{ $errors->first() }}',
+            }).then(() => {
+                openModal();
+            });
+        }
+        @endif
+    });
+</script>
+@endpush
