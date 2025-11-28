@@ -33,6 +33,7 @@ class SellerSeeder extends Seeder
                 'pic_rt' => '001',
                 'pic_rw' => '002',
                 'pic_village' => 'Sukmajaya',
+                'pic_district' => 'Sukamundur',
                 'pic_city' => 'Depok',
                 'pic_province' => 'Jawa Barat',
                 
@@ -57,6 +58,7 @@ class SellerSeeder extends Seeder
                 'pic_rt' => '005',
                 'pic_rw' => '003',
                 'pic_village' => 'Menteng',
+                'pic_district' => 'Genteng',
                 'pic_city' => 'Jakarta Pusat',
                 'pic_province' => 'DKI Jakarta',
                 'pic_ktp_number' => '3171234567890002',
