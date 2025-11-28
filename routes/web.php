@@ -35,6 +35,11 @@ Route::get('/', [RegisterController::class, 'showRegistrationForm'])->name('regi
 // Rute untuk memproses data saat formulir di-submit
 Route::post('/', [RegisterController::class, 'store'])->name('register.store');
 
+// API endpoints for dependent dropdown
+Route::get('/api/cities/{provinceCode}', [RegisterController::class, 'getCities'])->name('api.cities');
+Route::get('/api/districts/{cityCode}', [RegisterController::class, 'getDistricts'])->name('api.districts');
+Route::get('/api/villages/{districtCode}', [RegisterController::class, 'getVillages'])->name('api.villages');
+
 // Seller Routes
 Route::prefix('seller')->name('seller.')->group(function () {
     // Login & Logout
