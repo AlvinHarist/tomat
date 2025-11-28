@@ -70,14 +70,29 @@ Route::prefix('owner')->name('owner.')->group(function () {
 });
 
 // Rute Verifikasi Email
-Route::get('/email/verify', function () {
-    return "Halaman Verifikasi Email (Belum dibuat)";
-})->middleware('auth')->name('verification.notice');
+Route::get('/email/verify/{id}/{hash}', function (Request $request, $id, $hash) {
+    $user = \App\Models\User::findOrFail($id);
 
-Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-    $request->fulfill();
-    return redirect('/');
-})->middleware(['auth', 'signed'])->name('verification.verify');
+    // Verify hash
+    if (!hash_equals($hash, sha1($user->email))) {
+        abort(403, 'Invalid verification link.');
+    }
+
+    // Check if already verified
+    if ($user->email_verified_at) {
+        return redirect()->route('seller.login')->with('status', 'Email sudah terverifikasi sebelumnya.');
+    }
+
+    // Mark as verified
+    $user->email_verified_at = now();
+    $user->save();
+
+    return redirect()->route('seller.login')->with('status', 'Email berhasil diverifikasi! Silakan login.');
+})->middleware('signed')->name('verification.verify');
+
+Route::get('/email/verify', function () {
+    return redirect()->route('seller.login')->with('status', 'Silakan cek email Anda untuk link verifikasi.');
+})->name('verification.notice');
 
 Route::post('/email/verification-notification', function (Request $request) {
     $request->user()->sendEmailVerificationNotification();
