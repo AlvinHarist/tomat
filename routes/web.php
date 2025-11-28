@@ -54,9 +54,21 @@ Route::prefix('seller')->name('seller.')->group(function () {
     
     // Protected Routes
     Route::middleware(['auth', 'verified'])->group(function () {
-        Route::get('/dashboard', function () {
-            return view('seller.dashboard');
-        })->name('dashboard');
+        Route::get('/dashboard', [App\Http\Controllers\Seller\DashboardController::class, 'index'])->name('dashboard');
+        
+        // Products
+        Route::get('/products', [App\Http\Controllers\Seller\ProductController::class, 'index'])->name('products.index');
+        Route::get('/products/create', [App\Http\Controllers\Seller\ProductController::class, 'create'])->name('products.create');
+        Route::post('/products', [App\Http\Controllers\Seller\ProductController::class, 'store'])->name('products.store');
+        Route::get('/products/{id}/edit', [App\Http\Controllers\Seller\ProductController::class, 'edit'])->name('products.edit');
+        Route::put('/products/{id}', [App\Http\Controllers\Seller\ProductController::class, 'update'])->name('products.update');
+        Route::delete('/products/{id}', [App\Http\Controllers\Seller\ProductController::class, 'destroy'])->name('products.destroy');
+        
+        // Reports
+        Route::get('/reports', [App\Http\Controllers\Seller\ReportController::class, 'index'])->name('reports.index');
+        Route::get('/reports/stock', [App\Http\Controllers\Seller\ReportController::class, 'productsByStock'])->name('reports.stock');
+        Route::get('/reports/rating', [App\Http\Controllers\Seller\ReportController::class, 'productsByRating'])->name('reports.rating');
+        Route::get('/reports/restock', [App\Http\Controllers\Seller\ReportController::class, 'productsNeedRestock'])->name('reports.restock');
     });
 });
 
