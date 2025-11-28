@@ -1,0 +1,41 @@
+/* public/css/seller/dashboard.css */
+
+/* Pengaturan Umum Halaman */
+.container-fluid {
+    padding: 20px;
+}
+
+/* Gaya untuk Card/Kotak Konten */
+.card-shadow {
+    border-radius: 0.5rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Penyesuaian Tabel Produk */
+#dataTable th {
+    background-color: #f8f9fc; /* Warna header tabel */
+    color: #495057;
+    font-weight: 600;
+}
+
+/* Gaya untuk Gambar Produk dalam Tabel */
+.table img {
+    border-radius: 4px;
+    transition: transform 0.3s ease;
+}
+
+.table img:hover {
+    transform: scale(1.05);
+}
+
+/* Gaya untuk Formulir Upload (create.blade.php) */
+.form-group label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+/* Tombol Aksi */
+.btn-sm {
+    margin: 2px;
+}

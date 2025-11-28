@@ -6,15 +6,9 @@ return [
     |--------------------------------------------------------------------------
     | Authentication Defaults
     |--------------------------------------------------------------------------
-    |
-    | This option controls the default authentication "guard" and password
-    | reset options for your application. You may change these defaults
-    | as required, but they're a perfect start for most applications.
-    |
     */
-
     'defaults' => [
-        'guard' => 'web',
+        'guard' => 'web', // Guard default untuk user/pembeli
         'passwords' => 'users',
     ],
 
@@ -22,28 +16,24 @@ return [
     |--------------------------------------------------------------------------
     | Authentication Guards
     |--------------------------------------------------------------------------
-    |
-    | Next, you may define every authentication guard for your application.
-    | Of course, a great default configuration has been defined for you
-    | here which uses session storage and the Eloquent user provider.
-    |
-    | All authentication drivers have a user provider. This defines how the
-    | users are actually retrieved out of your database or other storage
-    | mechanisms used by this application to persist your user's data.
-    |
-    | Supported: "session"
-    |
+    | Mendefinisikan mekanisme otentikasi (session) dan provider model untuk setiap jenis pengguna.
     */
-
     'guards' => [
         'web' => [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        
+        // ** GUARD SELLER (Penjual) **
+        'seller' => [
+            'driver' => 'session',
+            'provider' => 'sellers', // Menggunakan provider 'sellers'
+        ],
 
+        // ** GUARD OWNER (Pemilik/Admin) **
         'owner' => [
-        'driver' => 'session',
-        'provider' => 'admins', // Kita akan buat provider ini di bawah
+            'driver' => 'session',
+            'provider' => 'admins', // Menggunakan provider 'admins'
         ],
     ],
 
@@ -51,28 +41,24 @@ return [
     |--------------------------------------------------------------------------
     | User Providers
     |--------------------------------------------------------------------------
-    |
-    | All authentication drivers have a user provider. This defines how the
-    | users are actually retrieved out of your database or other storage
-    | mechanisms used by this application to persist your user's data.
-    |
-    | If you have multiple user tables or models you may configure multiple
-    | sources which represent each model / table. These sources may then
-    | be assigned to any extra authentication guards you have defined.
-    |
-    | Supported: "database", "eloquent"
-    |
+    | Mendefinisikan Model Eloquent mana yang akan digunakan untuk setiap guard.
     */
-
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => App\Models\User::class,
+            'model' => App\Models\User::class, // Model untuk User/Pembeli
         ],
 
+        // ** PROVIDER SELLERS **
+        'sellers' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Seller::class, // Model untuk Seller
+        ],
+        
+        // ** PROVIDER ADMINS **
         'admins' => [
             'driver' => 'eloquent',
-            'model' => App\Models\Owner::class,
+            'model' => App\Models\Owner::class, // Model untuk Owner
         ],
     ],
 
@@ -80,21 +66,7 @@ return [
     |--------------------------------------------------------------------------
     | Resetting Passwords
     |--------------------------------------------------------------------------
-    |
-    | You may specify multiple password reset configurations if you have more
-    | than one user table or model in the application and you want to have
-    | separate password reset settings based on the specific user types.
-    |
-    | The expiry time is the number of minutes that each reset token will be
-    | considered valid. This security feature keeps tokens short-lived so
-    | they have less time to be guessed. You may change this as needed.
-    |
-    | The throttle setting is the number of seconds a user must wait before
-    | generating more password reset tokens. This prevents the user from
-    | quickly generating a very large amount of password reset tokens.
-    |
     */
-
     'passwords' => [
         'users' => [
             'provider' => 'users',
@@ -102,19 +74,21 @@ return [
             'expire' => 60,
             'throttle' => 60,
         ],
+        
+        // Anda mungkin perlu menambahkan konfigurasi reset password untuk Seller dan Owner
+        // 'sellers' => [
+        //     'provider' => 'sellers',
+        //     'table' => 'password_reset_tokens', // Atau tabel terpisah
+        //     'expire' => 60,
+        //     'throttle' => 60,
+        // ],
     ],
 
     /*
     |--------------------------------------------------------------------------
     | Password Confirmation Timeout
     |--------------------------------------------------------------------------
-    |
-    | Here you may define the amount of seconds before a password confirmation
-    | times out and the user is prompted to re-enter their password via the
-    | confirmation screen. By default, the timeout lasts for three hours.
-    |
     */
-
     'password_timeout' => 10800,
 
 ];

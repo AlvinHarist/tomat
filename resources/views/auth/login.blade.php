@@ -19,7 +19,7 @@
                 <a href="{{ route('register') }}" class="register-link">Register</a>
             </div>
 
-            <form action="{{ route('login.submit') }}" method="POST">
+            <form action="{{ route('seller.login.submit') }}" method="POST">
                 @csrf
 
                 @error('login_identifier')

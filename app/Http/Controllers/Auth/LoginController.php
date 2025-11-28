@@ -17,38 +17,42 @@ class LoginController extends Controller
     // 2. Proses Login
     public function login(Request $request)
     {
-        // Validasi input dasar
+        // Validasi input
         $request->validate([
             'login_identifier' => 'required|string',
             'password' => 'required|string',
         ]);
 
-        $inputType = $request->input('login_identifier');
-        $password = $request->input('password');
-        $remember = $request->boolean('remember');
+        $identifier = $request->input('login_identifier');
+        $password   = $request->input('password');
+        $remember   = $request->boolean('remember');
 
-        // Tentukan kolom apa yang dipakai: 'pic_email' atau 'pic_phone'
-        $loginType = filter_var($inputType, FILTER_VALIDATE_EMAIL) ? 'pic_email' : 'pic_phone';
+        // Tentukan login pakai email atau phone
+        $loginField = filter_var($identifier, FILTER_VALIDATE_EMAIL) ? 'pic_email' : 'pic_phone';
 
-        // MENGGUNAKAN AUTH::ATTEMPT (Lebih Aman & Ringkas)
-        // Laravel otomatis mengecek password hash, kita cukup kasih array kondisi
-        if (Auth::attempt([$loginType => $inputType, 'password' => $password], $remember)) {
-            
-            // Jika Sukses:
+        // Attempt login
+        if (Auth::attempt([$loginField => $identifier, 'password' => $password], $remember)) {
+
             $request->session()->regenerate();
-            
-            // Cek status seller (Opsional, jika ingin membatasi yang login hanya yang ACTIVE)
-            /*
-            if (Auth::user()->status !== 'ACTIVE') {
-                Auth::logout();
-                return back()->withErrors(['login_identifier' => 'Akun Anda belum aktif atau ditolak.']);
-            }
-            */
+            $user = Auth::user();
 
-            return redirect()->intended('dashboard');
+            // Redirect sesuai role
+            if ($user->role === 'seller') {
+                return redirect()->route('seller.dashboard');
+            }
+
+            if ($user->role === 'admin') {
+                return redirect()->route('admin.dashboard');
+            }
+
+            // Jika role tidak dikenal
+            Auth::logout();
+            return redirect()->route('login')->withErrors([
+                'login_identifier' => 'Role tidak dikenal.',
+            ]);
         }
 
-        // Jika Gagal:
+        // Jika gagal login
         return back()->withErrors([
             'login_identifier' => 'Email/No HP atau password salah.',
         ])->onlyInput('login_identifier');
@@ -60,6 +64,7 @@ class LoginController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+        
         return redirect('/login');
     }
 }

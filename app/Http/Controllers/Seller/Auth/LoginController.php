@@ -5,65 +5,46 @@ namespace App\Http\Controllers\Seller\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Seller;
 
 class LoginController extends Controller
 {
+    // 1. Tampilkan Form Login Seller
     public function showLoginForm()
     {
-        return view('seller.login');
+        return view('seller.login'); // Ganti view ke seller.login
     }
 
+    // 2. Proses Login
     public function login(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string|min:8',
+        $credentials = $request->validate([
+            'pic_email' => 'required|email', // Gunakan pic_email untuk login
+            'password' => 'required',
         ]);
+        
+        // Tambahkan kondisi untuk hanya memperbolehkan status ACTIVE
+        $credentials['status'] = 'ACTIVE';
 
-        // Check if seller exists (correct column name is pic_email)
-        $seller = Seller::where('pic_email', $request->email)->first();
-
-        if (!$seller) {
-            return back()->withErrors(['email' => 'Email tidak terdaftar.'])->withInput();
-        }
-
-        // Check seller status
-        if ($seller->status === 'PENDING') {
-            return redirect()->route('seller.status', ['status' => 'pending']);
-        }
-
-        if ($seller->status === 'REJECTED') {
-            return redirect()->route('seller.status', ['status' => 'rejected']);
-        }
-
-        // If status is ACTIVE, attempt login via users table
-        $credentials = [
-            'email' => $request->email,
-            'password' => $request->password
-        ];
-
-        if (Auth::attempt($credentials, $request->filled('remember'))) {
+        // Gunakan Guard 'seller'
+        if (Auth::guard('seller')->attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
-
-            // Check if email is verified
-            if (!Auth::user()->hasVerifiedEmail()) {
-                Auth::logout();
-                return back()->withErrors(['email' => 'Email Anda belum diverifikasi. Silakan cek email untuk link verifikasi.'])->withInput();
-            }
-
-            // Redirect to seller dashboard (create this later)
-            return redirect()->intended(route('seller.dashboard'));
+            
+            // Redirect ke Dashboard Seller
+            return redirect()->route('seller.dashboard');
         }
 
-        return back()->withErrors(['email' => 'Email atau password salah.'])->withInput();
+        // Jika login gagal (termasuk status non-aktif)
+        return back()->withErrors([
+            'pic_email' => 'Email atau password salah, atau akun Anda belum aktif/ditolak.',
+        ])->onlyInput('pic_email');
     }
 
+    // 3. Logout Seller
     public function logout(Request $request)
     {
-        Auth::logout();
+        Auth::guard('seller')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect()->route('seller.login');
+        return redirect()->route('seller.login'); // Redirect ke halaman login seller
     }
 }

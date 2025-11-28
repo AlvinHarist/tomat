@@ -4,123 +4,141 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Penjual - ToMaT</title>
-    @vite('resources/css/app.css')
-</head>
-<body class="bg-gray-50 min-h-screen">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
-    <!-- Header -->
-    <header class="bg-white shadow">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-green-600">ToMaT</h1>
-            <div class="flex items-center space-x-4">
-                <span class="text-gray-700">Halo, <strong>{{ Auth::user()->name }}</strong></span>
-                <form method="POST" action="{{ route('seller.logout') }}">
-                    @csrf
-                    <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                        Logout
-                    </button>
-                </form>
-            </div>
-        </div>
-    </header>
+    <link rel="stylesheet" href="{{ asset('css/seller/dashboard.css') }}">
+</head>
+<body>
 
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
-        <!-- Welcome Card -->
-        <div class="bg-white rounded-xl shadow-md p-8 mb-6">
-            <div class="flex items-center space-x-4">
-                <div class="bg-green-100 rounded-full p-4">
-                    <svg class="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                    </svg>
-                </div>
-                <div>
-                    <h2 class="text-3xl font-bold text-gray-800">Selamat Datang, {{ Auth::user()->name }}!</h2>
-                    <p class="text-gray-600 mt-1">Kelola toko Anda dengan mudah melalui dashboard ini.</p>
-                </div>
+    <div id="chart-data-source" 
+          data-stats="{{ json_encode($chartData) }}" 
+          style="display: none;">
+    </div>
+
+    <aside class="sidebar">
+        <div class="user-profile">
+            <div class="user-info">
+                <div class="user-name">{{ Auth::guard('seller')->user()->pic_name ?? 'Seller' }}</div>
+                <div class="user-role">Seller</div>
             </div>
+            <div class="avatar"></div>
         </div>
 
-        <!-- Info Notice -->
-        <div class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-lg mb-6">
-            <div class="flex items-start">
-                <svg class="w-6 h-6 text-blue-500 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-                </svg>
-                <div>
-                    <h3 class="text-lg font-semibold text-blue-800 mb-1">Halaman Dalam Pengembangan</h3>
-                    <p class="text-blue-700">
-                        Dashboard lengkap untuk mengelola produk, pesanan, dan laporan sedang dikerjakan oleh tim developer. 
-                        Fitur-fitur tersebut akan segera tersedia dalam waktu dekat.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Features Grid (Coming Soon) -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="menu-title">MENU</div>
+        <nav class="nav-links">
+            <a href="{{ route('seller.dashboard') }}" class="active">
+                <i class="fas fa-home"></i> Overview
+            </a>
+            <a href="{{ route('seller.products.create') }}">
+                <i class="fas fa-upload"></i> Upload Product
+            </a>
+            <a href="{{ route('seller.products.index') }}">
+                <i class="fas fa-cubes"></i> My Products
+            </a>
+            <a href="#"><i class="fas fa-chart-line"></i> Report</a>
             
-            <!-- Products Card -->
-            <div class="bg-white rounded-xl shadow-md p-6 border-2 border-gray-200 opacity-60">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="bg-purple-100 rounded-lg p-3">
-                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-                        </svg>
-                    </div>
-                    <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2 py-1 rounded">Segera</span>
-                </div>
-                <h3 class="text-xl font-bold text-gray-800 mb-2">Produk</h3>
-                <p class="text-gray-600 text-sm">Kelola katalog produk toko Anda</p>
+            <form action="{{ route('seller.logout') }}" method="POST" style="margin-top: 20px;">
+                @csrf
+                <button type="submit" style="background:none; border:none; color:#777; cursor:pointer; font-size:0.9rem; padding:12px 15px; display:flex; align-items:center;">
+                    <i class="fas fa-sign-out-alt" style="margin-right:15px;"></i> Logout
+                </button>
+            </form>
+        </nav>
+
+        <div class="logo">ToMaT</div>
+    </aside>
+
+    <main class="main-content">
+        <h1 class="page-title">Dashboard Penjual</h1>
+
+        <div class="stats-grid">
+            <div class="card">
+                <div class="icon-box icon-teal"><i class="fas fa-file-alt"></i></div>
+                <div class="stat-number">{{ $totalProducts }}</div>
+                <div class="stat-label">Total Product Anda</div>
+            </div>
+            
+            <div class="card">
+                <div class="icon-box icon-pink"><i class="far fa-comment-alt"></i></div>
+                <div class="stat-number">{{ $totalReviews }}</div>
+                <div class="stat-label">Total Review Produk Anda</div>
             </div>
 
-            <!-- Orders Card -->
-            <div class="bg-white rounded-xl shadow-md p-6 border-2 border-gray-200 opacity-60">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="bg-blue-100 rounded-lg p-3">
-                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                        </svg>
-                    </div>
-                    <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2 py-1 rounded">Segera</span>
-                </div>
-                <h3 class="text-xl font-bold text-gray-800 mb-2">Pesanan</h3>
-                <p class="text-gray-600 text-sm">Pantau dan kelola pesanan masuk</p>
+            <div class="card">
+                <div class="icon-box icon-blue"><i class="fas fa-star"></i></div>
+                <div class="stat-number">{{ $averageRating }}</div>
+                <div class="stat-label">Rata-rata Rating</div>
             </div>
 
-            <!-- Reports Card -->
-            <div class="bg-white rounded-xl shadow-md p-6 border-2 border-gray-200 opacity-60">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="bg-green-100 rounded-lg p-3">
-                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                        </svg>
-                    </div>
-                    <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2 py-1 rounded">Segera</span>
-                </div>
-                <h3 class="text-xl font-bold text-gray-800 mb-2">Laporan</h3>
-                <p class="text-gray-600 text-sm">Lihat statistik dan laporan penjualan</p>
-            </div>
-
-        </div>
-
-        <!-- Account Info -->
-        <div class="bg-white rounded-xl shadow-md p-6 mt-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Informasi Akun</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <p class="text-sm text-gray-600">Email</p>
-                    <p class="font-medium text-gray-800">{{ Auth::user()->email }}</p>
-                </div>
-                <div>
-                    <p class="text-sm text-gray-600">Status Akun</p>
-                    <p class="font-medium text-green-600">✓ Terverifikasi</p>
-                </div>
+            <div class="card">
+                <div class="icon-box icon-purple"><i class="fas fa-store"></i></div>
+                <div class="stat-number">{{ Auth::guard('seller')->user()->store_name ?? 'N/A' }}</div>
+                <div class="stat-label">Nama Toko Anda</div>
             </div>
         </div>
 
+        <div class="chart-container">
+            <div class="chart-header">
+                <div class="chart-title">AKTIVITAS REVIEW BULANAN</div>
+                <div style="font-size: 0.8rem; color: #999;">Produk Anda Tahun Ini v</div>
+            </div>
+            <canvas id="visitorsChart" height="80"></canvas>
+        </div>
+
+        <div class="bottom-grid" style="grid-template-columns: 1fr;"> 
+            <div class="table-card">
+                <div class="table-header">
+                    <span>Nama Produk</span>
+                    <span>Total Review</span>
+                </div>
+                @forelse($topProducts as $product)
+                <div class="list-item">
+                    <span>{{ $product->name }}</span>
+                    <span>{{ $product->comment_ratings_count }}</span>
+                </div>
+                @empty
+                <div class="list-item">
+                    <span>Belum ada produk atau review.</span>
+                    <span>0</span>
+                </div>
+                @endforelse
+                <a href="{{ route('seller.products.index') }}" class="more-link">Lihat Semua Produk...</a>
+            </div>
+        </div>
     </main>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dataSource = document.getElementById('chart-data-source');
+
+            if (dataSource) {
+                const visitorsData = JSON.parse(dataSource.getAttribute('data-stats'));
+
+                const ctx = document.getElementById('visitorsChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                        datasets: [{
+                            label: 'Review Produk',
+                            data: visitorsData,
+                            backgroundColor: '#4CAF50',
+                            borderRadius: 5,
+                            barThickness: 15
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, grid: { color: '#f0f0f0' } },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
