@@ -15,6 +15,7 @@
 <body>
     <div class="header">
         <h2>{{ $meta['title'] }}</h2>
+        <p style="margin: 0; font-size: 14px;">{{ $meta['period'] }}</p>
     </div>
 
     <div class="meta">

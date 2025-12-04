@@ -5,14 +5,14 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 use App\Models\Product;
-use App\Models\Review;
 use App\Models\Category;
+use App\Models\Seller;
 
 class ProductSeeder extends Seeder
 {
     public function run(): void
     {
-        // Ambil hanya kategori yang tidak punya child (kategori akhir)
+        // Ambil kategori leaf
         $leafCategories = Category::whereDoesntHave('children')->get();
 
         if ($leafCategories->count() === 0) {
@@ -20,54 +20,49 @@ class ProductSeeder extends Seeder
             return;
         }
 
+        // Ambil semua seller ID
+        $sellers = Seller::pluck('id');
+
+        if ($sellers->count() === 0) {
+            $this->command->warn("Tidak ada seller ditemukan. Jalankan SellerSeeder dulu.");
+            return;
+        }
+
+        // Produk
         $productNames = [
-            'Monitor Portabel 8 Inch IPS USB Display',
-            'Headphone Wireless Bluetooth HD Audio',
-            'Keyboard Mechanical RGB 87 Keys',
-            'Tas Selempang Kanvas Waterproof',
-            'Smartwatch Fitness Tracker OLED Display',
-            'Kamera Mini HD 1080p Motion Detection',
-            'Bluetooth Speaker Bass Boost',
-            'Tripod Kamera Portable Aluminium',
-            'Webcam Full HD 1080p Autofocus',
-            'Charger USB Fast Charging 3A',
-            'Powerbank 20000mAh Quickcharge',
-            'Lampu LED Smart RGB Wifi Control',
-            'Flashdisk 64GB USB 3.0 High Speed',
-            'Mouse Wireless Ergonomic Silent Click',
-            'Router Wifi Dual Band High Speed',
-            'SSD NVMe 256GB Ultra Fast',
-            'Microphone Podcast Condenser USB',
-            'Gaming Mousepad XXL Anti Slip',
-            'Cooling Pad Laptop 5 Fan RGB',
-            'Drone Mini Camera 4K Ultra HD',
-            'Printer Inkjet Wireless Home Office',
-            'TV Box Android 4K Streaming Player',
-            'Kipas Angin Portable Rechargeable',
-            'Mesin Pembuat Kopi Mini Travel',
-            'Timbangan Digital Portable Akurat',
+            'Monitor Portabel 8 Inch IPS USB Display'      => 'images/products/monitor.png',
+            'Headphone Wireless Bluetooth HD Audio'        => 'images/products/headphone.jpg',
+            'Keyboard Mechanical RGB 87 Keys'              => 'images/products/keyboard.webp',
+            'Tas Selempang Kanvas Waterproof'              => 'images/products/tas.jpg',
+            'Smartwatch Fitness Tracker OLED Display'      => 'images/products/jam.jpg',
+            'Kamera Mini HD 1080p Motion Detection'        => 'images/products/kamera.jpeg',
+            'Bluetooth Speaker Bass Boost'                 => 'images/products/speaker.jpg',
+            'Tripod Kamera Portable Aluminium'             => 'images/products/tripod.jpg',
+            'Webcam Full HD 1080p Autofocus'               => 'images/products/webcam.webp',
+            'Charger USB Fast Charging 3A'                 => 'images/products/charger.jpg',
+            'Powerbank 20000mAh Quickcharge'               => 'images/products/powerbank.webp',
+            'Lampu LED Smart RGB Wifi Control'             => 'images/products/lampu.jpg',
+            'Flashdisk 64GB USB 3.0 High Speed'            => 'images/products/flashdisk.jpg',
+            'Mouse Wireless Ergonomic Silent Click'        => 'images/products/mouse.png',
+            'Router Wifi Dual Band High Speed'             => 'images/products/router.jpg',
+            'SSD NVMe 256GB Ultra Fast'                    => 'images/products/ssd.jpg',
+            'Microphone Podcast Condenser USB'             => 'images/products/mic.jpg',
+            'Gaming Mousepad XXL Anti Slip'                => 'images/products/mousepad.jpg',
+            'Cooling Pad Laptop 5 Fan RGB'                 => 'images/products/coolingpad.jpg',
+            'Drone Mini Camera 4K Ultra HD'                => 'images/products/drone.png',
+            'Printer Inkjet Wireless Home Office'          => 'images/products/printer.jpg',
+            'TV Box Android 4K Streaming Player'           => 'images/products/tvbox.jpg',
+            'Kipas Angin Portable Rechargeable'            => 'images/products/kipas.jpg',
+            'Mesin Pembuat Kopi Mini Travel'               => 'images/products/mesinkopi.jpg',
+            'Timbangan Digital Portable Akurat'            => 'images/products/timbangan.jpg',
         ];
 
-        // $sampleComments = [
-        //     "Barangnya bagus, sesuai deskripsi!",
-        //     "Kualitas oke, harga terjangkau.",
-        //     "Pengiriman cepat dan rapi.",
-        //     "Lumayan, tapi ada sedikit cacat.",
-        //     "Sangat puas! Produk premium.",
-        //     "Seller responsif, rekomendasi.",
-        //     "Performa bagus, sesuai ekspektasi.",
-        //     "Barang ori, packing aman.",
-        //     "Sesuai harga, tidak mengecewakan.",
-        //     "Top banget, akan beli lagi!",
-        // ];
+        foreach ($productNames as $name => $imagePath) {
 
-        foreach ($productNames as $name) {
-
-            // Pilih kategori leaf secara acak
             $category = $leafCategories->random();
+            $sellerId = $sellers->random(); // Pilih seller random
 
-            // Buat produk
-            $product = Product::create([
+            Product::create([
                 'id'          => Str::uuid(),
                 'name'        => $name,
                 'description' => "Deskripsi produk: {$name}. Produk berkualitas tinggi.",
@@ -75,22 +70,9 @@ class ProductSeeder extends Seeder
                 'stock'       => rand(5, 100),
 
                 'category_id' => $category->id,
-                'seller_id'   => null,
-                'images'      => null,
+                'seller_id'   => $sellerId,
+                'images'      => $imagePath,
             ]);
-
-            // // Generate antara 1–5 komentar
-            // $totalComments = rand(1, 5);
-
-            // for ($i = 0; $i < $totalComments; $i++) {
-            //     Review::create([
-            //         'id'         => Str::uuid(),
-            //         'product_id' => $product->id,
-            //         'visitor_id' => null,
-            //         'comment'    => $sampleComments[array_rand($sampleComments)],
-            //         'rating'     => rand(3, 5),
-            //     ]);
-            // }
         }
     }
 }
