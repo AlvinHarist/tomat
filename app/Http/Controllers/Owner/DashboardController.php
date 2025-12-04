@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Seller;
 use App\Models\Product;
 use App\Models\Category;
-use App\Models\CommentRating;
+use App\Models\Review;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -22,7 +22,7 @@ class DashboardController extends Controller
         $totalProducts = Product::count();
         $totalCategories = Category::count();
         // SRS: Jumlah pengunjung yang memberikan komentar dan rating [cite: 67]
-        $totalReviews = CommentRating::count();
+        $totalReviews = Review::count();
 
         // 3. SRS: Sebaran jumlah produk berdasarkan kategori [cite: 67]
         // Kita ambil Top 5 kategori dengan produk terbanyak untuk tabel bawah
@@ -31,7 +31,7 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        // 4. SRS: Sebaran jumlah toko berdasarkan Lokasi propinsi [cite: 67]
+        // 4. SRS: Sebaran jumlah toko berdasarkan Lokasi provinsi [cite: 67]
         // Kita ambil Top 5 provinsi
         $sellerByLocation = Seller::select('pic_province', DB::raw('count(*) as total'))
             ->groupBy('pic_province')
@@ -41,7 +41,7 @@ class DashboardController extends Controller
 
         // 5. Grafik Pengunjung (Berdasarkan aktivitas Review per Bulan)
         // Ini untuk mengisi chart "Site Visitors" sesuai desain
-        $visitorStats = CommentRating::select(
+        $visitorStats = Review::select(
             DB::raw('MONTH(created_at) as month'), 
             DB::raw('count(*) as total')
         )

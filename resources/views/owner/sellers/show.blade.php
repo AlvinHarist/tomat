@@ -43,24 +43,7 @@
 </head>
 <body>
 
-    <aside class="sidebar">
-        <div class="user-profile">
-            <div class="user-info">
-                <div class="user-name">{{ Auth::guard('owner')->user()->name ?? 'Owner' }}</div>
-                <div class="user-role">Owner</div>
-            </div>
-            <div class="avatar"></div>
-        </div>
-        <div class="menu-title">MENU</div>
-        <nav class="nav-links">
-            <a href="{{ route('owner.dashboard') }}"><i class="fas fa-home"></i> Dashboard</a>
-            <a href="{{ route('owner.sellers.index') }}" class="active"><i class="fas fa-store"></i> Seller</a>
-            <a href="#"><i class="fas fa-box-open"></i> Categories</a>
-            <a href="#"><i class="fas fa-cubes"></i> Products</a>
-            <a href="#"><i class="fas fa-cog"></i> Reports</a>
-        </nav>
-        <div class="logo">ToMaT</div>
-    </aside>
+    @include('owner.sidebar')
 
     <main class="main-content">
         <div style="display: flex; align-items: center; margin-bottom: 30px;">
@@ -102,7 +85,7 @@
                 <h3>Dokumen Pendukung</h3>
                 
                 <span class="info-label">Foto KTP</span>
-                <div class="doc-preview" onclick="openModal('{{ asset('storage/' . $seller->pic_ktp_file_path) }}', 'Foto KTP - {{ $seller->pic_name }}')">
+                <div class="doc-preview" onclick="openModal('{{ asset( $seller->pic_ktp_file_path) }}', 'Foto KTP - {{ $seller->pic_name }}')">
                     @if($seller->pic_ktp_file_path)
                         <img src="{{ asset('storage/' . $seller->pic_ktp_file_path) }}" alt="Foto KTP">
                     @else
@@ -111,7 +94,7 @@
                 </div>
 
                 <span class="info-label">Foto PIC</span>
-                <div class="doc-preview" onclick="openModal('{{ asset('storage/' . $seller->pic_photo_path) }}', 'Foto PIC - {{ $seller->pic_name }}')">
+                <div class="doc-preview" onclick="openModal('{{ asset( $seller->pic_photo_path) }}', 'Foto PIC - {{ $seller->pic_name }}')">
                     @if($seller->pic_photo_path)
                         <img src="{{ asset('storage/' . $seller->pic_photo_path) }}" alt="Foto PIC">
                     @else
@@ -170,6 +153,5 @@
             }
         });
     </script>
-
 </body>
 </html>
