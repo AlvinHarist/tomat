@@ -55,8 +55,8 @@
             <canvas id="visitorsChart" height="80"></canvas>
         </div>
 
-<div class="bottom-grid">
-            
+        <div class="bottom-grid">
+
             <div class="table-card">
                 <div class="table-header">
                     <span>Category</span>
@@ -64,11 +64,12 @@
                 </div>
                 
                 <div id="category-list">
-                    @foreach($productByCategory as $index => $cat)
-                    <div class="list-item {{ $index >= 5 ? 'hidden-row' : '' }}">
-                        <span>{{ $cat->name }}</span>
-                        <span>{{ $cat->products_count }}</span>
-                    </div>
+                    @foreach($productByCategory as $cat)
+                        {{-- Gunakan $loop->index. Jika index ke-5 (item ke-6) atau lebih, sembunyikan --}}
+                        <div class="list-item {{ $loop->index >= 5 ? 'hidden-row' : '' }}">
+                            <span>{{ $cat->name }}</span>
+                            <span>{{ $cat->products_count }}</span>
+                        </div>
                     @endforeach
                 </div>
 
@@ -84,11 +85,11 @@
                 </div>
 
                 <div id="location-list">
-                    @foreach($sellerByLocation as $index => $loc)
-                    <div class="list-item {{ $index >= 5 ? 'hidden-row' : '' }}">
-                        <span>{{ $loc->pic_province }}</span>
-                        <span>{{ $loc->total }}</span>
-                    </div>
+                    @foreach($sellerByLocation as $loc)
+                        <div class="list-item {{ $loop->index >= 5 ? 'hidden-row' : '' }}">
+                            <span>{{ $loc->pic_province }}</span>
+                            <span>{{ $loc->total }}</span>
+                        </div>
                     @endforeach
                 </div>
 
@@ -118,7 +119,7 @@
                         datasets: [{
                             label: 'Visitors',
                             data: visitorsData,
-                            backgroundColor: '#4CAF50',
+                            backgroundColor: '#21BD38',
                             borderRadius: 5,
                             barThickness: 15
                         }]
@@ -143,7 +144,7 @@
             
             // 3. Tampilkan semua baris tersebut
             hiddenRows.forEach(row => {
-                row.style.display = 'flex'; // Kembalikan ke display flex agar rapi
+                row.classList.remove('hidden-row');
             });
 
             // 4. Sembunyikan tombol "More" karena semua data sudah tampil

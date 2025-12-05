@@ -28,7 +28,6 @@
             <h3>Tidak ada laporan dalam periode tanggal ini.</h3>
         </div>
     @else
-
         <table>
             <thead>
                 <tr>

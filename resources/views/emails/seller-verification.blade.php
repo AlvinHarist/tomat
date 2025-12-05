@@ -26,7 +26,7 @@
                 <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
                     
                     <tr>
-                        <td align="center" style="background-color: #4CAF50; padding: 30px 0;">
+                        <td align="center" style="background-color: #21BD38; padding: 30px 0;">
                             <h1 style="color: #ffffff; font-family: Arial, sans-serif; font-size: 28px; font-weight: bold; margin: 0;">ToMaT</h1>
                             <p style="color: #ffffff; font-family: Arial, sans-serif; font-size: 14px; margin: 5px 0 0;">Toko Online Terpercaya</p>
                         </td>
@@ -47,7 +47,7 @@
                             <table border="0" cellspacing="0" cellpadding="0" width="100%">
                                 <tr>
                                     <td align="center">
-                                        <a href="{{ $verificationUrl }}" class="button-link" style="background-color: #4CAF50; color: #ffffff; display: inline-block; font-size: 16px; font-weight: bold; padding: 15px 30px; text-decoration: none; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">Verifikasi Toko Saya</a>
+                                        <a href="{{ $verificationUrl }}" class="button-link" style="background-color: #21BD38; color: #ffffff; display: inline-block; font-size: 16px; font-weight: bold; padding: 15px 30px; text-decoration: none; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">Verifikasi Toko Saya</a>
                                     </td>
                                 </tr>
                             </table>
@@ -63,7 +63,7 @@
                         <td align="left" style="padding: 0 30px 30px; font-family: Arial, sans-serif;">
                             <p style="font-size: 12px; color: #999999; line-height: 18px; margin: 0;">
                                 Jika tombol di atas tidak berfungsi, salin dan tempel tautan berikut ke browser Anda:<br>
-                                <a href="{{ $verificationUrl }}" style="color: #4CAF50; word-break: break-all;">{{ $verificationUrl }}</a>
+                                <a href="{{ $verificationUrl }}" style="color: #21BD38; word-break: break-all;">{{ $verificationUrl }}</a>
                             </p>
                         </td>
                     </tr>
