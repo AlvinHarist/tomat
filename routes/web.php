@@ -27,10 +27,6 @@ use App\Mail\SendTestEmail;
 |
 */
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
-
 // Rute untuk menampilkan halaman formulir
 Route::get('/', [RegisterController::class, 'showRegistrationForm'])->name('register');
 
@@ -57,6 +53,12 @@ Route::prefix('seller')->name('seller.')->group(function () {
     // Protected Routes
     Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/dashboard', [App\Http\Controllers\Seller\DashboardController::class, 'index'])->name('dashboard');
+        
+        // --- Seller Functionality Routes ---
+        
+        // Rute Halaman Daftar Lengkap Reviewer (Dipanggil oleh tombol "More...")
+        Route::get('/reviewers/province', [App\Http\Controllers\Seller\DashboardController::class, 'reviewersByProvinceIndex'])
+             ->name('reviewers.by-province.index'); 
         
         // Products
         Route::get('/products', [App\Http\Controllers\Seller\ProductController::class, 'index'])->name('products.index');
