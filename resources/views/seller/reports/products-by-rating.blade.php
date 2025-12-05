@@ -57,12 +57,12 @@
 <body>
     <div class="header">
         <h2>LAPORAN DAFTAR PRODUK BERDASARKAN RATING</h2>
-        <p>SRS-MartPlace-13</p>
     </div>
 
     <div class="info-section">
         <p><strong>Nama Seller:</strong> {{ $seller->pic_name }}</p>
         <p><strong>Tanggal Cetak:</strong> {{ $date }}</p>
+        <p><strong>Rentang Produk Dibuat:</strong> {{ $filterDate }}</p>
     </div>
 
     <table>
@@ -85,7 +85,7 @@
                 <td class="text-right">Rp {{ number_format($product->price, 0, ',', '.') }}</td>
                 <td class="text-center">
                     @if($product->avg_rating > 0)
-                        <span class="rating-stars">{{ number_format($product->avg_rating, 1) }} ★</span>
+                        <span class="rating-stars">{{ number_format($product->avg_rating, 1) }}</span>
                     @else
                         <span>Belum ada rating</span>
                     @endif
@@ -103,7 +103,7 @@
     <div style="margin-top: 40px;">
         <p><strong>Total Produk:</strong> {{ $products->count() }}</p>
         @if($products->count() > 0)
-            <p><strong>Rata-rata Rating Keseluruhan:</strong> {{ number_format($products->avg('avg_rating'), 2) }} ★</p>
+            <p><strong>Rata-rata Rating Keseluruhan:</strong> {{ number_format($products->avg('avg_rating'), 2) }} </p>
         @endif
     </div>
 </body>

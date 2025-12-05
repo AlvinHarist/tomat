@@ -65,11 +65,22 @@ Route::prefix('seller')->name('seller.')->group(function () {
         Route::delete('/products/{id}', [App\Http\Controllers\Seller\ProductController::class, 'destroy'])->name('products.destroy');
         
         // Reports
-        Route::get('/reports', [App\Http\Controllers\Seller\ReportController::class, 'index'])->name('reports.index');
-        Route::get('/reports/stock', [App\Http\Controllers\Seller\ReportController::class, 'productsByStock'])->name('reports.stock');
-        Route::get('/reports/rating', [App\Http\Controllers\Seller\ReportController::class, 'productsByRating'])->name('reports.rating');
-        Route::get('/reports/restock', [App\Http\Controllers\Seller\ReportController::class, 'productsNeedRestock'])->name('reports.restock');
+    Route::prefix('reports')->name('reports.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Seller\ReportController::class, 'index'])->name('index');
+
+        // Products By Stock
+        Route::get('/stock/filter', [App\Http\Controllers\Seller\ReportController::class, 'productsByStockFilter'])->name('products-by-stock.filter');
+        Route::get('/stock', [App\Http\Controllers\Seller\ReportController::class, 'productsByStock'])->name('stock');
+
+        // Products By Rating
+        Route::get('/rating/filter', [App\Http\Controllers\Seller\ReportController::class, 'productsByRatingFilter'])->name('products-by-rating.filter');
+        Route::get('/rating', [App\Http\Controllers\Seller\ReportController::class, 'productsByRating'])->name('rating');
+
+        // Products Need Restock
+        Route::get('/restock/filter', [App\Http\Controllers\Seller\ReportController::class, 'productsNeedRestockFilter'])->name('products-need-restock.filter');
+        Route::get('/restock', [App\Http\Controllers\Seller\ReportController::class, 'productsNeedRestock'])->name('restock');
     });
+        });
 });
 
 Route::prefix('owner')->name('owner.')->group(function () {
