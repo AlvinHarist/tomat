@@ -117,26 +117,47 @@
                             </div>
                         </div>
                         
-                        <!-- Product Image -->
+                        <!-- Product Images (Multiple) -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">
-                                Foto Produk
+                                Foto Produk (Maksimal 10)
                             </label>
-                            <div class="flex items-start space-x-4">
-                                <div class="w-32 h-32 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden">
-                                    <img id="preview-image" src="{{ asset('storage/' . $product->image_path) }}" alt="Preview" class="w-full h-full object-cover">
+                            
+                            <!-- Existing Images -->
+                            @if($product->images && is_array($product->images) && count($product->images) > 0)
+                            <div class="mb-4">
+                                <p class="text-sm text-gray-600 mb-2">Foto saat ini:</p>
+                                <div class="grid grid-cols-2 md:grid-cols-5 gap-4" id="existing-images">
+                                    @foreach($product->images as $index => $image)
+                                    <div class="relative group">
+                                        <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 border-gray-300">
+                                            <img src="{{ asset('storage/' . $image) }}" class="w-full h-full object-cover">
+                                        </div>
+                                        <button type="button" onclick="markForDeletion('{{ $image }}', this)" 
+                                                class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    @endforeach
                                 </div>
-                                <div class="flex-1">
-                                    <label class="cursor-pointer inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg font-semibold text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                        </svg>
-                                        Ganti Foto
-                                        <input type="file" name="image" class="hidden" accept="image/*" id="image-input">
-                                    </label>
-                                    <p class="text-xs text-gray-500 mt-2">Format: JPG, PNG. Maksimal 2MB. Kosongkan jika tidak ingin mengganti.</p>
-                                    <p class="text-sm text-gray-700 mt-1" id="file-name">{{ basename($product->image_path) }}</p>
-                                </div>
+                            </div>
+                            @endif
+                            
+                            <!-- Add New Images -->
+                            <div>
+                                <label class="cursor-pointer inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg font-semibold text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                    Tambah Foto Baru
+                                    <input type="file" name="images[]" class="hidden" accept="image/*" multiple id="images-input">
+                                </label>
+                                <p class="text-xs text-gray-500 mt-2">Format: JPG, PNG. Maksimal 2MB per file. Total maksimal 10 foto.</p>
+                                
+                                <!-- New Images Preview -->
+                                <div id="preview-container" class="mt-4 grid grid-cols-2 md:grid-cols-5 gap-4"></div>
                             </div>
                         </div>
                         
@@ -161,29 +182,111 @@
     </div>
     
     <script>
-        // Image preview
-        document.getElementById('image-input').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            const preview = document.getElementById('preview-image');
-            const fileName = document.getElementById('file-name');
+        // Multiple images preview
+        const imagesInput = document.getElementById('images-input');
+        const previewContainer = document.getElementById('preview-container');
+        let selectedFiles = [];
+        let imagesToDelete = [];
+
+        imagesInput.addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            const existingCount = document.querySelectorAll('#existing-images > div:not(.deleted)').length;
+            const totalCount = existingCount + files.length - imagesToDelete.length;
             
-            if (file) {
-                // Check file size (2MB)
+            // Validate total file count
+            if (totalCount > 10) {
+                alert('Total maksimal 10 foto!');
+                e.target.value = '';
+                return;
+            }
+            
+            // Validate file sizes
+            for (let file of files) {
                 if (file.size > 2 * 1024 * 1024) {
-                    alert('Ukuran file terlalu besar! Maksimal 2MB.');
+                    alert(`File ${file.name} terlalu besar! Maksimal 2MB per file.`);
                     e.target.value = '';
                     return;
                 }
-                
-                fileName.textContent = file.name;
-                
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.src = e.target.result;
-                }
-                reader.readAsDataURL(file);
             }
+            
+            selectedFiles = files;
+            displayPreviews();
         });
+
+        function displayPreviews() {
+            previewContainer.innerHTML = '';
+            
+            selectedFiles.forEach((file, index) => {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const div = document.createElement('div');
+                    div.className = 'relative group';
+                    div.innerHTML = `
+                        <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 border-gray-300">
+                            <img src="${e.target.result}" class="w-full h-full object-cover">
+                        </div>
+                        <button type="button" onclick="removeNewImage(${index})" 
+                                class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                        <p class="text-xs text-gray-600 mt-1 text-center truncate">${file.name}</p>
+                    `;
+                    previewContainer.appendChild(div);
+                };
+                
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function removeNewImage(index) {
+            selectedFiles.splice(index, 1);
+            
+            // Update file input
+            const dt = new DataTransfer();
+            selectedFiles.forEach(file => dt.items.add(file));
+            imagesInput.files = dt.files;
+            
+            displayPreviews();
+        }
+
+        function markForDeletion(imagePath, button) {
+            const parentDiv = button.closest('.group');
+            
+            if (parentDiv.classList.contains('deleted')) {
+                // Unmark for deletion
+                parentDiv.classList.remove('deleted', 'opacity-50');
+                button.classList.remove('bg-green-500');
+                button.classList.add('bg-red-500');
+                button.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>`;
+                
+                imagesToDelete = imagesToDelete.filter(img => img !== imagePath);
+                
+                // Remove hidden input
+                document.querySelector(`input[name="delete_images[]"][value="${imagePath}"]`)?.remove();
+            } else {
+                // Mark for deletion
+                parentDiv.classList.add('deleted', 'opacity-50');
+                button.classList.remove('bg-red-500');
+                button.classList.add('bg-green-500');
+                button.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12l4 4m0 0l8-8m-8 8H2"/>
+                </svg>`;
+                
+                imagesToDelete.push(imagePath);
+                
+                // Add hidden input
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'delete_images[]';
+                input.value = imagePath;
+                document.querySelector('form').appendChild(input);
+            }
+        }
     </script>
         </div>
     </div>

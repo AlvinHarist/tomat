@@ -85,18 +85,18 @@
                 <h3>Dokumen Pendukung</h3>
                 
                 <span class="info-label">Foto KTP</span>
-                <div class="doc-preview" onclick="openModal('{{ asset( $seller->pic_ktp_file_path) }}', 'Foto KTP - {{ $seller->pic_name }}')">
+                <div class="doc-preview" onclick="openModal('{{ asset($seller->pic_ktp_file_path) }}', 'Foto KTP - {{ $seller->pic_name }}')"> 
                     @if($seller->pic_ktp_file_path)
-                        <img src="{{ asset('storage/' . $seller->pic_ktp_file_path) }}" alt="Foto KTP">
+                        <img src="{{ asset($seller->pic_ktp_file_path) }}" alt="Foto KTP">
                     @else
                         <span style="color: #ccc;">Tidak ada file</span>
                     @endif
                 </div>
 
                 <span class="info-label">Foto PIC</span>
-                <div class="doc-preview" onclick="openModal('{{ asset( $seller->pic_photo_path) }}', 'Foto PIC - {{ $seller->pic_name }}')">
+                <div class="doc-preview" onclick="openModal('{{ asset($seller->pic_photo_path) }}', 'Foto PIC - {{ $seller->pic_name }}')"> 
                     @if($seller->pic_photo_path)
-                        <img src="{{ asset('storage/' . $seller->pic_photo_path) }}" alt="Foto PIC">
+                        <img src="{{ asset($seller->pic_photo_path) }}" alt="Foto PIC">
                     @else
                         <span style="color: #ccc;">Tidak ada file</span>
                     @endif

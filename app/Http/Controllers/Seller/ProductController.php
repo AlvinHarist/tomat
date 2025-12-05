@@ -42,7 +42,8 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
-            'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'images.*' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'images' => 'required|array|min:1|max:10',
         ]);
         
         if ($validator->fails()) {
@@ -52,7 +53,16 @@ class ProductController extends Controller
         }
         
         try {
-            $imagePath = $request->file('image')->store('products', 'public');
+            $imagePaths = [];
+            
+            // Upload multiple images
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $image) {
+                    $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                    $image->move(public_path('images/products'), $filename);
+                    $imagePaths[] = 'images/products/' . $filename;
+                }
+            }
             
             Product::create([
                 'seller_id' => $seller->id,
@@ -61,15 +71,21 @@ class ProductController extends Controller
                 'description' => $request->description,
                 'price' => $request->price,
                 'stock' => $request->stock,
-                'images' => $imagePath,
+                'images' => $imagePaths,
             ]);
             
             return redirect()->route('seller.products.index')
                 ->with('success', 'Produk berhasil ditambahkan!');
                 
         } catch (\Exception $e) {
-            if (isset($imagePath)) {
-                Storage::disk('public')->delete($imagePath);
+            // Delete uploaded images if error occurs
+            if (isset($imagePaths) && count($imagePaths) > 0) {
+                foreach ($imagePaths as $path) {
+                    $fullPath = public_path($path);
+                    if (file_exists($fullPath)) {
+                        unlink($fullPath);
+                    }
+                }
             }
             
             return redirect()->back()
@@ -100,7 +116,10 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'images' => 'nullable|array|max:10',
+            'delete_images' => 'nullable|array',
+            'delete_images.*' => 'string',
         ]);
         
         if ($validator->fails()) {
@@ -118,13 +137,36 @@ class ProductController extends Controller
                 'category_id' => $request->category_id,
             ];
             
-            if ($request->hasFile('image')) {
-                // Delete old image
-                if ($product->images) {
-                    Storage::disk('public')->delete($product->images);
+            // Get existing images
+            $existingImages = $product->images ?? [];
+            
+            // Delete selected images
+            if ($request->has('delete_images')) {
+                foreach ($request->delete_images as $imageToDelete) {
+                    $fullPath = public_path($imageToDelete);
+                    if (file_exists($fullPath)) {
+                        unlink($fullPath);
+                    }
+                    $existingImages = array_diff($existingImages, [$imageToDelete]);
                 }
-                
-                $data['images'] = $request->file('image')->store('products', 'public');
+            }
+            
+            // Upload new images
+            if ($request->hasFile('images')) {
+                $newImagePaths = [];
+                foreach ($request->file('images') as $image) {
+                    $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                    $image->move(public_path('images/products'), $filename);
+                    $newImagePaths[] = 'images/products/' . $filename;
+                }
+                $existingImages = array_merge($existingImages, $newImagePaths);
+            }
+            
+            // Limit to 10 images
+            $existingImages = array_slice(array_values($existingImages), 0, 10);
+            
+            if (count($existingImages) > 0) {
+                $data['images'] = $existingImages;
             }
             
             $product->update($data);
@@ -146,9 +188,14 @@ class ProductController extends Controller
         $product = Product::where('seller_id', $seller->id)->findOrFail($id);
         
         try {
-            // Delete image
-            if ($product->images) {
-                Storage::disk('public')->delete($product->images);
+            // Delete all images
+            if ($product->images && is_array($product->images)) {
+                foreach ($product->images as $image) {
+                    $fullPath = public_path($image);
+                    if (file_exists($fullPath)) {
+                        unlink($fullPath);
+                    }
+                }
             }
             
             $product->delete();
