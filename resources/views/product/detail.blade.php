@@ -75,8 +75,9 @@
                 </div>
 
                 @php
-                    // rata-rata dari semua ulasan
-                    $avgRating = $product->reviews->avg('rating');
+                    // Gunakan avg_rating dari database (sudah disimpan)
+                    $avgRating = $product->avg_rating;
+                    $reviewCount = $product->review_count;
 
                     // rating yang sedang difilter (misal ?rating=5)
                     $selectedRating = request('rating');
@@ -87,7 +88,7 @@
                         : $product->reviews;
                 @endphp
 
-                @if ($avgRating)
+                @if ($avgRating > 0)
                     <div class="flex items-center gap-2 text-sm text-gray-600 mt-2">
                         <div class="flex">
                             @for ($i = 1; $i <= 5; $i++)
@@ -100,8 +101,16 @@
                         </div>
 
                         <span>{{ number_format($avgRating, 1) }}</span>
+                        @if($reviewCount > 0)
+                            <span class="text-gray-400">•</span>
+                            <span class="text-gray-600">{{ $reviewCount }} ulasan</span>
+                        @endif
                         <span class="text-gray-400">•</span>
                         <span>{{ optional($product->seller)->pic_province ?? 'Lokasi tidak diketahui' }}</span>
+                    </div>
+                @else
+                    <div class="text-sm text-gray-500 mt-2">
+                        Belum ada rating
                     </div>
                 @endif
 

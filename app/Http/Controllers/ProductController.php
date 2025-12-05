@@ -133,14 +133,8 @@ class ProductController extends Controller
         // 🔍 FILTER RATING (min rata-rata bintang)
         if (!empty($rating)) {
             $rating = (int) $rating;
-
-            // hitung avg rating via subquery dan filter di HAVING
-            $query
-                ->withAvg('reviews', 'rating')
-                ->having('reviews_avg_rating', '>=', $rating);
-        } else {
-            // kalau mau tetap punya kolom reviews_avg_rating untuk display
-            $query->withAvg('reviews', 'rating');
+            // Filter menggunakan avg_rating yang sudah disimpan di database
+            $query->where('avg_rating', '>=', $rating);
         }
 
         // 🔍 Ambil data

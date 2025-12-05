@@ -37,27 +37,22 @@ class="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-
           Rp {{ number_format($product->price, 0, ',', '.') }}
       </div>
 
-      {{-- Rating & terjual --}}
-      @if(isset($product->rating) || isset($product->sold))
-          <div class="flex items-center text-xs text-gray-600 mt-1 gap-1.5">
-              @if(isset($product->rating))
-                  <span class="text-yellow-500">★</span>
-                  <span class="font-semibold">{{ number_format($product->rating, 1) }}</span>
+      {{-- Rating & Review Count --}}
+      <div class="flex items-center gap-2 mt-2">
+          @if($product->avg_rating > 0)
+              <div class="flex items-center gap-1">
+                  <span class="text-xs font-semibold text-gray-900">{{ number_format($product->avg_rating, 1) }}</span>
+                  <span class="text-yellow-400 text-xs">★</span>
+              </div>
+              @if($product->review_count > 0)
+                  <span class="text-xs text-gray-500">
+                      ({{ $product->review_count }})
+                  </span>
               @endif
-
-              @if(isset($product->sold))
-                  <span>•</span>
-                  <span>{{ $product->sold }} terjual</span>
-              @endif
-          </div>
-      @endif
-
-      {{-- Lokasi --}}
-      @if(isset($product->location))
-          <div class="flex items-center text-xs text-gray-500 mt-1 gap-1.5">
-              {{ $product->location }}
-          </div>
-      @endif
+          @else
+              <span class="text-xs text-gray-400">Belum ada rating</span>
+          @endif
+      </div>
 
       {{-- Menu titik tiga --}}
       <div class="flex justify-end mt-2">
