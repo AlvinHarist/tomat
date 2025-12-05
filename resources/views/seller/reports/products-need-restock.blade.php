@@ -67,12 +67,12 @@
 <body>
     <div class="header">
         <h2>LAPORAN DAFTAR PRODUK SEGERA DIPESAN</h2>
-        <p>SRS-MartPlace-14</p>
     </div>
 
     <div class="info-section">
         <p><strong>Nama Seller:</strong> {{ $seller->pic_name }}</p>
         <p><strong>Tanggal Cetak:</strong> {{ $date }}</p>
+        <p><strong>Rentang Produk Dibuat:</strong> {{ $filterDate }}</p>
         <p><strong>Kriteria:</strong> Produk dengan stok kurang dari 10</p>
     </div>
 

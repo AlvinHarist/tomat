@@ -55,14 +55,13 @@ class ProductController extends Controller
             $imagePath = $request->file('image')->store('products', 'public');
             
             Product::create([
-                'id' => \Illuminate\Support\Str::uuid(),
                 'seller_id' => $seller->id,
                 'category_id' => $request->category_id,
                 'name' => $request->name,
                 'description' => $request->description,
                 'price' => $request->price,
                 'stock' => $request->stock,
-                'image_path' => $imagePath,
+                'images' => $imagePath,
             ]);
             
             return redirect()->route('seller.products.index')
@@ -121,11 +120,11 @@ class ProductController extends Controller
             
             if ($request->hasFile('image')) {
                 // Delete old image
-                if ($product->image_path) {
-                    Storage::disk('public')->delete($product->image_path);
+                if ($product->images) {
+                    Storage::disk('public')->delete($product->images);
                 }
                 
-                $data['image_path'] = $request->file('image')->store('products', 'public');
+                $data['images'] = $request->file('image')->store('products', 'public');
             }
             
             $product->update($data);
@@ -148,8 +147,8 @@ class ProductController extends Controller
         
         try {
             // Delete image
-            if ($product->image_path) {
-                Storage::disk('public')->delete($product->image_path);
+            if ($product->images) {
+                Storage::disk('public')->delete($product->images);
             }
             
             $product->delete();
