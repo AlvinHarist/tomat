@@ -34,8 +34,8 @@ class DashboardController extends Controller
         // Get monthly site visitors data (simulated data)
         $monthlyVisitors = $this->getMonthlyVisitors();
         
-        // Get reviewer counts by province
-        $reviewersByProvince = $this->getReviewersByProvince($seller->id);
+        // Get reviewer counts by province (dibatasi 3 baris untuk dashboard)
+        $reviewersByProvince = $this->getReviewersByProvince($seller->id, 3);
         
         // Get products with details (stock, category, comments, rating)
         $products = $this->getProductsWithDetails($seller->id);
@@ -50,6 +50,27 @@ class DashboardController extends Controller
         ));
     }
     
+    /**
+     * Metode baru: Menampilkan halaman penuh daftar reviewer per provinsi.
+     */
+    public function reviewersByProvinceIndex()
+    {
+        $user = Auth::guard('web')->user();
+        $seller = \App\Models\Seller::where('pic_email', $user->email)->first();
+
+        if (!$seller) {
+            return redirect()->route('seller.login')->with('error', 'Data seller tidak ditemukan.');
+        }
+
+        // Ambil semua data reviewer tanpa limit
+        $reviewers = $this->getReviewersByProvince($seller->id);
+
+        return view('seller.province-index', compact('reviewers'));
+    }
+
+    /**
+     * Mengambil data pengunjung bulanan simulasi.
+     */
     private function getMonthlyVisitors()
     {
         // Simulated monthly visitors data (this should be replaced with actual analytics)
@@ -66,27 +87,37 @@ class DashboardController extends Controller
         return $data;
     }
     
-    private function getReviewersByProvince($sellerId)
+    /**
+     * Mengambil data reviewer per provinsi dengan batasan limit.
+     */
+    private function getReviewersByProvince($sellerId, $limit = null)
     {
         // Get reviewer counts by province for seller's products
-        $reviewers = DB::table('reviews')
+        $query = DB::table('reviews')
             ->join('products', 'reviews.product_id', '=', 'products.id')
             ->where('products.seller_id', $sellerId)
             ->select('reviews.province', DB::raw('count(*) as count'))
             ->groupBy('reviews.province')
-            ->orderBy('count', 'desc')
-            ->limit(3)
-            ->get();
+            ->orderBy('count', 'desc');
+
+        if ($limit) {
+            $query->limit($limit);
+        }
         
-        if ($reviewers->isEmpty()) {
-            return collect([
-                ['province' => 'No reviews yet', 'count' => 0]
+        $reviewers = $query->get();
+        
+        if ($reviewers->isEmpty() && !$limit) {
+             return collect([
+                (object)['province' => 'No reviews yet', 'count' => 0]
             ]);
         }
         
         return $reviewers;
     }
     
+    /**
+     * Mengambil produk dengan detail untuk tampilan dashboard.
+     */
     private function getProductsWithDetails($sellerId)
     {
         // Get products with stock, category, comments count, and rating
