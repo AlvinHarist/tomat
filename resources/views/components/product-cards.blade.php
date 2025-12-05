@@ -11,7 +11,7 @@ class="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-
     @if ($hasImage)
         {{-- Jika punya gambar --}}
         <img
-            src="{{ asset('storage/' . $firstImage) }}"
+            src="{{ asset($firstImage) }}"
             alt="{{ $product->name }}"
             class="w-full h-full object-cover rounded-lg"
         >

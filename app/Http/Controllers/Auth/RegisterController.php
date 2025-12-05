@@ -103,8 +103,17 @@ class RegisterController extends Controller
 
         DB::beginTransaction();
         try {
-            $photoPath = $request->file('photo')->store('profiles', 'public');
-            $ktpFilePath = $request->file('ktp_file')->store('ktp', 'public');
+            // Upload photo to public/images/profiles
+            $photoFile = $request->file('photo');
+            $photoFilename = time() . '_' . uniqid() . '.' . $photoFile->getClientOriginalExtension();
+            $photoFile->move(public_path('images/profiles'), $photoFilename);
+            $photoPath = 'images/profiles/' . $photoFilename;
+            
+            // Upload KTP to public/images/ktp
+            $ktpFile = $request->file('ktp_file');
+            $ktpFilename = time() . '_' . uniqid() . '.' . $ktpFile->getClientOriginalExtension();
+            $ktpFile->move(public_path('images/ktp'), $ktpFilename);
+            $ktpFilePath = 'images/ktp/' . $ktpFilename;
 
             // Create User for Authentication
             $user = User::create([
@@ -177,10 +186,16 @@ class RegisterController extends Controller
             DB::rollBack();
 
             if ($photoPath) {
-                Storage::disk('public')->delete($photoPath);
+                $fullPath = public_path($photoPath);
+                if (file_exists($fullPath)) {
+                    unlink($fullPath);
+                }
             }
             if ($ktpFilePath) {
-                Storage::disk('public')->delete($ktpFilePath);
+                $fullPath = public_path($ktpFilePath);
+                if (file_exists($fullPath)) {
+                    unlink($fullPath);
+                }
             }
 
             return redirect()->back()
