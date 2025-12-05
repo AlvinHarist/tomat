@@ -26,7 +26,7 @@
                 @if ($hasImages)
                     <img
                         id="mainProductImage"
-                        src="{{ asset($firstImage) }}"
+                        src="{{ asset('storage/' . $firstImage) }}"
                         alt="{{ $product->name }}"
                         class="w-full h-full object-cover"
                     >
@@ -50,10 +50,10 @@
                             class="product-thumb-btn flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border
                                 @if($index === 0) ring-2 ring-green-500 border-green-500 @else border-gray-200 @endif
                                 focus:outline-none focus:ring-2 focus:ring-green-500"
-                            data-image="{{ asset($img) }}"
+                            data-image="{{ asset('storage/' . $img) }}"
                         >
                             <img
-                                src="{{ asset($img) }}"
+                                src="{{ asset('storage/' . $img) }}"
                                 alt="{{ $product->name }} thumbnail {{ $index + 1 }}"
                                 class="w-full h-full object-cover"
                             >

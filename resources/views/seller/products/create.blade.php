@@ -116,27 +116,23 @@
                             </div>
                         </div>
                         
-                        <!-- Product Image -->
+                        <!-- Product Images (Multiple) -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">
-                                Foto Produk <span class="text-red-500">*</span>
+                                Foto Produk (Maksimal 10) <span class="text-red-500">*</span>
                             </label>
-                            <div class="flex items-start space-x-4">
-                                <div class="w-32 h-32 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden">
-                                    <img id="preview-image" src="#" alt="Preview" class="w-full h-full object-cover hidden">
-                                    <span class="text-gray-400 text-xs text-center p-2" id="placeholder-image">Preview Foto</span>
-                                </div>
-                                <div class="flex-1">
-                                    <label class="cursor-pointer inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg font-semibold text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                        </svg>
-                                        Pilih Foto
-                                        <input type="file" name="image" class="hidden" accept="image/*" required id="image-input">
-                                    </label>
-                                    <p class="text-xs text-gray-500 mt-2">Format: JPG, PNG. Maksimal 2MB.</p>
-                                    <p class="text-sm text-gray-700 mt-1" id="file-name">Belum ada file dipilih</p>
-                                </div>
+                            <div>
+                                <label class="cursor-pointer inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg font-semibold text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                    Pilih Foto (Bisa lebih dari 1)
+                                    <input type="file" name="images[]" class="hidden" accept="image/*" multiple required id="images-input" max="10">
+                                </label>
+                                <p class="text-xs text-gray-500 mt-2">Format: JPG, PNG. Maksimal 2MB per file. Pilih 1-10 foto.</p>
+                                
+                                <!-- Preview Container -->
+                                <div id="preview-container" class="mt-4 grid grid-cols-2 md:grid-cols-5 gap-4"></div>
                             </div>
                         </div>
                         
@@ -161,36 +157,72 @@
     </div>
     
     <script>
-        // Image preview
-        document.getElementById('image-input').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            const preview = document.getElementById('preview-image');
-            const placeholder = document.getElementById('placeholder-image');
-            const fileName = document.getElementById('file-name');
+        // Multiple images preview
+        const imagesInput = document.getElementById('images-input');
+        const previewContainer = document.getElementById('preview-container');
+        let selectedFiles = [];
+
+        imagesInput.addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
             
-            if (file) {
-                // Check file size (2MB)
+            // Validate file count
+            if (files.length > 10) {
+                alert('Maksimal 10 foto!');
+                e.target.value = '';
+                return;
+            }
+            
+            // Validate file sizes
+            for (let file of files) {
                 if (file.size > 2 * 1024 * 1024) {
-                    alert('Ukuran file terlalu besar! Maksimal 2MB.');
+                    alert(`File ${file.name} terlalu besar! Maksimal 2MB per file.`);
                     e.target.value = '';
                     return;
                 }
-                
-                fileName.textContent = file.name;
-                
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.src = e.target.result;
-                    preview.classList.remove('hidden');
-                    placeholder.classList.add('hidden');
-                }
-                reader.readAsDataURL(file);
-            } else {
-                fileName.textContent = 'Belum ada file dipilih';
-                preview.classList.add('hidden');
-                placeholder.classList.remove('hidden');
             }
+            
+            selectedFiles = files;
+            displayPreviews();
         });
+
+        function displayPreviews() {
+            previewContainer.innerHTML = '';
+            
+            selectedFiles.forEach((file, index) => {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const div = document.createElement('div');
+                    div.className = 'relative group';
+                    div.innerHTML = `
+                        <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 border-gray-300">
+                            <img src="${e.target.result}" class="w-full h-full object-cover">
+                        </div>
+                        <button type="button" onclick="removeImage(${index})" 
+                                class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                        <p class="text-xs text-gray-600 mt-1 text-center truncate">${file.name}</p>
+                    `;
+                    previewContainer.appendChild(div);
+                };
+                
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function removeImage(index) {
+            selectedFiles.splice(index, 1);
+            
+            // Update file input
+            const dt = new DataTransfer();
+            selectedFiles.forEach(file => dt.items.add(file));
+            imagesInput.files = dt.files;
+            
+            displayPreviews();
+        }
     </script>
         </div>
     </div>
