@@ -55,20 +55,26 @@
             <canvas id="visitorsChart" height="80"></canvas>
         </div>
 
-        <div class="bottom-grid">
+<div class="bottom-grid">
             
             <div class="table-card">
                 <div class="table-header">
                     <span>Category</span>
                     <span>Product Count</span>
                 </div>
-                @foreach($productByCategory as $cat)
-                <div class="list-item">
-                    <span>{{ $cat->name }}</span>
-                    <span>{{ $cat->products_count }}</span>
+                
+                <div id="category-list">
+                    @foreach($productByCategory as $index => $cat)
+                    <div class="list-item {{ $index >= 5 ? 'hidden-row' : '' }}">
+                        <span>{{ $cat->name }}</span>
+                        <span>{{ $cat->products_count }}</span>
+                    </div>
+                    @endforeach
                 </div>
-                @endforeach
-                <a href="#" class="more-link">More...</a>
+
+                @if($productByCategory->count() > 5)
+                    <a href="javascript:void(0)" class="more-link" onclick="showMore('category-list', this)">More...</a>
+                @endif
             </div>
 
             <div class="table-card">
@@ -76,13 +82,19 @@
                     <span>Location</span>
                     <span>Seller Count</span>
                 </div>
-                @foreach($sellerByLocation as $loc)
-                <div class="list-item">
-                    <span>{{ $loc->pic_province }}</span>
-                    <span>{{ $loc->total }}</span>
+
+                <div id="location-list">
+                    @foreach($sellerByLocation as $index => $loc)
+                    <div class="list-item {{ $index >= 5 ? 'hidden-row' : '' }}">
+                        <span>{{ $loc->pic_province }}</span>
+                        <span>{{ $loc->total }}</span>
+                    </div>
+                    @endforeach
                 </div>
-                @endforeach
-                <a href="#" class="more-link">More...</a>
+
+                @if($sellerByLocation->count() > 5)
+                    <a href="javascript:void(0)" class="more-link" onclick="showMore('location-list', this)">More...</a>
+                @endif
             </div>
 
         </div>
@@ -122,6 +134,21 @@
                 });
             }
         });
+        function showMore(containerId, btnElement) {
+            // 1. Cari container listnya
+            const container = document.getElementById(containerId);
+            
+            // 2. Cari semua baris yang tersembunyi
+            const hiddenRows = container.querySelectorAll('.hidden-row');
+            
+            // 3. Tampilkan semua baris tersebut
+            hiddenRows.forEach(row => {
+                row.style.display = 'flex'; // Kembalikan ke display flex agar rapi
+            });
+
+            // 4. Sembunyikan tombol "More" karena semua data sudah tampil
+            btnElement.style.display = 'none';
+        }
     </script>
 
 </body>
