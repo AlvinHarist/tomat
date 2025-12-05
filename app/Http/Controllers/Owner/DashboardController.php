@@ -31,7 +31,7 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        // 4. SRS: Sebaran jumlah toko berdasarkan Lokasi propinsi [cite: 67]
+        // 4. SRS: Sebaran jumlah toko berdasarkan Lokasi provinsi [cite: 67]
         // Kita ambil Top 5 provinsi
         $sellerByLocation = Seller::select('pic_province', DB::raw('count(*) as total'))
             ->groupBy('pic_province')

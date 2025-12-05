@@ -110,7 +110,7 @@
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
                                     Stok <span class="text-red-500">*</span>
                                 </label>
-                                <input type="number" name="stock" value="{{ old('stock') }}" min="0"
+                                <input type="number" name="stock" value="{{ old('stock') }}" min="1"
                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
                                        placeholder="100" required>
                             </div>
