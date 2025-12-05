@@ -58,8 +58,9 @@ class ProductController extends Controller
             // Upload multiple images
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $image) {
-                    $path = $image->store('images/products', 'public');
-                    $imagePaths[] = $path;
+                    $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                    $image->move(public_path('images/products'), $filename);
+                    $imagePaths[] = 'images/products/' . $filename;
                 }
             }
             
@@ -80,7 +81,10 @@ class ProductController extends Controller
             // Delete uploaded images if error occurs
             if (isset($imagePaths) && count($imagePaths) > 0) {
                 foreach ($imagePaths as $path) {
-                    Storage::disk('public')->delete($path);
+                    $fullPath = public_path($path);
+                    if (file_exists($fullPath)) {
+                        unlink($fullPath);
+                    }
                 }
             }
             
@@ -139,7 +143,10 @@ class ProductController extends Controller
             // Delete selected images
             if ($request->has('delete_images')) {
                 foreach ($request->delete_images as $imageToDelete) {
-                    Storage::disk('public')->delete($imageToDelete);
+                    $fullPath = public_path($imageToDelete);
+                    if (file_exists($fullPath)) {
+                        unlink($fullPath);
+                    }
                     $existingImages = array_diff($existingImages, [$imageToDelete]);
                 }
             }
@@ -148,8 +155,9 @@ class ProductController extends Controller
             if ($request->hasFile('images')) {
                 $newImagePaths = [];
                 foreach ($request->file('images') as $image) {
-                    $path = $image->store('images/products', 'public');
-                    $newImagePaths[] = $path;
+                    $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                    $image->move(public_path('images/products'), $filename);
+                    $newImagePaths[] = 'images/products/' . $filename;
                 }
                 $existingImages = array_merge($existingImages, $newImagePaths);
             }
@@ -183,7 +191,10 @@ class ProductController extends Controller
             // Delete all images
             if ($product->images && is_array($product->images)) {
                 foreach ($product->images as $image) {
-                    Storage::disk('public')->delete($image);
+                    $fullPath = public_path($image);
+                    if (file_exists($fullPath)) {
+                        unlink($fullPath);
+                    }
                 }
             }
             

@@ -62,7 +62,7 @@
                                     <td class="px-6 py-4">
                                         <div class="flex items-center">
                                             @if($product->images && is_array($product->images) && count($product->images) > 0)
-                                            <img src="{{ asset('storage/' . $product->images[0]) }}" alt="{{ $product->name }}" class="w-12 h-12 rounded-lg object-cover">
+                                            <img src="{{ asset($product->images[0]) }}" alt="{{ $product->name }}" class="w-12 h-12 rounded-lg object-cover">
                                             @else
                                             <div class="w-12 h-12 rounded-lg bg-gray-200 flex items-center justify-center">
                                                 <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
