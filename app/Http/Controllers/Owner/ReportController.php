@@ -74,12 +74,10 @@ class ReportController extends Controller
         // Validasi Tanggal
         $request->validate(['start_date' => 'required|date', 'end_date' => 'required|date']);
 
-        // Filter Query
-        $data = Product::with(['seller', 'category', 'reviews'])
+        // Filter Query - ambil dari reviews yang ada di periode tersebut
+        $data = \App\Models\Review::with(['product.seller', 'product.category'])
                     ->whereBetween('created_at', [$request->start_date, $request->end_date . ' 23:59:59'])
-                    ->withAvg('reviews', 'rating')
-                    ->havingNotNull('reviews_avg_rating')
-                    ->orderByDesc('reviews_avg_rating')
+                    ->orderByDesc('rating')
                     ->get();
 
         // Gunakan Helper getMeta
