@@ -19,7 +19,7 @@ return new class extends Migration
             $table->double('price');
             $table->integer('stock');
             
-            $table->string('images')->nullable(); 
+            $table->json('images');
             
             $table->timestamps();
         });

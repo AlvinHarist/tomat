@@ -70,7 +70,7 @@ class ProductController extends Controller
             'images/banners/banner4.jpg',
         ];
 
-        return view('home.index', [
+        return view('product.index', [
             'banners'         => $banners,
             'products'        => $products,
             'categories'      => $categories,
@@ -86,8 +86,13 @@ class ProductController extends Controller
         $province   = $request->input('province');
         $minPrice   = $request->input('min_price');
         $maxPrice   = $request->input('max_price');
+        $rating     = $request->input('rating'); // ⭐ ambil rating min dari request
 
-        $query = Product::with(['category', 'seller']);
+        // Mulai query
+        $query = Product::with(['category', 'seller'])
+            // kalau mau pakai avg rating di kartu, boleh selalu di-withAvg
+            // ->withAvg('reviews', 'rating');
+        ;
 
         // 🔍 Filter pencarian teks
         if (!empty($search)) {
@@ -116,13 +121,26 @@ class ProductController extends Controller
             });
         }
 
-        // 🔍 FILTER HARGA BARU
+        // 🔍 FILTER HARGA
         if (!empty($minPrice)) {
             $query->where('price', '>=', (int) $minPrice);
         }
 
         if (!empty($maxPrice)) {
             $query->where('price', '<=', (int) $maxPrice);
+        }
+
+        // 🔍 FILTER RATING (min rata-rata bintang)
+        if (!empty($rating)) {
+            $rating = (int) $rating;
+
+            // hitung avg rating via subquery dan filter di HAVING
+            $query
+                ->withAvg('reviews', 'rating')
+                ->having('reviews_avg_rating', '>=', $rating);
+        } else {
+            // kalau mau tetap punya kolom reviews_avg_rating untuk display
+            $query->withAvg('reviews', 'rating');
         }
 
         // 🔍 Ambil data
@@ -146,7 +164,7 @@ class ProductController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('search.index', [
+        return view('product.search', [
             'products'        => $products,
             'categories'      => $categories,
             'currentSearch'   => $search,
@@ -154,9 +172,10 @@ class ProductController extends Controller
             'currentProvince' => $province,
             'currentMinPrice' => $minPrice,
             'currentMaxPrice' => $maxPrice,
+            // bisa juga kirim currentRating kalau mau, tapi kamu pakai request('rating') di Blade sudah cukup
+            // 'currentRating'   => $rating,
         ]);
     }
-
 
     public function create()
     {
@@ -175,20 +194,35 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'price'       => 'required|numeric|min:0',
             'stock'       => 'required|integer|min:0',
-            'main_image'  => 'nullable|image|max:2048',
+
+            // ✅ multiple images (JSON)
+            'images'      => 'nullable|array',
+            'images.*'    => 'image|max:2048',
         ]);
 
-        if ($request->hasFile('main_image')) {
-            $path = $request->file('main_image')->store('products', 'public');
-            $data['main_image'] = 'storage/' . $path;
+        $imagePaths = [];
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                // simpan ke storage/app/public/products
+                $path = $file->store('products', 'public');
+
+                // Simpan path seperti ini:
+                // - di DB: "storage/products/xxxx.jpg"
+                // - di view: src="{{ asset($img) }}"
+                $imagePaths[] = 'storage/' . $path;
+            }
         }
+
+        $data['images'] = $imagePaths;
 
         Product::create($data);
 
         return redirect()->route('products.index')->with('success', 'Product created.');
     }
 
-    public function show(Product $product)
+
+    public function show(Request $request, Product $product)
     {
         // eager load category + parent chain biar nggak N+1
         $product->load([
@@ -227,14 +261,30 @@ class ProductController extends Controller
             'url'   => null,
         ];
 
-        // Rekomendasi: produk lain dari seller / toko yang sama
-        $recommendations = Product::where('id', '!=', $product->id)
-            ->where('seller_id', $product->seller_id)
-            ->inRandomOrder()
-            ->limit(6)
-            ->get();
+        // Rekomendasi: produk lain dari seller / toko yang sama (pakai pagination)
+        $perPage = 6;
 
-        return view('product.index', [
+        $recommendationQuery = Product::where('id', '!=', $product->id)
+            ->where('seller_id', $product->seller_id)
+            ->latest(); // daripada inRandomOrder, biar pagination rapi
+
+        // paginate pakai nama page khusus: rec_page
+        $recommendations = $recommendationQuery->paginate($perPage, ['*'], 'rec_page');
+
+        // === HANDLE AJAX LOAD MORE RECOMMENDATIONS ===
+        if ($request->ajax() && $request->get('load') === 'recommendations') {
+            $html = view('components.product-cards', [
+                'products' => $recommendations,
+            ])->render();
+
+            return response()->json([
+                'html'      => $html,
+                'next_page' => $recommendations->currentPage() + 1,
+                'has_more'  => $recommendations->hasMorePages(),
+            ]);
+        }
+
+        return view('product.detail', [
             'product'         => $product,
             'recommendations' => $recommendations,
             'breadcrumbs'     => $breadcrumbs,
@@ -259,20 +309,34 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'price'       => 'required|numeric|min:0',
             'stock'       => 'required|integer|min:0',
-            'main_image'  => 'nullable|image|max:2048',
+
+            'images'      => 'nullable|array',
+            'images.*'    => 'image|max:2048',
         ]);
 
-        if ($request->hasFile('main_image')) {
-            // hapus file lama kalau dia file upload (bukan seeder "images/xxx.png")
-            if ($product->main_image && str_starts_with($product->main_image, 'storage/')) {
-                $oldPath = str_replace('storage/', '', $product->main_image); // "products/xxx.jpg"
-                Storage::disk('public')->delete($oldPath);
+        $imagePaths = $product->images ?? [];
+
+        // Kalau ada upload baru, kita replace seluruh gambar lama
+        if ($request->hasFile('images')) {
+
+            // 🔥 Hapus file lama yg memang file upload (bukan seeder "images/xxx.png")
+            if (!empty($imagePaths)) {
+                foreach ((array) $imagePaths as $oldImg) {
+                    if (is_string($oldImg) && str_starts_with($oldImg, 'storage/')) {
+                        $oldPath = str_replace('storage/', '', $oldImg); // "products/xxx.jpg"
+                        Storage::disk('public')->delete($oldPath);
+                    }
+                }
             }
 
-            // simpan file baru
-            $path = $request->file('main_image')->store('products', 'public');
-            $data['main_image'] = 'storage/' . $path;
+            $imagePaths = [];
+            foreach ($request->file('images') as $file) {
+                $path = $file->store('products', 'public');
+                $imagePaths[] = 'storage/' . $path;
+            }
         }
+
+        $data['images'] = $imagePaths;
 
         $product->update($data);
 
@@ -281,13 +345,19 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
-        if ($product->main_image && str_starts_with($product->main_image, 'storage/')) {
-            $oldPath = str_replace('storage/', '', $product->main_image);
-            Storage::disk('public')->delete($oldPath);
+        // Hapus semua file yang ada di kolom images (kalau dia file upload)
+        if (!empty($product->images)) {
+            foreach ((array) $product->images as $img) {
+                if (is_string($img) && str_starts_with($img, 'storage/')) {
+                    $oldPath = str_replace('storage/', '', $img);
+                    Storage::disk('public')->delete($oldPath);
+                }
+            }
         }
 
         $product->delete();
 
         return redirect()->route('products.index')->with('success', 'Product deleted.');
     }
+
 }
