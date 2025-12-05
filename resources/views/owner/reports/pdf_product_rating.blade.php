@@ -15,6 +15,7 @@
 <body>
     <div class="header">
         <h2>{{ $meta['title'] }}</h2>
+        <p style="margin: 0; font-size: 14px;">{{ $meta['period'] }}</p>
     </div>
 
     <div class="meta">
@@ -22,31 +23,37 @@
         <strong>Oleh:</strong> {{ $meta['processor'] }}
     </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th style="width: 5%">No</th>
-                <th>Produk</th>
-                <th>Kategori</th>
-                <th>Harga</th>
-                <th>Rating</th>
-                <th>Nama Toko</th>
-                <th>Provinsi (Pemberi Rating)</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($data as $index => $item)
-            <tr>
-                <td>{{ $index + 1 }}</td>
-                <td>{{ $item->product->name ?? '-' }}</td>
-                <td>{{ $item->product->category->name ?? '-' }}</td>
-                <td>Rp {{ number_format($item->product->price ?? 0, 0, ',', '.') }}</td>
-                <td>{{ $item->rating }}</td>
-                <td>{{ $item->product->seller->store_name ?? '-' }}</td>
-                <td>{{ $item->province ?? '-' }}</td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
+    @if($data->isEmpty())
+        <div style="text-align: center; margin-top: 50px; color: #666;">
+            <h3>Tidak ada laporan dalam periode tanggal ini.</h3>
+        </div>
+    @else
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 5%">No</th>
+                    <th>Produk</th>
+                    <th>Kategori</th>
+                    <th>Harga</th>
+                    <th>Rating</th>
+                    <th>Nama Toko</th>
+                    <th>Provinsi</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($data as $index => $item)
+                <tr>
+                    <td>{{ $index + 1 }}</td>
+                    <td>{{ $item->product->name ?? '-' }}</td>
+                    <td>{{ $item->product->category->name ?? '-' }}</td>
+                    <td>Rp {{ number_format($item->product->price ?? 0, 0, ',', '.') }}</td>
+                    <td>{{ $item->rating }}</td>
+                    <td>{{ $item->product->seller->store_name ?? '-' }}</td>
+                    <td>{{ $item->province ?? '-' }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @endif
 </body>
 </html>

@@ -13,6 +13,23 @@ body {
     overflow: hidden; 
 }
 
+.hidden-row {
+    display: none !important;
+}
+
+.more-link {
+    display: block;
+    margin-top: 10px;
+    color: #21BD38; /* Sesuaikan warna */
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 600;
+    text-decoration: none;
+}
+.more-link:hover {
+    text-decoration: underline;
+}
+
 /* --- Sidebar --- */
 .sidebar {
     width: 250px;
@@ -80,7 +97,7 @@ body {
 }
 
 .nav-links a.active { 
-    background-color: #4CAF50; 
+    background-color: #21BD38; 
     color: white; 
     box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3); 
 }
@@ -95,7 +112,7 @@ body {
     left: 20px;
     font-family: 'Brush Script MT', cursive; 
     font-size: 2rem; 
-    color: #4CAF50;
+    color: #21BD38;
 }
 
 /* --- Main Content --- */
@@ -210,12 +227,3 @@ body {
     font-size: 0.9rem; 
 }
 
-.more-link { 
-    display: block; 
-    text-align: center; 
-    margin-top: 15px; 
-    color: #4CAF50; 
-    text-decoration: none; 
-    font-size: 0.85rem; 
-    font-weight: bold; 
-}
