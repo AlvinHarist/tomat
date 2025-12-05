@@ -57,21 +57,37 @@ class ProductSeeder extends Seeder
             'Timbangan Digital Portable Akurat'            => 'images/products/timbangan.jpg',
         ];
 
-        foreach ($productNames as $name => $imagePath) {
+        // List gambar random untuk tambahan
+        $extraImages = [
+            'images/products/timbangan.jpg',
+            'images/products/mesinkopi.jpg',
+            'images/products/kipas.jpg',
+            'images/products/tvbox.jpg',
+            'images/products/printer.jpg',
+            'images/products/drone.png',
+        ];
+
+        foreach ($productNames as $name => $mainImage) {
 
             $category = $leafCategories->random();
-            $sellerId = $sellers->random(); // Pilih seller random
+            $sellerId = $sellers->random();
+
+            // Pilih 3 gambar random tambahan
+            $randomExtra = collect($extraImages)->random(6)->values()->toArray();
+
+            // Gabungkan gambar utama + gambar tambahan
+            $images = array_merge([$mainImage], $randomExtra);
 
             Product::create([
                 'id'          => Str::uuid(),
                 'name'        => $name,
-                'description' => "Deskripsi produk: {$name}. Produk berkualitas tinggi.",
+                'description' => "{$name}. Produk berkualitas tinggi.",
                 'price'       => rand(50000, 500000),
                 'stock'       => rand(5, 100),
 
                 'category_id' => $category->id,
-                'seller_id'   => $sellerId,
-                'images'      => $imagePath,
+                'seller_id'   => "11111111-1111-1111-1111-111111111111",
+                'images'      => $images, // JSON array
             ]);
         }
     }

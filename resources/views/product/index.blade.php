@@ -1,556 +1,453 @@
+@php
+    // Parent (general category)
+    $parentCategories = $categories->whereNull('parent_id');
+    $parentIds = $categories->pluck('parent_id')->filter()->unique();
+    $leafCategories = $categories->whereNotIn('id', $parentIds);
+
+    $generalCategories = $parentCategories->random(min(5, $parentCategories->count()));
+    $specificCategories = $leafCategories->random(min(5, $leafCategories->count()));
+
+    $groupedCategories = $categories->groupBy('parent_id');
+@endphp
+
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-6xl mx-auto space-y-10 mt-12">
-    <div class="max-w-6xl mx-auto mt-6">
-        <x-breadcrumb :items="$breadcrumbs" />
-    </div>
+    {{-- BANNER SLIDER --}}
+    <div class="w-full flex justify-center mb-8 mt-12">
+        <div class="relative w-full max-w-7xl overflow-hidden rounded-xl shadow" id="banner-slider">
 
-    {{-- CONTAINER 1: gambar + deskripsi + spesifikasi --}}
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-        {{-- gambar --}}
-        <div class="md:col-span-1 bg-white rounded-xl shadow p-4 flex items-center justify-center">
-            <img src="{{ asset($product->images) }}"
-                 alt="{{ $product->name }}"
-                 class="rounded-lg object-cover w-full">
-        </div>
-
-        {{-- deskripsi + spesifikasi --}}
-        <div class="md:col-span-2 bg-white rounded-xl shadow p-6 space-y-6">
-
-            {{-- Nama + harga + “rating” --}}
-            <div>
-                <h1 class="text-2xl font-bold">{{ $product->name }}</h1>
-
-                <div class="text-orange-600 font-bold text-xl mt-2">
-                    Rp {{ number_format($product->price, 0, ',', '.') }}
-                </div>
-
-                @php
-                    // rata-rata dari semua ulasan
-                    $avgRating = $product->reviews->avg('rating');
-
-                    // rating yang sedang difilter (misal ?rating=5)
-                    $selectedRating = request('rating');
-
-                    // ulasan yang akan ditampilkan (filtered)
-                    $filteredReviews = $selectedRating
-                        ? $product->reviews->where('rating', (int) $selectedRating)
-                        : $product->reviews;
-                @endphp
-
-                @if ($avgRating)
-                    <div class="flex items-center gap-2 text-sm text-gray-600 mt-2">
-                        <div class="flex">
-                            @for ($i = 1; $i <= 5; $i++)
-                                @if ($i <= floor($avgRating))
-                                    <span class="text-yellow-400">★</span>
-                                @else
-                                    <span class="text-gray-300">★</span>
-                                @endif
-                            @endfor
-                        </div>
-
-                        <span>{{ number_format($avgRating, 1) }}</span>
-                        <span class="text-gray-400">•</span>
-                        <span>{{ optional($product->seller)->pic_province ?? 'Lokasi tidak diketahui' }}</span>
+            {{-- Track semua slide --}}
+            <div class="flex transition-transform duration-500 ease-out" id="banner-track">
+                @foreach ($banners as $banner)
+                    <div class="w-full flex-shrink-0">
+                        <img
+                            src="{{ $banner }}"
+                            alt="Banner {{ $loop->iteration }}"
+                            class="w-full h-64 md:h-80 object-cover"
+                        >
                     </div>
-                @endif
+                @endforeach
             </div>
 
-            {{-- Deskripsi --}}
-            <div>
-                <h2 class="text-lg font-semibold mb-2">Deskripsi Produk</h2>
-                <p class="text-gray-700 leading-relaxed">
-                    {{ $product->description }}
-                </p>
-            </div>
-
-            {{-- Info penjual: kontak jika tertarik --}}
-            @if ($product->seller)
-                <div class="mt-4 p-4 border rounded-lg bg-gray-50">
-                    <h3 class="text-sm font-semibold text-gray-800 mb-1">
-                        Tertarik dengan produk ini?
-                    </h3>
-                    <p class="text-xs text-gray-500 mb-3">
-                        Hubungi penjual untuk tanya stok, nego harga, atau detail lainnya.
-                    </p>
-
-                    <div class="space-y-1 text-sm">
-                        <div>
-                            <span class="font-medium text-gray-700">No. HP / WhatsApp:</span>
-                            <span class="ml-1 text-gray-800">
-                                {{ $product->seller->pic_phone }}
-                            </span>
-                            {{-- Kalau mau langsung ke WhatsApp, bisa pakai link ini --}}
-                            {{-- 
-                            <a
-                                href="https://wa.me/62{{ ltrim($product->seller->pic_phone, '0') }}"
-                                target="_blank"
-                                class="ml-2 text-green-600 hover:underline text-xs"
-                            >
-                                Chat via WhatsApp
-                            </a>
-                            --}}
-                        </div>
-
-                        <div>
-                            <span class="font-medium text-gray-700">Email:</span>
-                            <a
-                                href="mailto:{{ $product->seller->pic_email }}"
-                                class="ml-1 text-blue-600 hover:underline"
-                            >
-                                {{ $product->seller->pic_email }}
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            @else
-                <div class="mt-4 text-xs text-gray-400">
-                    Informasi penjual tidak tersedia.
-                </div>
-            @endif
-
-        </div>
-    </div>
-
-    {{-- CONTAINER 2: REVIEW & RATING --}}
-    <div class="bg-white rounded-xl shadow p-6 space-y-6">
-        <div class="flex items-center justify-between gap-4">
-            <h2 class="text-xl font-semibold">Ulasan & Rating</h2>
-
-            {{-- Tombol buka modal tambah ulasan --}}
-            <button
-                id="openReviewModal"
-                class="inline-flex items-center px-4 py-2 rounded-lg bg-green-600 text-white text-sm font-semibold hover:bg-green-700 transition"
-            >
-                + Tulis Ulasan
-            </button>
-        </div>
-
-        @if ($avgRating)
-            <div class="flex items-center justify-between flex-wrap gap-4">
-                {{-- Rata-rata rating --}}
-                <div class="flex items-center gap-4">
-                    <div class="text-4xl font-bold text-yellow-500">
-                        {{ number_format($avgRating, 1) }}
-                    </div>
-
-                    <div>
-                        <div class="flex">
-                            @for ($i = 1; $i <= 5; $i++)
-                                @if ($i <= floor($avgRating))
-                                    <span class="text-yellow-400 text-xl">★</span>
-                                @else
-                                    <span class="text-gray-300 text-xl">★</span>
-                                @endif
-                            @endfor
-                        </div>
-                        <p class="text-sm text-gray-500">
-                            Dari {{ $product->reviews->count() }} ulasan
-                            @if($selectedRating)
-                                <span class="text-gray-400">
-                                    • Menampilkan hanya bintang {{ $selectedRating }}
-                                    ({{ $filteredReviews->count() }} ulasan)
-                                </span>
-                            @endif
-                        </p>
-                    </div>
-                </div>
-
-                {{-- FILTER BERDASARKAN BINTANG --}}
-                <div class="flex items-center gap-2">
-                    {{-- Tombol "Semua" --}}
-                    <a href="{{ route('product.show', $product->id) }}"
-                      class="px-3 py-1.5 text-xs sm:text-sm rounded-full border
-                              {{ $selectedRating ? 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50' : 'bg-green-600 text-white border-green-600' }}">
-                        Semua
-                    </a>
-
-                    {{-- Tombol 5 → 1 bintang --}}
-                    @for ($star = 5; $star >= 1; $star--)
-                        <a href="{{ request()->fullUrlWithQuery(['rating' => $star]) }}"
-                          class="px-3 py-1.5 text-xs sm:text-sm rounded-full border inline-flex items-center gap-1
-                                  {{ (int)$selectedRating === $star
-                                        ? 'bg-green-600 text-white border-green-600'
-                                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50' }}">
-                            <span>{{ $star }}</span>
-                            <span class="text-yellow-400">★</span>
-                        </a>
-                    @endfor
-                </div>
-            </div>
-        @else
-            <p class="text-gray-500">Belum ada rating.</p>
-        @endif
-
-        <hr>
-
-        {{-- DAFTAR ULASAN (TERFILTER) --}}
-        <div class="space-y-4">
-            @forelse ($filteredReviews as $review)
-                <div class="border rounded-lg p-4 bg-gray-50">
-                    <div class="flex items-center justify-between">
-                        <strong>{{ $review->name ?? 'User' }}</strong>
-                        <span class="text-xs text-gray-500">
-                            {{ $review->created_at->format('Y-m-d') }}
-                        </span>
-                    </div>
-
-                    <div class="text-yellow-400 text-sm mt-1">
-                        @for ($i = 1; $i <= 5; $i++)
-                            @if ($i <= $review->rating)
-                                ★
-                            @else
-                                <span class="text-gray-300">★</span>
-                            @endif
-                        @endfor
-                    </div>
-
-                    <p class="text-gray-700 mt-2">{{ $review->comment }}</p>
-                </div>
-            @empty
-                <p class="text-gray-500">
-                    @if($selectedRating)
-                        Belum ada ulasan dengan rating {{ $selectedRating }} bintang.
-                    @else
-                        Belum ada ulasan.
-                    @endif
-                </p>
-            @endforelse
-        </div>
-    </div>
-
-    {{-- MODAL TAMBAH ULASAN --}}
-    <div
-        id="reviewModal"
-        class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden"
-    >
-        <div class="bg-white rounded-xl shadow-lg w-full max-w-lg mx-4 relative">
-            {{-- Tombol close --}}
+            {{-- Tombol Kiri --}}
             <button
                 type="button"
-                id="closeReviewModal"
-                class="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
+                id="banner-prev"
+                class="banner-nav-btn left-3"
+                aria-label="Sebelumnya"
             >
-                ✕
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
             </button>
 
-            <div class="p-6 space-y-4">
-                <h3 class="text-lg font-semibold text-gray-800 mb-2">
-                    Tulis Ulasan untuk {{ $product->name }}
-                </h3>
+            {{-- Tombol Kanan --}}
+            <button
+                type="button"
+                id="banner-next"
+                class="banner-nav-btn right-3"
+                aria-label="Berikutnya"
+            >
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+            </button>
 
-                <form
-                    action="{{ route('review.store') }}"
-                    method="POST"
-                    class="space-y-4"
-                    autocomplete="off"
+            {{-- DOT INDICATORS --}}
+            <div id="banner-dots" class="absolute bottom-3 left-3 flex gap-1.5 z-10">
+                @foreach ($banners as $banner)
+                    <span class="w-2.5 h-2.5 rounded-full bg-white/40 backdrop-blur-sm"></span>
+                @endforeach
+            </div>
+        </div>
+    </div>
+
+    {{-- KATEGORI PILIHAN --}}
+    <section class="max-w-7xl mx-auto mb-10">
+        <div class="bg-white rounded-2xl shadow-md p-5 space-y-5">
+
+            {{-- Header --}}
+            <div class="flex items-center justify-between">
+                <h2 class="text-2xl font-bold text-gray-800">
+                    Selected Category
+                </h2>
+                <button 
+                    id="open-category-modal"
+                    class="text-xs sm:text-sm text-green-600 hover:underline"
                 >
-                    @csrf
+                    Lihat Semua
+                </button>
+            </div>
 
-                    {{-- hidden product id --}}
-                    <input type="hidden" name="product_id" value="{{ $product->id }}">
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                            Nama Lengkap
-                        </label>
-                        <input
-                            type="text"
-                            name="name"
-                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm
-                                focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                            required
-                            autocomplete="off"
-                        >
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                            No. Handphone / WhatsApp
-                        </label>
-                        <input
-                            type="text"
-                            name="phone"
-                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm
-                                focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                            required
-                            autocomplete="off"
-                        >
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                            Email
-                        </label>
-                        <input
-                            type="email"
-                            name="email"
-                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm
-                                focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                            required
-                            autocomplete="off"
-                        >
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                            Provinsi
-                        </label>
-
-                        <select
-                            name="province"
-                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm
-                                focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                            required
-                        >
-                            <option value="" disabled selected>Pilih provinsi</option>
-
-                            {{-- 34 Provinsi Indonesia --}}
-                            <option value="Aceh">Aceh</option>
-                            <option value="Sumatera Utara">Sumatera Utara</option>
-                            <option value="Sumatera Barat">Sumatera Barat</option>
-                            <option value="Riau">Riau</option>
-                            <option value="Jambi">Jambi</option>
-                            <option value="Sumatera Selatan">Sumatera Selatan</option>
-                            <option value="Bengkulu">Bengkulu</option>
-                            <option value="Lampung">Lampung</option>
-                            <option value="Kepulauan Bangka Belitung">Kepulauan Bangka Belitung</option>
-                            <option value="Kepulauan Riau">Kepulauan Riau</option>
-
-                            <option value="DKI Jakarta">DKI Jakarta</option>
-                            <option value="Jawa Barat">Jawa Barat</option>
-                            <option value="Jawa Tengah">Jawa Tengah</option>
-                            <option value="D.I. Yogyakarta">D.I. Yogyakarta</option>
-                            <option value="Jawa Timur">Jawa Timur</option>
-                            
-                            <option value="Banten">Banten</option>
-                            <option value="Bali">Bali</option>
-                            <option value="Nusa Tenggara Barat">Nusa Tenggara Barat</option>
-                            <option value="Nusa Tenggara Timur">Nusa Tenggara Timur</option>
-
-                            <option value="Kalimantan Barat">Kalimantan Barat</option>
-                            <option value="Kalimantan Tengah">Kalimantan Tengah</option>
-                            <option value="Kalimantan Selatan">Kalimantan Selatan</option>
-                            <option value="Kalimantan Timur">Kalimantan Timur</option>
-                            <option value="Kalimantan Utara">Kalimantan Utara</option>
-
-                            <option value="Sulawesi Utara">Sulawesi Utara</option>
-                            <option value="Sulawesi Tengah">Sulawesi Tengah</option>
-                            <option value="Sulawesi Selatan">Sulawesi Selatan</option>
-                            <option value="Sulawesi Tenggara">Sulawesi Tenggara</option>
-                            <option value="Gorontalo">Gorontalo</option>
-                            <option value="Sulawesi Barat">Sulawesi Barat</option>
-
-                            <option value="Maluku">Maluku</option>
-                            <option value="Maluku Utara">Maluku Utara</option>
-                            <option value="Papua">Papua</option>
-                            <option value="Papua Barat">Papua Barat</option>
-                            <option value="Papua Tengah">Papua Tengah</option>
-                            <option value="Papua Pegunungan">Papua Pegunungan</option>
-                            <option value="Papua Selatan">Papua Selatan</option>
-                            <option value="Papua Barat Daya">Papua Barat Daya</option>
-                        </select>
-                    </div>
-
-                    {{-- RATING: BINTANG KLIKABLE --}}
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                            Rating
-                        </label>
-
-                        {{-- input hidden yang dikirim ke server --}}
-                        <input type="hidden" name="rating" id="ratingInput">
-
-                        <div id="ratingStars" class="flex items-center gap-1 text-2xl">
-                            @for ($i = 1; $i <= 5; $i++)
-                                <button
-                                    type="button"
-                                    class="rating-star text-gray-300 hover:text-yellow-400 transition
-                                        focus:outline-none"
-                                    data-value="{{ $i }}"
-                                >
-                                    ★
-                                </button>
-                            @endfor
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                @foreach ($specificCategories as $item)
+                    <a
+                        href="{{ route('search', [
+                            'category' => $item->id,
+                            'q'        => request('q'),
+                            'province' => request('province'),
+                        ]) }}"
+                        class="bg-white rounded-xl border border-gray-200
+                            hover:shadow-sm flex flex-col items-center justify-center 
+                            p-3 cursor-pointer transition-all duration-200
+                            min-h-[150px]"
+                    >
+                        <div class="w-20 h-20 sm:w-24 sm:h-24 mb-2">
+                            <img
+                                src="{{ asset($item['image']) }}"
+                                alt="{{ $item['name'] }}"
+                                class="w-full h-full object-cover rounded-lg"
+                            >
                         </div>
 
-                        <p class="text-xs text-gray-500 mt-1" id="ratingHint">
-                            Klik jumlah bintang untuk memberi rating.
+                        <p class="text-xs sm:text-sm font-medium text-gray-800 text-center leading-tight">
+                            {{ $item['name'] }}
                         </p>
-                    </div>
+                    </a>
+                @endforeach
+            </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                            Komentar
-                        </label>
-                        <textarea
-                            name="comment"
-                            rows="4"
-                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm
-                                focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                            placeholder="Ceritakan pengalamanmu dengan produk ini..."
-                            autocomplete="off"
-                        ></textarea>
-                    </div>
 
-                    <div class="flex items-center justify-end gap-2 pt-2">
-                        <button
-                            type="button"
-                            id="cancelReviewModal"
-                            class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 text-sm hover:bg-gray-50"
-                        >
-                            Batal
-                        </button>
-                        <button
-                            type="submit"
-                            class="px-4 py-2 rounded-lg bg-green-600 text-white text-sm font-semibold hover:bg-green-700"
-                        >
-                            Kirim Ulasan
-                        </button>
+            <div class="pt-3">
+              <div class="flex flex-wrap gap-2 sm:gap-3 justify-center">
+
+                  {{-- Chip "Semua Kategori" --}}
+                  @foreach ($generalCategories as $category)
+                      @php
+                          $active = (int) request('category') === $category->id;
+                      @endphp
+
+                      <a
+                          href="{{ route('search', [
+                              'category' => $category->id,
+                              'q'        => request('q'),
+                              'province' => request('province'),
+                          ]) }}"
+                          class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm
+                                shadow-sm transition-all duration-200
+
+                                {{-- ACTIVE: Hijau premium (jika ingin putih juga bisa saya ubah) --}}
+                                {{ $active
+                                      ? 'bg-green-600 text-white border-green-600 hover:bg-green-700'
+                                      : 'bg-white text-gray-800 border border-gray-200 hover:bg-gray-50' }}"
+                      >
+
+                          <span class="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 text-xs font-semibold text-gray-700">
+                              {{ strtoupper(mb_substr($category->name, 0, 1)) }}
+                          </span>
+
+                          <span class="font-medium whitespace-nowrap">{{ $category->name }}</span>
+
+                          @if(isset($category->products_count))
+                              <span class="text-[11px] text-gray-400">({{ $category->products_count }})</span>
+                          @endif
+
+                      </a>
+                  @endforeach
+
+              </div>
+            </div>
+
+        </div>
+    </section>
+
+    {{-- MODAL SEMUA KATEGORI (STYLED) --}}
+    <div 
+        id="category-modal"
+        class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"
+    >
+        <div class="bg-white w-full max-w-5xl rounded-3xl shadow-2xl p-6 md:p-7 relative max-h-[80vh] overflow-y-auto">
+
+            {{-- Close button --}}
+            <button 
+                id="close-category-modal"
+                class="absolute top-4 right-4 w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition"
+            >
+                <span class="text-gray-500 text-sm">✕</span>
+            </button>
+
+            {{-- Title --}}
+            <div class="mb-5 flex items-center justify-between gap-3">
+                <div>
+                    <h2 class="text-xl md:text-2xl font-bold text-gray-900">Semua Kategori</h2>
+                    <p class="text-xs md:text-sm text-gray-500 mt-1">
+                        Jelajahi kategori berdasarkan jenis dan subkategori.
+                    </p>
+                </div>
+            </div>
+
+            @php
+                $groupedCategories = $categories->groupBy('parent_id');
+            @endphp
+
+            <div class="space-y-4">
+                {{-- Level 0: Parent (root, parent_id = null) --}}
+                @foreach ($groupedCategories[null] ?? [] as $parent)
+                    @php
+                        $children = $groupedCategories[$parent->id] ?? collect();
+                        $subCount = $children->count();
+                    @endphp
+
+                    <div class="bg-gray-50/70 border border-gray-200 rounded-2xl p-4 md:p-5 hover:shadow-md transition">
+
+                        {{-- Parent header --}}
+                        <div class="flex items-center justify-between gap-3 mb-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center text-sm font-semibold text-green-700">
+                                    {{ strtoupper(mb_substr($parent->name, 0, 1)) }}
+                                </div>
+                                <div>
+                                    <a href="{{ route('search', ['category' => $parent->id]) }}"
+                                      class="font-semibold text-gray-900 hover:text-green-600">
+                                        {{ $parent->name }}
+                                    </a>
+                                    @if($subCount > 0)
+                                        <p class="text-[11px] text-gray-500">
+                                            {{ $subCount }} subkategori
+                                        </p>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Level 1 & 2 --}}
+                        @if ($children->isNotEmpty())
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                @foreach ($children as $child)
+                                    @php
+                                        $grandChildren = $groupedCategories[$child->id] ?? collect();
+                                    @endphp
+
+                                    <div class="bg-white rounded-xl border border-gray-100 p-3">
+                                        {{-- Child --}}
+                                        <a href="{{ route('search', ['category' => $child->id]) }}"
+                                          class="text-sm font-medium text-gray-800 hover:text-green-600 flex items-center gap-2">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                                            {{ $child->name }}
+                                        </a>
+
+                                        {{-- Grandchild (max depth 3) --}}
+                                        @if ($grandChildren->isNotEmpty())
+                                            <div class="mt-2 flex flex-wrap gap-1.5 ml-4">
+                                                @foreach ($grandChildren as $grand)
+                                                    <a href="{{ route('search', ['category' => $grand->id]) }}"
+                                                      class="px-2.5 py-0.5 rounded-full border border-gray-200 bg-gray-50
+                                                              text-[11px] text-gray-700 hover:border-green-500 hover:text-green-700 transition">
+                                                        {{ $grand->name }}
+                                                    </a>
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <p class="text-xs text-gray-500 italic">
+                                Belum ada subkategori.
+                            </p>
+                        @endif
                     </div>
-                </form>
+                @endforeach
             </div>
         </div>
     </div>
 
 
-    {{-- CONTAINER 3: PRODUK REKOMENDASI --}}
-    <div class="space-y-4">
-        <h2 class="text-xl font-semibold text-gray-800">Lainnya di toko ini</h2>
+    {{-- PRODUCT SECTION --}}
+    <section class="max-w-7xl mx-auto space-y-4 mb-2">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800">Product</h2>
 
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
-            @if($recommendations->count() > 0)
-              @include('components.product-cards', ['products' => $recommendations])
+                @if(request('q') || request('category') || request('province'))
+                    <p class="text-xs text-gray-500 mt-1">
+                        Filter:
+                        @if(request('q'))
+                            <span>cari "<strong>{{ request('q') }}</strong>"</span>
+                        @endif
+                        @if(request('category') && $categories->where('id', request('category'))->first())
+                            @php
+                                $activeCat = $categories->where('id', request('category'))->first();
+                            @endphp
+                            <span> • kategori "<strong>{{ $activeCat->name }}</strong>"</span>
+                        @endif
+                        @if(request('province'))
+                            <span> • lokasi "<strong>{{ request('province') }}</strong>"</span>
+                        @endif
+                    </p>
+                @endif
+            </div>
+        </div>
+
+        {{-- Grid produk: max 6 kolom, tumbuh ke bawah --}}
+        <div id="product-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
+            @if($products->count() > 0)
+              @include('components.product-cards', ['products' => $products])
+            @else
+                <p class="text-gray-500 text-sm col-span-full">
+                    Tidak ada produk.
+                </p>
             @endif
         </div>
-    </div>
 
-</div>
+        @if ($products instanceof \Illuminate\Pagination\AbstractPaginator && $products->hasMorePages())
+            <div class="flex justify-center mt-6">
+                <button
+                    id="load-more"
+                    class="px-6 py-2 text-sm font-medium 
+                          bg-white text-green-600 
+                          border border-green-600 
+                          rounded-full shadow-sm
+                          hover:bg-green-50 hover:shadow-md 
+                          transition"
+                    data-next-page="{{ $products->currentPage() + 1 }}"
+                >
+                    Show more
+                </button>
+            </div>
+        @endif
+    </section>
 @endsection
 
 @push('scripts')
-<script>
+  <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const openBtn   = document.getElementById('openReviewModal');
-        const closeBtn  = document.getElementById('closeReviewModal');
-        const cancelBtn = document.getElementById('cancelReviewModal');
-        const modal     = document.getElementById('reviewModal');
-        const form      = modal ? modal.querySelector('form') : null;
+    const track    = document.getElementById('banner-track');
+    const prevBtn  = document.getElementById('banner-prev');
+    const nextBtn  = document.getElementById('banner-next');
+    const slides   = track.children;
+    const total    = slides.length;
 
-        // rating
-        const ratingInput     = document.getElementById('ratingInput');
-        const ratingStarsWrap = document.getElementById('ratingStars');
-        const ratingHint      = document.getElementById('ratingHint');
-        const stars           = ratingStarsWrap
-            ? ratingStarsWrap.querySelectorAll('.rating-star')
-            : [];
+    const dotsContainer = document.getElementById('banner-dots');
+    const dots = dotsContainer.children;
 
-        function setRating(value) {
-            if (!ratingInput) return;
+    let index = 0;
+    let autoSlide = null;
 
-            ratingInput.value = value;
+    function updateSlide() {
+        track.style.transform = `translateX(-${index * 100}%)`;
+        updateDots();
+    }
 
-            stars.forEach(star => {
-                const starValue = parseInt(star.dataset.value, 10);
-                if (starValue <= value) {
-                    star.classList.add('text-yellow-400');
-                    star.classList.remove('text-gray-300');
-                } else {
-                    star.classList.add('text-gray-300');
-                    star.classList.remove('text-yellow-400');
-                }
-            });
+    function updateDots() {
+        for (let i = 0; i < dots.length; i++) {
+            dots[i].classList.remove('bg-white');
+            dots[i].classList.remove('opacity-100');
 
-            if (ratingHint) {
-                ratingHint.textContent = value
-                    ? `Kamu memberi rating ${value} bintang.`
-                    : 'Klik jumlah bintang untuk memberi rating.';
-            }
+            dots[i].classList.add('bg-white/40'); // default
         }
 
-        // event klik bintang
-        stars.forEach(star => {
-            star.addEventListener('click', () => {
-                const value = parseInt(star.dataset.value, 10);
-                setRating(value);
-            });
+        dots[index].classList.remove('bg-white/40');
+        dots[index].classList.add('bg-white');     // dot aktif
+        dots[index].classList.add('opacity-100');
+    }
+
+    function startAutoSlide() {
+        if (total <= 1) return;
+
+        if (autoSlide) clearInterval(autoSlide);
+
+        autoSlide = setInterval(() => {
+            index = (index + 1) % total;
+            updateSlide();
+        }, 5000);
+    }
+
+    if (total > 1) startAutoSlide();
+    updateDots(); // inisialisasi dot pertama
+
+    prevBtn.addEventListener('click', function () {
+        index = (index - 1 + total) % total;
+        updateSlide();
+        startAutoSlide();
+    });
+
+    nextBtn.addEventListener('click', function () {
+        index = (index + 1) % total;
+        updateSlide();
+        startAutoSlide();
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowLeft') {
+                index = (index - 1 + total) % total;
+                updateSlide();
+                startAutoSlide();
+            } else if (e.key === 'ArrowRight') {
+                index = (index + 1) % total;
+                updateSlide();
+                startAutoSlide();
+            }
         });
 
-        function openModal() {
-            if (!modal) return;
-            modal.classList.remove('hidden');
-        }
+    const loadMoreBtn = document.getElementById('load-more');
+    const productGrid = document.getElementById('product-grid');
 
-        function clearForm() {
-            if (form) {
-                form.reset();
-            }
-            // reset rating visual & value
-            setRating(0);
-        }
+    if (loadMoreBtn && productGrid) {
+        loadMoreBtn.addEventListener('click', function () {
+            const button = this;
+            const nextPage = button.dataset.nextPage;
 
-        function closeModal() {
-            if (!modal) return;
-            modal.classList.add('hidden');
-            clearForm();
-        }
+            // optional: state loading
+            button.disabled = true;
+            button.textContent = 'Loading...';
 
-        if (openBtn)   openBtn.addEventListener('click', openModal);
-        if (closeBtn)  closeBtn.addEventListener('click', closeModal);
-        if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+            const url = new URL("{{ route('home') }}", window.location.origin);
+            url.searchParams.set('page', nextPage);
 
-        // Tutup modal kalau klik di area overlay
-        if (modal) {
-            modal.addEventListener('click', function (e) {
-                if (e.target === modal) {
-                    closeModal();
+            @if(request('q'))
+                url.searchParams.set('q', "{{ request('q') }}");
+            @endif
+            @if(request('category'))
+                url.searchParams.set('category', "{{ request('category') }}");
+            @endif
+            @if(request('province'))
+                url.searchParams.set('province', "{{ request('province') }}");
+            @endif
+
+            fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
                 }
-            });
-        }
+            })
+            .then(res => res.json())
+            .then(data => {
+                productGrid.insertAdjacentHTML('beforeend', data.html);
 
-        // SWEETALERT lokal (window.Swal dari app.js)
-
-        // sukses
-        @if (session('success'))
-        if (window.Swal) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil',
-                text: '{{ session('success') }}',
-                timer: 3000,
-                showConfirmButton: false
+                if (data.has_more) {
+                    button.dataset.nextPage = data.next_page;
+                    button.disabled = false;
+                    button.textContent = 'Show more';
+                } else {
+                    button.remove();
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                button.disabled = false;
+                button.textContent = 'Show more';
             });
-        }
-        @endif
+        });
+    }
 
-        // error server
-        @if (session('error'))
-        if (window.Swal) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Gagal',
-                text: '{{ session('error') }}',
-            }).then(() => {
-                openModal();
-            });
-        }
-        @endif
+    const modal = document.getElementById('category-modal');
+    const openBtn = document.getElementById('open-category-modal');
+    const closeBtn = document.getElementById('close-category-modal');
 
-        // error validasi (ambil pesan pertama)
-        @if ($errors->any())
-        if (window.Swal) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Form tidak valid',
-                text: '{{ $errors->first() }}',
-            }).then(() => {
-                openModal();
-            });
+    // Open modal
+    openBtn.addEventListener('click', () => modal.classList.remove('hidden'));
+
+    // Close modal
+    closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
+
+    // Close when clicking outside modal content
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            modal.classList.add('hidden');
         }
-        @endif
     });
-</script>
+    });
+  </script>
 @endpush

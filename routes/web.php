@@ -123,8 +123,8 @@ Route::get('send-mail', function() {
     Mail::to('alvin.harist502@gmail.com')->send(new SendTestEmail($message));
 });
 
+### route product public(tanpa middleware auth/verif)
 Route::get('/home', [ProductController::class, 'index'])->name('home');
 Route::get('/search', [ProductController::class, 'search'])->name('search');
 Route::resource('product', ProductController::class)->except(['index']);
-
 Route::post('/review', [ReviewController::class, 'store'])->name('review.store');
