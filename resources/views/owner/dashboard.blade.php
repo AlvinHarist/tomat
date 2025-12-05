@@ -16,38 +16,7 @@
          style="display: none;">
     </div>
 
-    <aside class="sidebar">
-        <div class="user-profile">
-            <div class="user-info">
-                <div class="user-name">{{ Auth::guard('owner')->user()->name ?? 'Owner' }}</div>
-                <div class="user-role">Owner</div>
-            </div>
-            <div class="avatar"></div>
-        </div>
-
-        <div class="menu-title">MENU</div>
-        <nav class="nav-links">
-           <a href="{{ route('owner.dashboard') }}" class="{{ request()->routeIs('owner.dashboard') ? 'active' : '' }}">
-                <i class="fas fa-home"></i> Dashboard
-            </a>
-        
-            <a href="{{ route('owner.sellers.index') }}" class="{{ request()->routeIs('owner.sellers.*') ? 'active' : '' }}">
-                <i class="fas fa-store"></i> Seller
-            </a>
-            <a href="#"><i class="fas fa-box-open"></i> Categories</a>
-            <a href="#"><i class="fas fa-cubes"></i> Products</a>
-            <a href="#"><i class="fas fa-cog"></i> Reports</a>
-            
-            <form action="{{ route('owner.logout') }}" method="POST" style="margin-top: 20px;">
-                @csrf
-                <button type="submit" style="background:none; border:none; color:#777; cursor:pointer; font-size:0.9rem; padding:12px 15px; display:flex; align-items:center;">
-                    <i class="fas fa-sign-out-alt" style="margin-right:15px;"></i> Logout
-                </button>
-            </form>
-        </nav>
-
-        <div class="logo">ToMaT</div>
-    </aside>
+    @include('owner.sidebar')
 
     <main class="main-content">
         <h1 class="page-title">Dashboard Pemilik</h1>

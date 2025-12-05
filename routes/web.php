@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\Owner\ReportController;
+use App\Http\Controllers\Owner\CategoryController;
 use App\Http\Controllers\Owner\Auth\LoginController as OwnerLoginController;
 use App\Http\Controllers\Owner\DashboardController as OwnerDashboardController;
 use App\Mail\SendTestEmail;
@@ -85,6 +87,21 @@ Route::prefix('owner')->name('owner.')->group(function () {
     Route::get('/sellers', [App\Http\Controllers\Owner\SellerController::class, 'index'])->name('sellers.index');
     Route::get('/sellers/{id}', [App\Http\Controllers\Owner\SellerController::class, 'show'])->name('sellers.show');
     Route::post('/sellers/{id}/status', [App\Http\Controllers\Owner\SellerController::class, 'updateStatus'])->name('sellers.updateStatus');
+
+    // Reports
+    // Menu Utama Laporan
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+
+    // Action Print PDF
+    Route::get('/reports/seller-status', [ReportController::class, 'reportSellerStatus'])->name('reports.seller_status');
+    Route::get('/reports/seller-province', [ReportController::class, 'reportSellerProvince'])->name('reports.seller_province');
+    Route::get('/reports/product-rating', [ReportController::class, 'reportProductRating'])->name('reports.product_rating');
+
+    // Rute Kategori
+    Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
+    Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
+    Route::put('/categories/{id}', [CategoryController::class, 'update'])->name('categories.update');
+    Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])->name('categories.destroy');
 });
 
 // Rute Verifikasi Email
