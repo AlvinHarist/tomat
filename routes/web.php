@@ -37,6 +37,11 @@ Route::get('/', [RegisterController::class, 'showRegistrationForm'])->name('regi
 // Rute untuk memproses data saat formulir di-submit
 Route::post('/', [RegisterController::class, 'store'])->name('register.store');
 
+// API endpoints for dependent dropdown
+Route::get('/api/cities/{provinceCode}', [RegisterController::class, 'getCities'])->name('api.cities');
+Route::get('/api/districts/{cityCode}', [RegisterController::class, 'getDistricts'])->name('api.districts');
+Route::get('/api/villages/{districtCode}', [RegisterController::class, 'getVillages'])->name('api.villages');
+
 // Seller Routes
 Route::prefix('seller')->name('seller.')->group(function () {
     // Login & Logout
@@ -51,9 +56,21 @@ Route::prefix('seller')->name('seller.')->group(function () {
     
     // Protected Routes
     Route::middleware(['auth', 'verified'])->group(function () {
-        Route::get('/dashboard', function () {
-            return view('seller.dashboard');
-        })->name('dashboard');
+        Route::get('/dashboard', [App\Http\Controllers\Seller\DashboardController::class, 'index'])->name('dashboard');
+        
+        // Products
+        Route::get('/products', [App\Http\Controllers\Seller\ProductController::class, 'index'])->name('products.index');
+        Route::get('/products/create', [App\Http\Controllers\Seller\ProductController::class, 'create'])->name('products.create');
+        Route::post('/products', [App\Http\Controllers\Seller\ProductController::class, 'store'])->name('products.store');
+        Route::get('/products/{id}/edit', [App\Http\Controllers\Seller\ProductController::class, 'edit'])->name('products.edit');
+        Route::put('/products/{id}', [App\Http\Controllers\Seller\ProductController::class, 'update'])->name('products.update');
+        Route::delete('/products/{id}', [App\Http\Controllers\Seller\ProductController::class, 'destroy'])->name('products.destroy');
+        
+        // Reports
+        Route::get('/reports', [App\Http\Controllers\Seller\ReportController::class, 'index'])->name('reports.index');
+        Route::get('/reports/stock', [App\Http\Controllers\Seller\ReportController::class, 'productsByStock'])->name('reports.stock');
+        Route::get('/reports/rating', [App\Http\Controllers\Seller\ReportController::class, 'productsByRating'])->name('reports.rating');
+        Route::get('/reports/restock', [App\Http\Controllers\Seller\ReportController::class, 'productsNeedRestock'])->name('reports.restock');
     });
 });
 
@@ -123,8 +140,8 @@ Route::get('send-mail', function() {
     Mail::to('alvin.harist502@gmail.com')->send(new SendTestEmail($message));
 });
 
+### route product public(tanpa middleware auth/verif)
 Route::get('/home', [ProductController::class, 'index'])->name('home');
 Route::get('/search', [ProductController::class, 'search'])->name('search');
 Route::resource('product', ProductController::class)->except(['index']);
-
 Route::post('/review', [ReviewController::class, 'store'])->name('review.store');

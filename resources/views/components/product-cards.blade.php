@@ -1,15 +1,28 @@
+
 @foreach ($products as $product)
 <a href="{{ route('product.show', $product) }}"
 class="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col">
+    @php
+        $hasImage = is_array($product->images) && !empty($product->images);
+        $firstImage = $hasImage ? $product->images[0] : null;
+    @endphp
 
-  {{-- Gambar produk --}}
-  <div class="w-full h-32 sm:h-36 md:h-40 overflow-hidden rounded-b-none">
-      <img
-          src="{{ asset($product->main_image) }}"
-          alt="{{ $product->name }}"
-          class="w-full h-full object-cover"
-      >
-  </div>
+    {{-- Gambar produk --}}
+    @if ($hasImage)
+        {{-- Jika punya gambar --}}
+        <img
+            src="{{ asset($firstImage) }}"
+            alt="{{ $product->name }}"
+            class="w-full h-full object-cover rounded-lg"
+        >
+    @else
+        {{-- Fallback icon --}}
+        <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" stroke-width="2"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                d="M3 5a2 2 0 012-2h3l2 2h6a2 2 0 012 2v3m0 4v3a2 2 0 01-2 2h-3l-2-2H5a2 2 0 01-2-2v-3m0-4V7m0 0h18m-9 4l3 3m0 0l3-3m-3 3V3" />
+        </svg>
+    @endif
 
   {{-- Detail produk --}}
   <div class="p-3 flex flex-col flex-1">

@@ -102,15 +102,55 @@
                     <h3 class="text-lg font-medium text-gray-800 mb-3">Alamat Lengkap</h3>
                     
                     <div class="space-y-4">
+            
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Jalan <span class="text-red-500">*</span></label>
-                            <input type="text" name="jalan" value="{{ old('jalan') }}" 
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
-                                   placeholder="Nama Jalan, No. Rumah" required>
-                            <p class="text-red-500 text-xs mt-1 hidden error-msg">Alamat jalan wajib diisi.</p>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Provinsi <span class="text-red-500">*</span></label>
+                            <select name="provinsi" id="provinsi" 
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                                    required>
+                                <option value="">Pilih Provinsi</option>
+                                @foreach($provinces as $province)
+                                    <option value="{{ $province->code }}" {{ old('provinsi') == $province->code ? 'selected' : '' }}>
+                                        {{ $province->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <p class="text-red-500 text-xs mt-1 hidden error-msg">Provinsi wajib dipilih.</p>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Kabupaten/Kota <span class="text-red-500">*</span></label>
+                            <select name="kabupatenkota" id="kabupatenkota" 
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                                    required disabled>
+                                <option value="">Pilih Kabupaten/Kota</option>
+                            </select>
+                            <p class="text-red-500 text-xs mt-1 hidden error-msg">Kabupaten/Kota wajib dipilih.</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Kecamatan <span class="text-red-500">*</span></label>
+                            <select name="kecamatan" id="kecamatan" 
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                                    required disabled>
+                                <option value="">Pilih Kecamatan</option>
+                            </select>
+                            <p class="text-red-500 text-xs mt-1 hidden error-msg">Kecamatan wajib dipilih.</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Kelurahan <span class="text-red-500">*</span></label>
+                            <select name="kelurahan" id="kelurahan" 
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                                    required disabled>
+                                <option value="">Pilih Kelurahan</option>
+                            </select>
+                            <p class="text-red-500 text-xs mt-1 hidden error-msg">Kelurahan wajib dipilih.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">RT <span class="text-red-500">*</span></label>
                                 <input type="text" name="rt" value="{{ old('rt') }}" 
@@ -127,32 +167,13 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Kelurahan <span class="text-red-500">*</span></label>
-                                <input type="text" name="kelurahan" value="{{ old('kelurahan') }}" 
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
-                                       placeholder="Nama Kelurahan" required>
-                                <p class="text-red-500 text-xs mt-1 hidden error-msg">Kelurahan wajib diisi.</p>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Kabupaten/Kota <span class="text-red-500">*</span></label>
-                                <input type="text" name="kabupatenkota" value="{{ old('kabupatenkota') }}" 
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
-                                       placeholder="Nama Kota/Kab" required>
-                                <p class="text-red-500 text-xs mt-1 hidden error-msg">Kabupaten/Kota wajib diisi.</p>
-                            </div>
-                        </div>
-
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Provinsi <span class="text-red-500">*</span></label>
-                            <input type="text" name="provinsi" value="{{ old('provinsi') }}" 
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Jalan <span class="text-red-500">*</span></label>
+                            <input type="text" name="jalan" value="{{ old('jalan') }}" 
                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
-                                   placeholder="Nama Provinsi" required>
-                            <p class="text-red-500 text-xs mt-1 hidden error-msg">Provinsi wajib diisi.</p>
+                                   placeholder="Nama Jalan, No. Rumah" required>
+                            <p class="text-red-500 text-xs mt-1 hidden error-msg">Alamat jalan wajib diisi.</p>
                         </div>
-                    </div>
-                </div>
 
                 <!-- Password Section -->
                 <div class="border-t border-gray-200 pt-4 mt-4">
@@ -277,7 +298,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('registerForm');
-            const inputs = form.querySelectorAll('input:not([type="hidden"]), textarea');
+            const inputs = form.querySelectorAll('input:not([type="hidden"]), textarea, select');
             
             // --- 1. Validation Logic (Touched & Dirty) ---
             inputs.forEach(input => {
@@ -290,8 +311,9 @@
                     validateField(this);
                 });
 
-                // Input event: Validate immediately if already touched
-                input.addEventListener('input', function() {
+                // Input/Change event: Validate immediately if already touched
+                const eventType = input.tagName === 'SELECT' ? 'change' : 'input';
+                input.addEventListener(eventType, function() {
                     if (this.dataset.touched === 'true') {
                         validateField(this);
                     }
@@ -491,11 +513,141 @@
                     confirmInput.focus();
                 }
 
+                // Validate Region Dropdowns (make sure all are selected)
+                const provinsiSelect = document.getElementById('provinsi');
+                const kabupatenSelect = document.getElementById('kabupatenkota');
+                const kecamatanSelect = document.getElementById('kecamatan');
+                const kelurahanSelect = document.getElementById('kelurahan');
+
+                if (!provinsiSelect.value) {
+                    hasError = true;
+                    provinsiSelect.focus();
+                    alert('Provinsi wajib dipilih.');
+                } else if (!kabupatenSelect.value) {
+                    hasError = true;
+                    kabupatenSelect.focus();
+                    alert('Kabupaten/Kota wajib dipilih.');
+                } else if (!kecamatanSelect.value) {
+                    hasError = true;
+                    kecamatanSelect.focus();
+                    alert('Kecamatan wajib dipilih.');
+                } else if (!kelurahanSelect.value) {
+                    hasError = true;
+                    kelurahanSelect.focus();
+                    alert('Kelurahan wajib dipilih.');
+                }
+
                 if (hasError) {
                     e.preventDefault();
                     // Scroll to first error
                     const firstError = document.querySelector('.border-red-500');
                     if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            });
+
+            // --- 5. Dependent Dropdown for Indonesian Regions ---
+            const provinsiSelect = document.getElementById('provinsi');
+            const kabupatenSelect = document.getElementById('kabupatenkota');
+            const kecamatanSelect = document.getElementById('kecamatan');
+            const kelurahanSelect = document.getElementById('kelurahan');
+
+            // Province change
+            provinsiSelect.addEventListener('change', function() {
+                const provinceCode = this.value;
+                
+                // Reset dependent dropdowns
+                kabupatenSelect.innerHTML = '<option value="">Pilih Kabupaten/Kota</option>';
+                kecamatanSelect.innerHTML = '<option value="">Pilih Kecamatan</option>';
+                kelurahanSelect.innerHTML = '<option value="">Pilih Kelurahan</option>';
+                
+                kabupatenSelect.value = '';
+                kecamatanSelect.value = '';
+                kelurahanSelect.value = '';
+                
+                kabupatenSelect.disabled = true;
+                kecamatanSelect.disabled = true;
+                kelurahanSelect.disabled = true;
+
+                if (provinceCode) {
+                    // Fetch cities
+                    fetch(`/api/cities/${provinceCode}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            data.forEach(city => {
+                                const option = document.createElement('option');
+                                option.value = city.code;
+                                option.textContent = city.name;
+                                kabupatenSelect.appendChild(option);
+                            });
+                            kabupatenSelect.disabled = false;
+                        })
+                        .catch(error => {
+                            console.error('Error fetching cities:', error);
+                            alert('Gagal memuat data Kabupaten/Kota. Silakan refresh halaman.');
+                        });
+                }
+            });
+
+            // City change
+            kabupatenSelect.addEventListener('change', function() {
+                const cityCode = this.value;
+                
+                // Reset dependent dropdowns
+                kecamatanSelect.innerHTML = '<option value="">Pilih Kecamatan</option>';
+                kelurahanSelect.innerHTML = '<option value="">Pilih Kelurahan</option>';
+                
+                kecamatanSelect.value = '';
+                kelurahanSelect.value = '';
+                
+                kecamatanSelect.disabled = true;
+                kelurahanSelect.disabled = true;
+
+                if (cityCode) {
+                    // Fetch districts
+                    fetch(`/api/districts/${cityCode}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            data.forEach(district => {
+                                const option = document.createElement('option');
+                                option.value = district.code;
+                                option.textContent = district.name;
+                                kecamatanSelect.appendChild(option);
+                            });
+                            kecamatanSelect.disabled = false;
+                        })
+                        .catch(error => {
+                            console.error('Error fetching districts:', error);
+                            alert('Gagal memuat data Kecamatan. Silakan refresh halaman.');
+                        });
+                }
+            });
+
+            // District change
+            kecamatanSelect.addEventListener('change', function() {
+                const districtCode = this.value;
+                
+                // Reset dependent dropdown
+                kelurahanSelect.innerHTML = '<option value="">Pilih Kelurahan</option>';
+                kelurahanSelect.value = '';
+                kelurahanSelect.disabled = true;
+
+                if (districtCode) {
+                    // Fetch villages
+                    fetch(`/api/villages/${districtCode}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            data.forEach(village => {
+                                const option = document.createElement('option');
+                                option.value = village.code;
+                                option.textContent = village.name;
+                                kelurahanSelect.appendChild(option);
+                            });
+                            kelurahanSelect.disabled = false;
+                        })
+                        .catch(error => {
+                            console.error('Error fetching villages:', error);
+                            alert('Gagal memuat data Kelurahan. Silakan refresh halaman.');
+                        });
                 }
             });
         });

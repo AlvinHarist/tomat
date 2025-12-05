@@ -11,13 +11,38 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Auth\Events\Registered;
+use Laravolt\Indonesia\Models\Province;
+use Laravolt\Indonesia\Models\City;
+use Laravolt\Indonesia\Models\District;
+use Laravolt\Indonesia\Models\Village;
 
 class RegisterController extends Controller
 {
     public function showRegistrationForm()
     {
-        return view('auth.register');
+        $provinces = Province::all();
+        return view('auth.register', compact('provinces'));
+    }
+
+    // API endpoints for dependent dropdown
+    public function getCities($provinceCode)
+    {
+        $cities = City::where('province_code', $provinceCode)->get();
+        return response()->json($cities);
+    }
+
+    public function getDistricts($cityCode)
+    {
+        $districts = District::where('city_code', $cityCode)->get();
+        return response()->json($districts);
+    }
+
+    public function getVillages($districtCode)
+    {
+        $villages = Village::where('district_code', $districtCode)->get();
+        return response()->json($villages);
     }
 
     public function store(Request $request)
@@ -44,9 +69,10 @@ class RegisterController extends Controller
             'jalan' => ['required', 'string'],
             'rt' => ['required', 'string'],
             'rw' => ['required', 'string'],
-            'kelurahan' => ['required', 'string'],
-            'kabupatenkota' => ['required', 'string'],
             'provinsi' => ['required', 'string'],
+            'kabupatenkota' => ['required', 'string'],
+            'kecamatan' => ['required', 'string'],
+            'kelurahan' => ['required', 'string'],
 
             'password' => ['required', 'string', 'min:8', 'confirmed', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/'],
             'ktp_number' => ['required', 'string', 'size:16', 'unique:sellers,pic_ktp_number'],
@@ -58,6 +84,10 @@ class RegisterController extends Controller
             'phone.regex' => 'Nomor HP hanya boleh berisi angka.',
             'ktp_number.regex' => 'Nomor KTP hanya boleh berisi angka.',
             'password.regex' => 'Password harus mengandung huruf besar, kecil, angka, dan simbol.',
+            'provinsi.required' => 'Provinsi wajib dipilih.',
+            'kabupatenkota.required' => 'Kabupaten/Kota wajib dipilih.',
+            'kecamatan.required' => 'Kecamatan wajib dipilih.',
+            'kelurahan.required' => 'Kelurahan wajib dipilih.',
         ];
         
         $validator = Validator::make($request->all(), $rules, $messages);
@@ -85,9 +115,34 @@ class RegisterController extends Controller
                 // 'status' => 'aktif', // Assuming 'status' column exists in users table
             ]);
 
+            // Debug: Log received data
+            Log::info('Registration data received:', [
+                'provinsi' => $request->provinsi,
+                'kabupatenkota' => $request->kabupatenkota,
+                'kecamatan' => $request->kecamatan,
+                'kelurahan' => $request->kelurahan,
+            ]);
+
+            // Get region names from codes
+            $province = Province::where('code', $request->provinsi)->first();
+            $city = City::where('code', $request->kabupatenkota)->first();
+            $district = District::where('code', $request->kecamatan)->first();
+            $village = Village::where('code', $request->kelurahan)->first();
+
+            // Debug: Log query results
+            Log::info('Region query results:', [
+                'province' => $province ? $province->name : 'NULL',
+                'city' => $city ? $city->name : 'NULL',
+                'district' => $district ? $district->name : 'NULL',
+                'village' => $village ? $village->name : 'NULL',
+            ]);
+
+            // Validate that all region data was found
+            if (!$province || !$city || !$district || !$village) {
+                throw new \Exception('Data wilayah tidak valid. Pastikan Anda memilih wilayah dari dropdown yang tersedia. (Provinsi: ' . ($province ? '✓' : '✗') . ', Kota: ' . ($city ? '✓' : '✗') . ', Kecamatan: ' . ($district ? '✓' : '✗') . ', Kelurahan: ' . ($village ? '✓' : '✗') . ')');
+            }
+
             // Create Seller (using the sellers table structure)
-            // Note: The sellers table migration does not have user_id, so we cannot link it here unless the migration is updated.
-            // We will save the data as per the sellers table schema.
             Seller::create([
                 'id' => \Illuminate\Support\Str::uuid(),
                 'store_name' => $request->store_name,
@@ -95,13 +150,14 @@ class RegisterController extends Controller
                 'pic_name' => $request->name,
                 'pic_phone' => $request->phone,
                 'pic_email' => $request->email,
-                'password' => Hash::make($request->password), // Storing password in sellers table too as per schema
+                'password' => Hash::make($request->password),
                 'pic_street' => $request->jalan,
                 'pic_rt' => $request->rt,
                 'pic_rw' => $request->rw,
-                'pic_village' => $request->kelurahan,
-                'pic_city' => $request->kabupatenkota,
-                'pic_province' => $request->provinsi,
+                'pic_village' => $village->name,
+                'pic_district' => $district->name,
+                'pic_city' => $city->name,
+                'pic_province' => $province->name,
                 'pic_ktp_number' => $request->ktp_number,
                 'pic_photo_path' => $photoPath,
                 'pic_ktp_file_path' => $ktpFilePath,
