@@ -10,10 +10,8 @@ class Product extends Model
 {
     use HasFactory, HasUuids;
 
-    // penamaan tabel di database
     protected $table = 'products';
 
-    // kolom dapat diisi insert
     protected $fillable = [
         'seller_id',
         'category_id',
@@ -24,13 +22,11 @@ class Product extends Model
         'images',
     ];
 
-    // casting sesuai migrasi tabel
     protected $casts = [
-        'images' => 'array',
         'price'  => 'double',
+        'images' => 'array',
     ];
 
-    // relasi model lain
     public function seller()
     {
         return $this->belongsTo(Seller::class);
@@ -42,6 +38,11 @@ class Product extends Model
     }
 
     public function reviews()
+    {
+        return $this->hasMany(Review::class, 'product_id');
+    }
+
+    public function reviewAndRatings()
     {
         return $this->hasMany(Review::class, 'product_id');
     }

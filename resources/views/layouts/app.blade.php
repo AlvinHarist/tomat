@@ -21,7 +21,9 @@
 
             <!-- Nama App -->
             <div class="font-pacifico text-2xl font-semibold text-green-600">
-                {{ config('app.name', 'MyApp') }}
+                <a href="{{ route('home') }}">
+                    {{ config('app.name', 'MyApp') }}
+                </a>
             </div>
 
             <!-- Search Bar -->
