@@ -11,7 +11,7 @@
 
         {{-- gambar --}}
         <div class="md:col-span-1 bg-white rounded-xl shadow p-4 flex items-center justify-center">
-            <img src="{{ asset($product->images) }}"
+              <img src="{{ asset('storage/' . ($product->images[0] ?? 'images/store.png')) }}"
                  alt="{{ $product->name }}"
                  class="rounded-lg object-cover w-full">
         </div>

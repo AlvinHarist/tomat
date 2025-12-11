@@ -4,100 +4,146 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Produk Saya - ToMaT</title>
-    @vite('resources/css/app.css')
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/owner/dashboard.css') }}">
+    <style>
+        body { 
+            background-color: #f4f4f4; 
+            display: flex; 
+            height: 100vh; 
+            overflow: hidden; 
+        }
+        /* Style untuk penomoran halaman Laravel agar terlihat rapi dengan CSS Owner */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .pagination li {
+            margin: 0 5px;
+        }
+        .pagination li a,
+        .pagination li span {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            border-radius: 8px;
+            color: #777;
+            border: 1px solid #ddd;
+            transition: 0.3s;
+        }
+        .pagination li a:hover:not(.active) {
+            background-color: #f0f0f0;
+        }
+        .pagination li.active span {
+            background-color: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
+        .pagination li.disabled span {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
 </head>
-<body class="bg-gray-50">
-    <!-- Sidebar -->
+<body>
     @include('seller.partials.sidebar')
     
-    <!-- Main Content -->
-    <div class="ml-64 p-8">
-        <div class="max-w-7xl mx-auto">
-            <!-- Header -->
-            <div class="flex items-center justify-between mb-8">
+    <main class="main-content"> 
+        <div class="page-container" style="max-width: 100%;">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-800">Produk Saya</h1>
-                    <p class="text-gray-600 mt-2">Kelola produk toko Anda</p>
+                    <h1 class="page-title" style="margin-bottom: 5px;">Produk Saya</h1>
+                    <p class="text-muted">Kelola produk toko Anda</p>
                 </div>
-                <a href="{{ route('seller.products.create') }}" class="flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                    </svg>
-                    Tambah Produk
+                <a href="{{ route('seller.products.create') }}" class="btn btn-primary">
+                    <i class="fas fa-plus" style="margin-right: 5px;"></i> Tambah Produk
                 </a>
             </div>
             
-            <!-- Content -->
             <div>
                 
                 @if(session('success'))
-                <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded mb-6">
-                    <p class="text-green-700">{{ session('success') }}</p>
+                <div class="alert alert-success">
+                    <p>{{ session('success') }}</p>
                 </div>
                 @endif
 
                 @if(session('error') || $errors->any())
-                <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded mb-6">
-                    <p class="text-red-700">{{ session('error') ?? 'Terjadi kesalahan' }}</p>
+                <div class="alert alert-danger">
+                    <p>{{ session('error') ?? 'Terjadi kesalahan' }}</p>
                 </div>
                 @endif
                 
-                <!-- Products Table -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100">
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead class="bg-gray-50 border-b border-gray-200">
-                                <tr>
-                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Produk</th>
-                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Kategori</th>
-                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Harga</th>
-                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Stok</th>
-                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Tanggal</th>
-                                    <th class="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Aksi</th>
+                <div class="card" style="padding: 0; text-align: left;">
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid #eee;">
+                                    <th style="padding: 15px 20px; text-align: left; font-size: 0.85rem; color: #888; font-weight: 600;">Produk</th>
+                                    <th style="padding: 15px 20px; text-align: left; font-size: 0.85rem; color: #888; font-weight: 600;">Kategori</th>
+                                    <th style="padding: 15px 20px; text-align: left; font-size: 0.85rem; color: #888; font-weight: 600;">Harga</th>
+                                    <th style="padding: 15px 20px; text-align: left; font-size: 0.85rem; color: #888; font-weight: 600;">Stok</th>
+                                    <th style="padding: 15px 20px; text-align: left; font-size: 0.85rem; color: #888; font-weight: 600;">Tanggal</th>
+                                    <th style="padding: 15px 20px; text-align: right; font-size: 0.85rem; color: #888; font-weight: 600;">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-200">
+                            <tbody>
                                 @forelse($products as $product)
-                                <tr class="hover:bg-gray-50 transition-colors">
-                                    <td class="px-6 py-4">
-                                        <div class="flex items-center">
-                                            <img src="{{ asset('storage/' . $product->image_path) }}" alt="{{ $product->name }}" class="w-12 h-12 rounded-lg object-cover">
-                                            <div class="ml-4">
-                                                <p class="text-sm font-medium text-gray-900">{{ $product->name }}</p>
-                                                <p class="text-sm text-gray-500 line-clamp-1">{{ Str::limit($product->description, 50) }}</p>
+                                <tr style="border-bottom: 1px solid #f9f9f9; background: white;">
+                                    <td style="padding: 15px 20px;">
+                                        <div style="display: flex; align-items: center;">
+                                            @php
+                                                // Logika untuk mengambil gambar pertama
+                                                $imageArray = is_string($product->images) ? json_decode($product->images, true) : $product->images;
+                                                $firstImage = ($imageArray && is_array($imageArray) && count($imageArray) > 0) ? $imageArray[0] : null;
+                                            @endphp
+                                            
+                                            @if($firstImage)
+                                            <img src="{{ asset('storage/' . $firstImage) }}" alt="{{ $product->name }}" class="file-preview" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover; margin-right: 15px;">
+                                            @else
+                                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #eee; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
+                                                <i class="fas fa-image" style="color: #ccc; font-size: 1.2rem;"></i>
+                                            </div>
+                                            @endif
+                                            <div style="max-width: 250px;">
+                                                <p style="font-size: 0.95rem; font-weight: bold; color: #333; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ $product->name }}</p>
+                                                <p style="font-size: 0.8rem; color: #888; margin-top: 2px; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ Str::limit($product->description, 50) }}</p>
+                                                @if($imageArray && count($imageArray) > 1)
+                                                <p style="font-size: 0.75rem; color: #999; margin-top: 2px;">+{{ count($imageArray) - 1 }} foto lainnya</p>
+                                                @endif
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4 text-sm text-gray-600">
-                                        <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                                    <td style="padding: 15px 20px; font-size: 0.9rem; color: #555;">
+                                        <span style="display: inline-block; padding: 4px 10px; background: #e3f2fd; color: #2196f3; border-radius: 5px; font-size: 0.75rem; font-weight: 600;">
                                             {{ $product->category->name ?? '-' }}
                                         </span>
                                     </td>
-                                    <td class="px-6 py-4 text-sm font-semibold text-gray-900">
+                                    <td style="padding: 15px 20px; font-size: 0.9rem; font-weight: bold; color: #333;">
                                         Rp {{ number_format($product->price, 0, ',', '.') }}
                                     </td>
-                                    <td class="px-6 py-4">
-                                        <span class="px-3 py-1 text-xs font-semibold rounded-full {{ $product->stock > 10 ? 'bg-green-100 text-green-800' : ($product->stock > 0 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800') }}">
+                                    <td style="padding: 15px 20px;">
+                                        <span style="display: inline-block; padding: 4px 10px; font-size: 0.75rem; font-weight: 600; border-radius: 5px; {{ $product->stock > 10 ? 'background: #edfdf6; color: #065f46;' : ($product->stock > 0 ? 'background: #fffbe5; color: #a16207;' : 'background: #fff5f5; color: #e53e3e;') }}">
                                             {{ $product->stock }} unit
                                         </span>
                                     </td>
-                                    <td class="px-6 py-4 text-sm text-gray-600">
+                                    <td style="padding: 15px 20px; font-size: 0.85rem; color: #888;">
                                         {{ $product->created_at->format('d M Y') }}
                                     </td>
-                                    <td class="px-6 py-4 text-right">
-                                        <div class="flex items-center justify-end space-x-2">
-                                            <a href="{{ route('seller.products.edit', $product->id) }}" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                                </svg>
+                                    <td style="padding: 15px 20px; text-align: right;">
+                                        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                                            <a href="{{ route('seller.products.edit', $product->id) }}" style="color: #2196f3; font-size: 1rem; padding: 5px; border-radius: 5px; transition: 0.3s;" onmouseover="this.style.backgroundColor='#e3f2fd'" onmouseout="this.style.backgroundColor='transparent'">
+                                                <i class="fas fa-edit"></i>
                                             </a>
-                                            <form action="{{ route('seller.products.destroy', $product->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus produk ini?')">
+                                            <form action="{{ route('seller.products.destroy', $product->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus produk ini?')" style="display: inline;">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                                    </svg>
+                                                <button type="submit" style="color: #e53e3e; background: none; border: none; cursor: pointer; font-size: 1rem; padding: 5px; border-radius: 5px; transition: 0.3s;" onmouseover="this.style.backgroundColor='#ffebee'" onmouseout="this.style.backgroundColor='transparent'">
+                                                    <i class="fas fa-trash-alt"></i>
                                                 </button>
                                             </form>
                                         </div>
@@ -105,16 +151,11 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="6" class="px-6 py-12 text-center">
-                                        <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
-                                        </svg>
-                                        <p class="text-gray-600 mb-4">Belum ada produk</p>
-                                        <a href="{{ route('seller.products.create') }}" class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors">
-                                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                                            </svg>
-                                            Tambah Produk Pertama
+                                    <td colspan="6" style="padding: 50px; text-align: center;">
+                                        <i class="fas fa-box-open" style="font-size: 3rem; color: #ccc; margin-bottom: 10px;"></i>
+                                        <p style="color: #888; margin-bottom: 15px;">Belum ada produk</p>
+                                        <a href="{{ route('seller.products.create') }}" class="btn btn-primary">
+                                            <i class="fas fa-plus" style="margin-right: 5px;"></i> Tambah Produk Pertama
                                         </a>
                                     </td>
                                 </tr>
@@ -123,16 +164,14 @@
                         </table>
                     </div>
                     
-                    <!-- Pagination -->
                     @if($products->hasPages())
-                    <div class="px-6 py-4 border-t border-gray-200">
-                        {{ $products->links() }}
+                    <div style="padding: 15px 20px; border-top: 1px solid #eee; text-align: center;">
+                        {{ $products->links() }} 
                     </div>
                     @endif
                 </div>
-                
             </div>
         </div>
-    </div>
+    </main>
 </body>
 </html>

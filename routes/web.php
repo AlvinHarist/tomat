@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\Owner\ReportController;
+use App\Http\Controllers\Owner\CategoryController;
 use App\Http\Controllers\Owner\Auth\LoginController as OwnerLoginController;
 use App\Http\Controllers\Owner\DashboardController as OwnerDashboardController;
 use App\Mail\SendTestEmail;
@@ -24,10 +26,6 @@ use App\Mail\SendTestEmail;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-
-// Route::get('/', function () {
-//     return view('welcome');
-// });
 
 // Rute untuk menampilkan halaman formulir
 Route::get('/', [RegisterController::class, 'showRegistrationForm'])->name('register');
@@ -56,6 +54,12 @@ Route::prefix('seller')->name('seller.')->group(function () {
     Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/dashboard', [App\Http\Controllers\Seller\DashboardController::class, 'index'])->name('dashboard');
         
+        // --- Seller Functionality Routes ---
+        
+        // Rute Halaman Daftar Lengkap Reviewer (Dipanggil oleh tombol "More...")
+        Route::get('/reviewers/province', [App\Http\Controllers\Seller\DashboardController::class, 'reviewersByProvinceIndex'])
+             ->name('reviewers.by-province.index'); 
+        
         // Products
         Route::get('/products', [App\Http\Controllers\Seller\ProductController::class, 'index'])->name('products.index');
         Route::get('/products/create', [App\Http\Controllers\Seller\ProductController::class, 'create'])->name('products.create');
@@ -65,11 +69,22 @@ Route::prefix('seller')->name('seller.')->group(function () {
         Route::delete('/products/{id}', [App\Http\Controllers\Seller\ProductController::class, 'destroy'])->name('products.destroy');
         
         // Reports
-        Route::get('/reports', [App\Http\Controllers\Seller\ReportController::class, 'index'])->name('reports.index');
-        Route::get('/reports/stock', [App\Http\Controllers\Seller\ReportController::class, 'productsByStock'])->name('reports.stock');
-        Route::get('/reports/rating', [App\Http\Controllers\Seller\ReportController::class, 'productsByRating'])->name('reports.rating');
-        Route::get('/reports/restock', [App\Http\Controllers\Seller\ReportController::class, 'productsNeedRestock'])->name('reports.restock');
+    Route::prefix('reports')->name('reports.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Seller\ReportController::class, 'index'])->name('index');
+
+        // Products By Stock
+        Route::get('/stock/filter', [App\Http\Controllers\Seller\ReportController::class, 'productsByStockFilter'])->name('products-by-stock.filter');
+        Route::get('/stock', [App\Http\Controllers\Seller\ReportController::class, 'productsByStock'])->name('stock');
+
+        // Products By Rating
+        Route::get('/rating/filter', [App\Http\Controllers\Seller\ReportController::class, 'productsByRatingFilter'])->name('products-by-rating.filter');
+        Route::get('/rating', [App\Http\Controllers\Seller\ReportController::class, 'productsByRating'])->name('rating');
+
+        // Products Need Restock
+        Route::get('/restock/filter', [App\Http\Controllers\Seller\ReportController::class, 'productsNeedRestockFilter'])->name('products-need-restock.filter');
+        Route::get('/restock', [App\Http\Controllers\Seller\ReportController::class, 'productsNeedRestock'])->name('restock');
     });
+        });
 });
 
 Route::prefix('owner')->name('owner.')->group(function () {
@@ -85,6 +100,21 @@ Route::prefix('owner')->name('owner.')->group(function () {
     Route::get('/sellers', [App\Http\Controllers\Owner\SellerController::class, 'index'])->name('sellers.index');
     Route::get('/sellers/{id}', [App\Http\Controllers\Owner\SellerController::class, 'show'])->name('sellers.show');
     Route::post('/sellers/{id}/status', [App\Http\Controllers\Owner\SellerController::class, 'updateStatus'])->name('sellers.updateStatus');
+
+    // Reports
+    // Menu Utama Laporan
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+
+    // Action Print PDF
+    Route::get('/reports/seller-status', [ReportController::class, 'reportSellerStatus'])->name('reports.seller_status');
+    Route::get('/reports/seller-province', [ReportController::class, 'reportSellerProvince'])->name('reports.seller_province');
+    Route::get('/reports/product-rating', [ReportController::class, 'reportProductRating'])->name('reports.product_rating');
+
+    // Rute Kategori
+    Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
+    Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
+    Route::put('/categories/{id}', [CategoryController::class, 'update'])->name('categories.update');
+    Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])->name('categories.destroy');
 });
 
 // Rute Verifikasi Email
@@ -123,8 +153,8 @@ Route::get('send-mail', function() {
     Mail::to('alvin.harist502@gmail.com')->send(new SendTestEmail($message));
 });
 
+### route product public(tanpa middleware auth/verif)
 Route::get('/home', [ProductController::class, 'index'])->name('home');
 Route::get('/search', [ProductController::class, 'search'])->name('search');
 Route::resource('product', ProductController::class)->except(['index']);
-
 Route::post('/review', [ReviewController::class, 'store'])->name('review.store');

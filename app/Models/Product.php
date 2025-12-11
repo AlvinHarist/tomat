@@ -27,6 +27,8 @@ class Product extends Model
     // casting sesuai migrasi tabel
     protected $casts = [
         'price'  => 'double',
+        // images stored as JSON array in DB (cast to array for convenience)
+        'images' => 'array',
     ];
 
     // relasi model lain

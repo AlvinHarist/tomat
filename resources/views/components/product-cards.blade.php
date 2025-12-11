@@ -5,7 +5,7 @@ class="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-
   {{-- Gambar produk --}}
     <div class="w-full h-32 sm:h-36 md:h-40 p-2">
         <img
-            src="{{ asset($product->images) }}"
+            src="{{ asset('storage/' . ($product->images[0] ?? 'images/store.png')) }}"
             alt="{{ $product->name }}"
             class="w-full h-full object-cover rounded-lg"
         >
