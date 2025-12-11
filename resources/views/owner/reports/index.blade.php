@@ -9,7 +9,7 @@
     <style>
         .reports-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
         .report-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); text-align: center; border: 1px solid #eee; }
-        .report-icon { font-size: 2.5rem; color: #4CAF50; margin-bottom: 15px; }
+        .report-icon { font-size: 2.5rem; color: #21BD38; margin-bottom: 15px; }
         .report-title { font-weight: bold; font-size: 1.1rem; color: #333; margin-bottom: 10px; }
         .report-desc { color: #888; font-size: 0.85rem; margin-bottom: 20px; min-height: 40px; }
         
@@ -19,7 +19,7 @@
         .date-group label { display: block; font-size: 0.7rem; color: #666; margin-bottom: 2px; }
         .date-group input { padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.8rem; width: 110px; }
 
-        .btn-print { background-color: #4CAF50; color: white; padding: 10px 20px; border-radius: 25px; border: none; cursor: pointer; font-size: 0.9rem; transition: 0.3s; }
+        .btn-print { background-color: #21BD38; color: white; padding: 10px 20px; border-radius: 25px; border: none; cursor: pointer; font-size: 0.9rem; transition: 0.3s; }
         .btn-print:hover { background-color: #45a049; }
     </style>
 </head>

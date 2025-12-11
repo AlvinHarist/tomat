@@ -15,7 +15,7 @@
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; color: #555; font-size: 0.9rem; }
         .form-control { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.9rem; }
-        .btn-save { width: 100%; padding: 10px; background: #4CAF50; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-save { width: 100%; padding: 10px; background: #21BD38; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
         .btn-save:hover { background: #45a049; }
 
         /* Tree List Styles */
@@ -51,7 +51,7 @@
             
             <!-- PANEL KIRI: Form Tambah -->
             <div class="panel">
-                <h3 style="margin-top: 0; color: #4CAF50;">Tambah Kategori</h3>
+                <h3 style="margin-top: 0; color: #21BD38;">Tambah Kategori</h3>
                 <form action="{{ route('owner.categories.store') }}" method="POST">
                     @csrf
                     

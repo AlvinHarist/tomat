@@ -11,13 +11,13 @@
         .left-info { flex: 1; }
         .right-docs { flex: 1; border-left: 1px solid #eee; padding-left: 40px; }
         
-        h3 { margin-top: 0; color: #4CAF50; margin-bottom: 20px; font-size: 1.2rem; }
+        h3 { margin-top: 0; color: #21BD38; margin-bottom: 20px; font-size: 1.2rem; }
         .info-row { margin-bottom: 15px; }
         .info-label { font-size: 0.85rem; color: #888; display: block; margin-bottom: 5px; }
         .info-value { font-size: 1rem; color: #333; font-weight: 500; }
 
         .doc-preview { width: 100%; height: 200px; background-color: #f9f9f9; border-radius: 8px; display: flex; align-items: center; justify-content: center; border: 2px dashed #ddd; margin-bottom: 20px; overflow: hidden; cursor: pointer; transition: 0.3s; }
-        .doc-preview:hover { border-color: #4CAF50; box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2); }
+        .doc-preview:hover { border-color: #21BD38; box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2); }
         .doc-preview img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
         /* Modal Styles */
@@ -30,7 +30,7 @@
 
         .action-buttons { margin-top: 30px; display: flex; gap: 15px; }
         .btn { padding: 12px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; text-decoration: none; color: white; display: inline-block; }
-        .btn-approve { background-color: #4CAF50; }
+        .btn-approve { background-color: #21BD38; }
         .btn-approve:hover { background-color: #45a049; }
         .btn-reject { background-color: #e74c3c; }
         .btn-reject:hover { background-color: #c0392b; }
@@ -107,7 +107,7 @@
                         @csrf
                         <input type="hidden" name="status" value="ACTIVE">
                         <button type="submit" class="btn btn-approve" onclick="return confirm('Yakin ingin mengaktifkan akun ini?')">
-                            <i class="fas fa-check"></i> Terima (Aktifkan)
+                            <i class="fas fa-check"></i> Terima
                         </button>
                     </form>
 

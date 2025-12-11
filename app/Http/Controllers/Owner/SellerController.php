@@ -43,9 +43,9 @@ class SellerController extends Controller
             'status' => $request->status
         ]);
 
-        // Send email verification ONLY when APPROVED
+        // Send email based on status
         if ($request->status == 'ACTIVE') {
-            // Find user for this seller
+            // APPROVED - Send verification email
             $user = User::where('email', $seller->pic_email)->first();
             
             if ($user && !$user->hasVerifiedEmail()) {
@@ -59,7 +59,7 @@ class SellerController extends Controller
                     ]
                 );
 
-                // Send email
+                // Send approval email
                 Mail::send('emails.seller-verification', [
                     'sellerName' => $seller->pic_name,
                     'storeName' => $seller->store_name,
@@ -69,9 +69,26 @@ class SellerController extends Controller
                             ->subject('Verifikasi Toko ToMaT - ' . $seller->store_name);
                 });
             }
+            
+            $message = 'Penjual berhasil diaktifkan! Email verifikasi telah dikirim.';
+            
+        } elseif ($request->status == 'REJECTED') {
+            // REJECTED - Send rejection email
+            $registrationUrl = route('register');
+            
+            Mail::send('emails.seller-rejection', [
+                'sellerName' => $seller->pic_name,
+                'storeName' => $seller->store_name,
+                'registrationUrl' => $registrationUrl
+            ], function ($message) use ($seller) {
+                $message->to($seller->pic_email)
+                        ->subject('Pemberitahuan Verifikasi Toko ToMaT - ' . $seller->store_name);
+            });
+            
+            $message = 'Penjual berhasil ditolak. Email pemberitahuan telah dikirim.';
+        } else {
+            $message = 'Status berhasil diperbarui.';
         }
-
-        $message = $request->status == 'ACTIVE' ? 'Penjual berhasil diaktifkan! Email verifikasi telah dikirim.' : 'Penjual berhasil ditolak.';
         return redirect()->route('owner.sellers.index')->with('success', $message);
     }
 }

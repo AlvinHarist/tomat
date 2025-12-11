@@ -22,33 +22,38 @@
         <strong>Tanggal dibuat:</strong> {{ $meta['date'] }} <br>
         <strong>Oleh:</strong> {{ $meta['processor'] }}
     </div>
-
-    <table>
-        <thead>
-            <tr>
-                <th style="width: 5%">No</th>
-                <th>Nama User (Email)</th>
-                <th>Nama PIC</th>
-                <th>Nama Toko</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($data as $index => $item)
-            <tr>
-                <td>{{ $index + 1 }}</td>
-                <td>{{ $item->pic_email }}</td>
-                <td>{{ $item->pic_name }}</td>
-                <td>{{ $item->store_name }}</td>
-                <td>
-                    @if($item->status == 'ACTIVE') Aktif
-                    @elseif($item->status == 'PENDING') Pending
-                    @else Tidak Aktif (Ditolak)
-                    @endif
-                </td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
+    @if($data->isEmpty())
+        <div style="text-align: center; margin-top: 50px; color: #666;">
+            <h3>Tidak ada laporan dalam periode tanggal ini.</h3>
+        </div>
+    @else
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 5%">No</th>
+                    <th>Nama User</th>
+                    <th>Nama PIC</th>
+                    <th>Nama Toko</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($data as $index => $item)
+                <tr>
+                    <td>{{ $index + 1 }}</td>
+                    <td>{{ $item->pic_email }}</td>
+                    <td>{{ $item->pic_name }}</td>
+                    <td>{{ $item->store_name }}</td>
+                    <td>
+                        @if($item->status == 'ACTIVE') Aktif
+                        @elseif($item->status == 'PENDING') Pending
+                        @else Tidak Aktif (Ditolak)
+                        @endif
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @endif
 </body>
 </html>
