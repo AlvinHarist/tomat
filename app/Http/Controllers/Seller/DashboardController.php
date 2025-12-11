@@ -19,7 +19,7 @@ class DashboardController extends Controller
         $seller = \App\Models\Seller::where('pic_email', $user->email)->first();
         
         if (!$seller) {
-            return redirect()->route('seller.login')->with('error', 'Data seller tidak ditemukan.');
+            return redirect()->route('login')->with('error', 'Data seller tidak ditemukan.');
         }
         
         // Get seller's products count
@@ -59,7 +59,7 @@ class DashboardController extends Controller
         $seller = \App\Models\Seller::where('pic_email', $user->email)->first();
 
         if (!$seller) {
-            return redirect()->route('seller.login')->with('error', 'Data seller tidak ditemukan.');
+            return redirect()->route('login')->with('error', 'Data seller tidak ditemukan.');
         }
 
         // Ambil semua data reviewer tanpa limit

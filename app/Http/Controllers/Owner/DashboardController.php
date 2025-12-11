@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Owner;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Seller;
 use App\Models\Product;
 use App\Models\Category;
@@ -12,6 +13,18 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
+    public function __construct()
+    {
+        // Check if user is owner
+        $this->middleware(function ($request, $next) {
+            $user = Auth::user();
+            if (!$user || $user->role !== 'owner') {
+                abort(403, 'Unauthorized');
+            }
+            return $next($request);
+        });
+    }
+
     public function index()
     {
         // 1. SRS: Jumlah User Penjual Aktif dan Tidak Aktif [cite: 67]

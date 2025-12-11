@@ -4,9 +4,9 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\UnifiedLoginController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\Owner\ReportController;
@@ -27,7 +27,12 @@ use App\Mail\SendTestEmail;
 |
 */
 
-// Rute untuk menampilkan halaman formulir
+// UNIFIED LOGIN (both Seller and Owner)
+Route::get('/login', [UnifiedLoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [UnifiedLoginController::class, 'login'])->name('login.submit');
+Route::post('/logout', [UnifiedLoginController::class, 'logout'])->name('logout');
+
+// Rute untuk menampilkan halaman formulir registrasi (Seller only)
 Route::get('/', [RegisterController::class, 'showRegistrationForm'])->name('register');
 
 // Rute untuk memproses data saat formulir di-submit
@@ -40,17 +45,12 @@ Route::get('/api/villages/{districtCode}', [RegisterController::class, 'getVilla
 
 // Seller Routes
 Route::prefix('seller')->name('seller.')->group(function () {
-    // Login & Logout
-    Route::get('/login', [App\Http\Controllers\Seller\Auth\LoginController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [App\Http\Controllers\Seller\Auth\LoginController::class, 'login'])->name('login.submit');
-    Route::post('/logout', [App\Http\Controllers\Seller\Auth\LoginController::class, 'logout'])->name('logout');
-    
-    // Status Page
+    // Status Page (for pending/rejected sellers)
     Route::get('/status/{status}', function ($status) {
         return view('seller.status', ['status' => strtoupper($status)]);
     })->name('status');
     
-    // Protected Routes
+    // Protected Routes (require auth + verified)
     Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/dashboard', [App\Http\Controllers\Seller\DashboardController::class, 'index'])->name('dashboard');
         
@@ -87,15 +87,10 @@ Route::prefix('seller')->name('seller.')->group(function () {
         });
 });
 
-Route::prefix('owner')->name('owner.')->group(function () {
+Route::prefix('owner')->name('owner.')->middleware(['auth', 'auth.owner'])->group(function () {
     
-    // Login & Logout
-    Route::get('/login', [OwnerLoginController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [OwnerLoginController::class, 'login'])->name('login.submit');
-    Route::post('/logout', [OwnerLoginController::class, 'logout'])->name('logout');
-
-    // Dashboard (Protected by auth:owner middleware)
-    Route::get('/dashboard', [OwnerDashboardController::class, 'index'])->name('dashboard')->middleware('auth:owner');
+    // Dashboard
+    Route::get('/dashboard', [OwnerDashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/sellers', [App\Http\Controllers\Owner\SellerController::class, 'index'])->name('sellers.index');
     Route::get('/sellers/{id}', [App\Http\Controllers\Owner\SellerController::class, 'show'])->name('sellers.show');
@@ -128,18 +123,18 @@ Route::get('/email/verify/{id}/{hash}', function (Request $request, $id, $hash) 
 
     // Check if already verified
     if ($user->email_verified_at) {
-        return redirect()->route('seller.login')->with('status', 'Email sudah terverifikasi sebelumnya.');
+        return redirect()->route('login')->with('status', 'Email sudah terverifikasi sebelumnya.');
     }
 
     // Mark as verified
     $user->email_verified_at = now();
     $user->save();
 
-    return redirect()->route('seller.login')->with('status', 'Email berhasil diverifikasi! Silakan login.');
+    return redirect()->route('login')->with('status', 'Email berhasil diverifikasi! Silakan login.');
 })->middleware('signed')->name('verification.verify');
 
 Route::get('/email/verify', function () {
-    return redirect()->route('seller.login')->with('status', 'Silakan cek email Anda untuk link verifikasi.');
+    return redirect()->route('login')->with('status', 'Silakan cek email Anda untuk link verifikasi.');
 })->name('verification.notice');
 
 Route::post('/email/verification-notification', function (Request $request) {

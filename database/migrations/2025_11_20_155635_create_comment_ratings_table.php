@@ -8,6 +8,11 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // Check if reviews table already exists to avoid duplicate creation
+        if (Schema::hasTable('reviews')) {
+            return;
+        }
+
         Schema::create('reviews', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name');

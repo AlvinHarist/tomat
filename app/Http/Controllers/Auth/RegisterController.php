@@ -120,8 +120,7 @@ class RegisterController extends Controller
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
-                // 'role' => 'penjual', // Assuming 'role' column exists in users table, if not remove this
-                // 'status' => 'aktif', // Assuming 'status' column exists in users table
+                'role' => 'seller',
             ]);
 
             // Debug: Log received data
@@ -180,7 +179,7 @@ class RegisterController extends Controller
 
             DB::commit();
 
-            return redirect()->route('seller.login')->with('status', 'Registrasi berhasil! Mohon tunggu verifikasi dari admin.');
+            return redirect()->route('login')->with('status', 'Registrasi berhasil! Mohon tunggu verifikasi dari admin.');
 
         } catch (\Exception $e) {
             DB::rollBack();
