@@ -20,6 +20,17 @@ class ReviewController extends Controller
             'rating'     => 'required|integer|min:1|max:5',
         ]);
 
+        // Cek apakah email sudah pernah memberikan ulasan untuk produk ini
+        $existingReview = Review::where('product_id', $validated['product_id'])
+                                ->where('email', $validated['email'])
+                                ->first();
+
+        if ($existingReview) {
+            return redirect()
+                ->back()
+                ->with('error', 'Email ini sudah pernah memberikan ulasan untuk produk ini.');
+        }
+
         try {
             $validated['id'] = (string) Str::uuid();
 
