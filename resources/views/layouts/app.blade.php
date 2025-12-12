@@ -151,7 +151,7 @@
 
                 </button>
 
-                <a href="#"
+                <a href="{{ route('seller.login') }}"
                    class="theme-transition px-5 py-2 text-sm font-medium rounded-full
                           border border-green-500 text-green-600 
                           bg-white hover:bg-green-50
@@ -160,7 +160,7 @@
                           dark:border-emerald-300/80 dark:text-emerald-100 
                           dark:bg-white/5 dark:hover:bg-emerald-500/10 dark:hover:border-emerald-300
                           dark:backdrop-blur-xl">
-                    Login
+                    Masuk
                 </a>
 
                 <a href="{{ route('register') }}"
@@ -171,7 +171,7 @@
                           dark:bg-emerald-500 dark:hover:bg-emerald-600
                           dark:shadow-[0_0_25px_rgba(16,185,129,0.5)]
                           dark:hover:shadow-[0_0_35px_rgba(16,185,129,0.7)]">
-                    Register
+                    Daftar
                 </a>
             </div>
         </div>
