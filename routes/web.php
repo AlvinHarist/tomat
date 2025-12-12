@@ -52,7 +52,7 @@ Route::prefix('seller')->name('seller.')->group(function () {
     })->name('status');
 
     // Protected Seller Routes
-    Route::middleware(['auth', 'verified', 'role:seller'])->group(function () {
+    Route::middleware(['auth', 'role:seller'])->group(function () {
 
         Route::get('/dashboard', [SellerDashboardController::class, 'index'])->name('dashboard');
 
