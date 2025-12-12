@@ -47,159 +47,156 @@ class RegisterController extends Controller
 
     public function store(Request $request)
     {
-        // Check if seller with this email was previously rejected - allow re-registration
-        $existingSeller = Seller::where('pic_email', $request->email)->first();
-        if ($existingSeller && $existingSeller->status === 'REJECTED') {
-            // Delete old rejected seller and user records
-            $existingSeller->delete();
-            
-            $existingUser = User::where('email', $request->email)->first();
-            if ($existingUser) {
-                $existingUser->delete();
-            }
-        }
-
+        // =========================
+        // 1) VALIDATION
+        // =========================
         $rules = [
-            'store_name' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'name' => ['required', 'string', 'max:100'], // PIC Name
-            'phone' => ['required', 'string', 'max:20', 'min:10', 'regex:/^\d+$/', 'unique:sellers,pic_phone'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users', 'unique:sellers,pic_email'],
-            
-            'jalan' => ['required', 'string'],
-            'rt' => ['required', 'string'],
-            'rw' => ['required', 'string'],
-            'provinsi' => ['required', 'string'],
-            'kabupatenkota' => ['required', 'string'],
-            'kecamatan' => ['required', 'string'],
-            'kelurahan' => ['required', 'string'],
+            'store_name'    => ['required', 'string', 'max:255'],
+            'description'   => ['nullable', 'string'],
 
-            'password' => ['required', 'string', 'min:8', 'confirmed', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/'],
-            'ktp_number' => ['required', 'string', 'size:16', 'unique:sellers,pic_ktp_number'],
-            'photo' => ['required', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
-            'ktp_file' => ['required', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
+            // PIC name disimpan di users.name
+            'name'          => ['required', 'string', 'max:100'],
+
+            // di sellers kolomnya pic_phone
+            'phone'         => ['required', 'string', 'min:10', 'max:20', 'regex:/^\d+$/', 'unique:sellers,pic_phone'],
+
+            // email hanya di users
+            'email'         => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+
+            'jalan'         => ['required', 'string'],
+            'rt'            => ['required', 'string'],
+            'rw'            => ['required', 'string'],
+            'provinsi'      => ['required'],
+            'kabupatenkota' => ['required'],
+            'kecamatan'     => ['required'],
+            'kelurahan'     => ['required'],
+
+            'password'      => ['required', 'string', 'min:8', 'confirmed'],
+
+            // di sellers kolomnya pic_ktp_number
+            'ktp_number'    => ['required', 'string', 'size:16', 'regex:/^\d+$/', 'unique:sellers,pic_ktp_number'],
+
+            'photo'         => ['required', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
+            'ktp_file'      => ['required', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
         ];
 
         $messages = [
-            'phone.regex' => 'Nomor HP hanya boleh berisi angka.',
+            'phone.regex'      => 'Nomor HP hanya boleh berisi angka.',
             'ktp_number.regex' => 'Nomor KTP hanya boleh berisi angka.',
-            'password.regex' => 'Password harus mengandung huruf besar, kecil, angka, dan simbol.',
             'provinsi.required' => 'Provinsi wajib dipilih.',
             'kabupatenkota.required' => 'Kabupaten/Kota wajib dipilih.',
             'kecamatan.required' => 'Kecamatan wajib dipilih.',
             'kelurahan.required' => 'Kelurahan wajib dipilih.',
         ];
-        
-        $validator = Validator::make($request->all(), $rules, $messages);
 
+        $validator = Validator::make($request->all(), $rules, $messages);
         if ($validator->fails()) {
             return redirect()->back()
-                        ->withErrors($validator)
-                        ->withInput();
+                ->withErrors($validator)
+                ->withInput();
         }
 
+        // =========================
+        // 2) OPTIONAL: RE-REGISTER JIKA SELLER SEBELUMNYA REJECTED
+        //    (status ada di sellers, bukan users)
+        // =========================
+        $existingUser = User::where('email', $request->email)->first();
+        if ($existingUser) {
+            $existingSeller = $existingUser->seller; // relasi hasOne di User
+
+            if ($existingSeller && $existingSeller->status === 'REJECTED') {
+                // hapus file lama jika ada (opsional)
+                if (!empty($existingSeller->pic_photo_path)) {
+                    Storage::disk('public')->delete($existingSeller->pic_photo_path);
+                }
+                if (!empty($existingSeller->pic_ktp_file_path)) {
+                    Storage::disk('public')->delete($existingSeller->pic_ktp_file_path);
+                }
+
+                // hapus seller & user lama
+                $existingSeller->delete();
+                $existingUser->delete();
+            } else {
+                // kalau user sudah ada dan bukan rejected, jangan lanjut
+                return redirect()->back()
+                    ->withErrors(['email' => 'Email sudah terdaftar. Silakan login atau gunakan email lain.'])
+                    ->withInput();
+            }
+        }
+
+        // =========================
+        // 3) TRANSACTION CREATE USER + SELLER
+        // =========================
         $photoPath = null;
-        $ktpFilePath = null;
+        $ktpPath = null;
 
         DB::beginTransaction();
         try {
-            // Upload photo to public/images/profiles
-            $photoFile = $request->file('photo');
-            $photoFilename = time() . '_' . uniqid() . '.' . $photoFile->getClientOriginalExtension();
-            $photoFile->move(public_path('images/profiles'), $photoFilename);
-            $photoPath = 'images/profiles/' . $photoFilename;
-            
-            // Upload KTP to public/images/ktp
-            $ktpFile = $request->file('ktp_file');
-            $ktpFilename = time() . '_' . uniqid() . '.' . $ktpFile->getClientOriginalExtension();
-            $ktpFile->move(public_path('images/ktp'), $ktpFilename);
-            $ktpFilePath = 'images/ktp/' . $ktpFilename;
+            // Upload files ke storage/app/public/...
+            // Pastikan sudah: php artisan storage:link
+            $photoPath = Storage::disk('public')->putFile('profiles', $request->file('photo'));
+            $ktpPath   = Storage::disk('public')->putFile('ktp', $request->file('ktp_file'));
 
-            // Create User for Authentication
-            $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-                'role' => 'seller',
-            ]);
-
-            // Debug: Log received data
-            Log::info('Registration data received:', [
-                'provinsi' => $request->provinsi,
-                'kabupatenkota' => $request->kabupatenkota,
-                'kecamatan' => $request->kecamatan,
-                'kelurahan' => $request->kelurahan,
-            ]);
-
-            // Get region names from codes
+            // ambil nama wilayah dari code
             $province = Province::where('code', $request->provinsi)->first();
-            $city = City::where('code', $request->kabupatenkota)->first();
+            $city     = City::where('code', $request->kabupatenkota)->first();
             $district = District::where('code', $request->kecamatan)->first();
-            $village = Village::where('code', $request->kelurahan)->first();
+            $village  = Village::where('code', $request->kelurahan)->first();
 
-            // Debug: Log query results
-            Log::info('Region query results:', [
-                'province' => $province ? $province->name : 'NULL',
-                'city' => $city ? $city->name : 'NULL',
-                'district' => $district ? $district->name : 'NULL',
-                'village' => $village ? $village->name : 'NULL',
-            ]);
-
-            // Validate that all region data was found
             if (!$province || !$city || !$district || !$village) {
-                throw new \Exception('Data wilayah tidak valid. Pastikan Anda memilih wilayah dari dropdown yang tersedia. (Provinsi: ' . ($province ? '✓' : '✗') . ', Kota: ' . ($city ? '✓' : '✗') . ', Kecamatan: ' . ($district ? '✓' : '✗') . ', Kelurahan: ' . ($village ? '✓' : '✗') . ')');
+                throw new \Exception('Data wilayah tidak valid. Pastikan memilih dari dropdown yang tersedia.');
             }
 
-            // Create Seller (using the sellers table structure)
-            Seller::create([
-                'id' => \Illuminate\Support\Str::uuid(),
-                'store_name' => $request->store_name,
-                'store_description' => $request->description,
-                'pic_name' => $request->name,
-                'pic_phone' => $request->phone,
-                'pic_email' => $request->email,
+            // Create User
+            $user = User::create([
+                'name'     => $request->name,
+                'email'    => $request->email,
                 'password' => Hash::make($request->password),
-                'pic_street' => $request->jalan,
-                'pic_rt' => $request->rt,
-                'pic_rw' => $request->rw,
-                'pic_village' => $village->name,
-                'pic_district' => $district->name,
-                'pic_city' => $city->name,
-                'pic_province' => $province->name,
-                'pic_ktp_number' => $request->ktp_number,
-                'pic_photo_path' => $photoPath,
-                'pic_ktp_file_path' => $ktpFilePath,
-                'status' => 'PENDING',
+                'role'     => 'seller',
             ]);
 
-            // Store::create(...) removed because stores table does not exist.
+            // Create Seller (UUID akan otomatis via boot() Seller)
+            Seller::create([
+                'user_id'            => $user->id,
+                'store_name'         => $request->store_name,
+                'store_description'  => $request->description,
 
-            // DO NOT send email verification yet - it will be sent after owner approval
-            // event(new Registered($user));
+                'pic_phone'          => $request->phone,
+                'pic_street'         => $request->jalan,
+                'pic_rt'             => $request->rt,
+                'pic_rw'             => $request->rw,
+
+                'pic_village'        => $village->name,
+                'pic_district'       => $district->name,
+                'pic_city'           => $city->name,
+                'pic_province'       => $province->name,
+
+                'pic_ktp_number'     => $request->ktp_number,
+                'pic_photo_path'     => $photoPath,
+                'pic_ktp_file_path'  => $ktpPath,
+
+                'status'             => 'PENDING',
+            ]);
 
             DB::commit();
 
-            return redirect()->route('login')->with('status', 'Registrasi berhasil! Mohon tunggu verifikasi dari admin.');
+            return redirect()->route('seller.login')
+                ->with('status', 'Registrasi berhasil! Mohon tunggu verifikasi dari admin.');
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
 
+            // hapus file yang sudah terlanjur terupload
             if ($photoPath) {
-                $fullPath = public_path($photoPath);
-                if (file_exists($fullPath)) {
-                    unlink($fullPath);
-                }
+                Storage::disk('public')->delete($photoPath);
             }
-            if ($ktpFilePath) {
-                $fullPath = public_path($ktpFilePath);
-                if (file_exists($fullPath)) {
-                    unlink($fullPath);
-                }
+            if ($ktpPath) {
+                Storage::disk('public')->delete($ktpPath);
             }
 
             return redirect()->back()
-                        ->withErrors(['error' => 'Terjadi kesalahan saat registrasi. Coba lagi. ' . $e->getMessage()])
-                        ->withInput();
+                ->withErrors(['error' => 'Terjadi kesalahan saat registrasi. ' . $e->getMessage()])
+                ->withInput();
         }
     }
 }

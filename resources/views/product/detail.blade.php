@@ -167,7 +167,7 @@
                                 href="mailto:{{ $product->seller->pic_email }}"
                                 class="ml-1 text-blue-600 hover:underline"
                             >
-                                {{ $product->seller->pic_email }}
+                                {{ $sellerEmail }}
                             </a>
                         </div>
                     </div>
