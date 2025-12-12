@@ -470,7 +470,7 @@
                                 <button
                                     type="button"
                                     class="rating-star text-gray-300 hover:text-yellow-400 transition focus:outline-none
-                                           dark:text-slate-600"
+                                           dark:text-slate-600 dark:hover:text-yellow-400"
                                     data-value="{{ $i }}"
                                 >
                                     ★
@@ -606,11 +606,13 @@
             stars.forEach(star => {
                 const starValue = parseInt(star.dataset.value, 10);
                 if (starValue <= value) {
-                    star.classList.add('text-yellow-400');
-                    star.classList.remove('text-gray-300');
+                    // Selected star - force yellow in both light and dark mode
+                    star.classList.add('!text-yellow-400');
+                    star.classList.remove('text-gray-300', 'dark:text-slate-600');
                 } else {
-                    star.classList.add('text-gray-300');
-                    star.classList.remove('text-yellow-400');
+                    // Unselected star - back to default
+                    star.classList.remove('!text-yellow-400');
+                    star.classList.add('text-gray-300', 'dark:text-slate-600');
                 }
             });
 
