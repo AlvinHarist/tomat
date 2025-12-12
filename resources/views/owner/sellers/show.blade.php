@@ -11,13 +11,13 @@
         .left-info { flex: 1; }
         .right-docs { flex: 1; border-left: 1px solid #eee; padding-left: 40px; }
         
-        h3 { margin-top: 0; color: #4CAF50; margin-bottom: 20px; font-size: 1.2rem; }
+        h3 { margin-top: 0; color: #21BD38; margin-bottom: 20px; font-size: 1.2rem; }
         .info-row { margin-bottom: 15px; }
         .info-label { font-size: 0.85rem; color: #888; display: block; margin-bottom: 5px; }
         .info-value { font-size: 1rem; color: #333; font-weight: 500; }
 
         .doc-preview { width: 100%; height: 200px; background-color: #f9f9f9; border-radius: 8px; display: flex; align-items: center; justify-content: center; border: 2px dashed #ddd; margin-bottom: 20px; overflow: hidden; cursor: pointer; transition: 0.3s; }
-        .doc-preview:hover { border-color: #4CAF50; box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2); }
+        .doc-preview:hover { border-color: #21BD38; box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2); }
         .doc-preview img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
         /* Modal Styles */
@@ -30,7 +30,7 @@
 
         .action-buttons { margin-top: 30px; display: flex; gap: 15px; }
         .btn { padding: 12px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; text-decoration: none; color: white; display: inline-block; }
-        .btn-approve { background-color: #4CAF50; }
+        .btn-approve { background-color: #21BD38; }
         .btn-approve:hover { background-color: #45a049; }
         .btn-reject { background-color: #e74c3c; }
         .btn-reject:hover { background-color: #c0392b; }
@@ -43,24 +43,7 @@
 </head>
 <body>
 
-    <aside class="sidebar">
-        <div class="user-profile">
-            <div class="user-info">
-                <div class="user-name">{{ Auth::guard('owner')->user()->name ?? 'Owner' }}</div>
-                <div class="user-role">Owner</div>
-            </div>
-            <div class="avatar"></div>
-        </div>
-        <div class="menu-title">MENU</div>
-        <nav class="nav-links">
-            <a href="{{ route('owner.dashboard') }}"><i class="fas fa-home"></i> Dashboard</a>
-            <a href="{{ route('owner.sellers.index') }}" class="active"><i class="fas fa-store"></i> Seller</a>
-            <a href="#"><i class="fas fa-box-open"></i> Categories</a>
-            <a href="#"><i class="fas fa-cubes"></i> Products</a>
-            <a href="#"><i class="fas fa-cog"></i> Reports</a>
-        </nav>
-        <div class="logo">ToMaT</div>
-    </aside>
+    @include('owner.sidebar')
 
     <main class="main-content">
         <div style="display: flex; align-items: center; margin-bottom: 30px;">
@@ -102,18 +85,18 @@
                 <h3>Dokumen Pendukung</h3>
                 
                 <span class="info-label">Foto KTP</span>
-                <div class="doc-preview" onclick="openModal('{{ asset('storage/' . $seller->pic_ktp_file_path) }}', 'Foto KTP - {{ $seller->pic_name }}')">
+                <div class="doc-preview" onclick="openModal('{{ asset($seller->pic_ktp_file_path) }}', 'Foto KTP - {{ $seller->pic_name }}')"> 
                     @if($seller->pic_ktp_file_path)
-                        <img src="{{ asset('storage/' . $seller->pic_ktp_file_path) }}" alt="Foto KTP">
+                        <img src="{{ asset($seller->pic_ktp_file_path) }}" alt="Foto KTP">
                     @else
                         <span style="color: #ccc;">Tidak ada file</span>
                     @endif
                 </div>
 
                 <span class="info-label">Foto PIC</span>
-                <div class="doc-preview" onclick="openModal('{{ asset('storage/' . $seller->pic_photo_path) }}', 'Foto PIC - {{ $seller->pic_name }}')">
+                <div class="doc-preview" onclick="openModal('{{ asset($seller->pic_photo_path) }}', 'Foto PIC - {{ $seller->pic_name }}')"> 
                     @if($seller->pic_photo_path)
-                        <img src="{{ asset('storage/' . $seller->pic_photo_path) }}" alt="Foto PIC">
+                        <img src="{{ asset($seller->pic_photo_path) }}" alt="Foto PIC">
                     @else
                         <span style="color: #ccc;">Tidak ada file</span>
                     @endif
@@ -124,7 +107,7 @@
                         @csrf
                         <input type="hidden" name="status" value="ACTIVE">
                         <button type="submit" class="btn btn-approve" onclick="return confirm('Yakin ingin mengaktifkan akun ini?')">
-                            <i class="fas fa-check"></i> Terima (Aktifkan)
+                            <i class="fas fa-check"></i> Terima
                         </button>
                     </form>
 
@@ -170,6 +153,5 @@
             }
         });
     </script>
-
 </body>
 </html>

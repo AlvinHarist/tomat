@@ -24,7 +24,7 @@ body {
 .main-logo {
     font-family: 'Brush Script MT', cursive; /* Atau font script lain */
     font-size: 4rem;
-    color: #4CAF50; /* Hijau ToMaT */
+    color: #21BD38; /* Hijau ToMaT */
     margin-bottom: 20px;
 }
 
@@ -53,7 +53,7 @@ body {
 }
 
 .register-link {
-    color: #4CAF50;
+    color: #21BD38;
     text-decoration: none;
     font-weight: bold;
 }
@@ -82,7 +82,7 @@ body {
 }
 
 .form-group input:focus {
-    border-color: #4CAF50;
+    border-color: #21BD38;
 }
 
 /* Forgot Password */
@@ -92,7 +92,7 @@ body {
 }
 
 .forgot-pass {
-    color: #4CAF50;
+    color: #21BD38;
     text-decoration: none;
     font-size: 0.9rem;
 }
@@ -113,7 +113,7 @@ body {
 }
 
 .btn-login:hover {
-    background-color: #4CAF50;
+    background-color: #21BD38;
     color: #ffffff;
 }
 
@@ -135,7 +135,7 @@ body {
     color: #333;
 }
 .card-footer a {
-    color: #4CAF50;
+    color: #21BD38;
     text-decoration: none;
 }
 
@@ -146,6 +146,6 @@ body {
     color: #666;
 }
 .global-footer a {
-    color: #4CAF50;
+    color: #21BD38;
     text-decoration: none;
 }

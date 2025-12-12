@@ -18,14 +18,14 @@ class CategorySeeder extends Seeder
             // Kategori level 1
             [
                 'name' => 'Elektronik',
-                'image' => '/images/categories/pan.webp',
+                'image' => '/images/categories/electronic.avif',
                 'description' => 'Produk elektronik dan teknologi',
                 'parent_id' => null,
                 'sort_order' => 1,
                 'children' => [
                     [
                         'name' => 'Smartphone',
-                        'image' => '/images/categories/pan.webp',
+                        'image' => '/images/categories/phone.png',
                         'description' => 'Ponsel pintar dan aksesorisnya',
                         'sort_order' => 1,
                         'children' => [
@@ -36,7 +36,7 @@ class CategorySeeder extends Seeder
                     ],
                     [
                         'name' => 'Laptop & Komputer',
-                        'image' => '/images/categories/pan.webp',
+                        'image' => '/images/categories/workstation.png',
                         'description' => 'Laptop, desktop, dan komponen',
                         'sort_order' => 2,
                         'children' => [
@@ -46,7 +46,7 @@ class CategorySeeder extends Seeder
                     ],
                     [
                         'name' => 'Aksesori',
-                        'image' => '/images/categories/pan.webp',
+                        'image' => '/images/categories/electronic-acc.png',
                         'description' => 'Aksesori elektronik',
                         'sort_order' => 3,
                     ]
@@ -55,14 +55,14 @@ class CategorySeeder extends Seeder
             // Kategori level 1
             [
                 'name' => 'Fashion',
-                'image' => '/images/categories/pan.webp',
+                'image' => '/images/categories/fashion.jpg',
                 'description' => 'Pakaian dan mode',
                 'parent_id' => null,
                 'sort_order' => 2,
                 'children' => [
                     [
                         'name' => 'Pakaian Pria',
-                        'image' => '/images/categories/pan.webp',
+                        'image' => '/images/categories/men-fashion.jpg',
                         'description' => 'Koleksi pakaian pria',
                         'sort_order' => 1,
                         'children' => [
@@ -73,7 +73,7 @@ class CategorySeeder extends Seeder
                     ],
                     [
                         'name' => 'Pakaian Wanita',
-                        'image' => '/images/categories/pan.webp',
+                        'image' => '/images/categories/women-fashion.jpg',
                         'description' => 'Koleksi pakaian wanita',
                         'sort_order' => 2,
                         'children' => [
@@ -84,7 +84,7 @@ class CategorySeeder extends Seeder
                     ],
                     [
                         'name' => 'Sepatu',
-                        'image' => '/images/categories/pan.webp',
+                        'image' => '/images/categories/shoes.webp',
                         'description' => 'Koleksi sepatu',
                         'sort_order' => 3,
                     ]
@@ -93,14 +93,14 @@ class CategorySeeder extends Seeder
             // Kategori level 1
             [
                 'name' => 'Rumah Tangga',
-                'image' => '/images/categories/pan.webp',
+                'image' => '/images/categories/house.jpg',
                 'description' => 'Kebutuhan rumah tangga',
                 'parent_id' => null,
                 'sort_order' => 3,
                 'children' => [
                     [
                         'name' => 'Dapur',
-                        'image' => '/images/categories/pan.webp',
+                        'image' => '/images/categories/kitchen.webp',
                         'description' => 'Peralatan dapur',
                         'sort_order' => 1,
                         'children' => [
@@ -110,7 +110,7 @@ class CategorySeeder extends Seeder
                     ],
                     [
                         'name' => 'Kamar Tidur',
-                        'image' => '/images/categories/pan.webp',
+                        'image' => '/images/categories/bedroom.jpg',
                         'description' => 'Peralatan kamar tidur',
                         'sort_order' => 2,
                     ]
@@ -119,7 +119,7 @@ class CategorySeeder extends Seeder
             // Kategori level 1
             [
                 'name' => 'Olahraga & Outdoor',
-                'image' => '/images/categories/pan.webp',
+                'image' => '/images/categories/sport-outdoor.webp',
                 'description' => 'Perlengkapan olahraga',
                 'parent_id' => null,
                 'sort_order' => 4,

@@ -1,11 +1,33 @@
 @import url("https://fonts.googleapis.com/css2?family=Pacifico&display=swap");
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
-  --font-pacifico: "Pacifico", cursive;
+    --font-pacifico: "Pacifico", cursive;
 }
 
-/* Tombol default: berada di tengah sedikit */
+@keyframes twinkle {
+    0%,
+    100% {
+        opacity: 0.2;
+        transform: scale(0.8);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+.animate-twinkle {
+    animation: twinkle 1.2s infinite ease-in-out;
+}
+
+.theme-transition {
+    transition: background-color 300ms ease, color 300ms ease,
+        border-color 300ms ease, fill 300ms ease, stroke 300ms ease,
+        box-shadow 300ms ease;
+}
+
 #banner-slider .banner-nav-btn {
     @apply absolute top-1/2 -translate-y-1/2 bg-white/80 text-gray-700 
            rounded-full p-2 shadow-md opacity-0 transition-all duration-500
@@ -14,13 +36,11 @@
     transform: translateY(0) translateX(0);
 }
 
-/* Prev awalnya di tengah sedikit → bergerak ke kiri */
 #banner-slider:hover #banner-prev {
     transform: translateY(0) translateX(-10px);
     opacity: 1;
 }
 
-/* Next awalnya di tengah sedikit → bergerak ke kanan */
 #banner-slider:hover #banner-next {
     transform: translateY(0) translateX(10px);
     opacity: 1;

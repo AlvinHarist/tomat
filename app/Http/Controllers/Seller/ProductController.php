@@ -46,11 +46,8 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:1', // Stok minimal 1
             'category_id' => 'required|exists:categories,id',
-            
-            // Validasi Array Gambar: minimal 1 file, maksimal 10
             'images' => 'required|array|min:1|max:10',
-            // Validasi setiap file dalam array
-            'images.*' => 'image|mimes:jpeg,png,jpg|max:2048', 
+            'images.*' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
         
         if ($validator->fails()) {
@@ -61,32 +58,37 @@ class ProductController extends Controller
         
         $imagePaths = [];
         try {
-            // Simpan semua gambar
+            // Upload multiple images
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $image) {
-                    $imagePaths[] = $image->store('products', 'public');
+                    $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                    $image->move(public_path('images/products'), $filename);
+                    $imagePaths[] = 'images/products/' . $filename;
                 }
             }
             
             Product::create([
-                'id' => \Illuminate\Support\Str::uuid(),
                 'seller_id' => $seller->id,
                 'category_id' => $request->category_id,
                 'name' => $request->name,
                 'description' => $request->description,
                 'price' => $request->price,
                 'stock' => $request->stock,
-                // ASUMSI: Kolom 'images' di model Anda bisa menyimpan array (JSON)
-                'images' => $imagePaths, 
+                'images' => $imagePaths,
             ]);
             
             return redirect()->route('seller.products.index')
                 ->with('success', 'Produk berhasil ditambahkan!');
                 
         } catch (\Exception $e) {
-            // Hapus semua gambar yang baru diupload jika ada error
-            foreach ($imagePaths as $path) {
-                Storage::disk('public')->delete($path);
+            // Delete uploaded images if error occurs
+            if (isset($imagePaths) && count($imagePaths) > 0) {
+                foreach ($imagePaths as $path) {
+                    $fullPath = public_path($path);
+                    if (file_exists($fullPath)) {
+                        unlink($fullPath);
+                    }
+                }
             }
             
             return redirect()->back()
@@ -134,8 +136,10 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
-            // Validasi file baru
-            'images.*' => 'image|mimes:jpeg,png,jpg|max:2048', 
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'images' => 'nullable|array|max:10',
+            'delete_images' => 'nullable|array',
+            'delete_images.*' => 'string',
         ]);
         
         if ($validator->fails()) {
@@ -145,12 +149,12 @@ class ProductController extends Controller
         }
         
         // Validasi kustom untuk memastikan minimal 1 gambar
+        // Validasi kustom untuk memastikan minimal 1 gambar
         if ($totalImagesAfterUpdate < 1) {
              return redirect()->back()
                  ->withErrors(['images' => 'Produk harus memiliki minimal 1 foto.'])
                  ->withInput();
         }
-
 
         $data = [
             'name' => $request->name,
@@ -164,20 +168,27 @@ class ProductController extends Controller
         try {
             // 1. Hapus gambar lama yang ditandai untuk dihapus
             foreach ($imagesToDelete as $path) {
-                Storage::disk('public')->delete($path);
+                $fullPath = public_path($path);
+                if (file_exists($fullPath)) {
+                    unlink($fullPath);
+                }
             }
 
             // 2. Upload gambar baru
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $image) {
-                    $uploadedPaths[] = $image->store('products', 'public');
+                    $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                    $image->move(public_path('images/products'), $filename);
+                    $uploadedPaths[] = 'images/products/' . $filename;
                 }
             }
             
             // 3. Gabungkan gambar yang tersisa dan yang baru diupload
             $finalImages = array_merge($remainingImages, $uploadedPaths);
             
-            // ASUMSI: Kolom 'images' di model Anda bisa menyimpan array (JSON)
+            // Limit to 10 images
+            $finalImages = array_slice(array_values($finalImages), 0, 10);
+            
             $data['images'] = $finalImages;
 
             $product->update($data);
@@ -188,7 +199,10 @@ class ProductController extends Controller
         } catch (\Exception $e) {
             // Hapus gambar baru jika terjadi kegagalan update
             foreach ($uploadedPaths as $path) {
-                Storage::disk('public')->delete($path);
+                $fullPath = public_path($path);
+                if (file_exists($fullPath)) {
+                    unlink($fullPath);
+                }
             }
             
             return redirect()->back()
@@ -209,7 +223,10 @@ class ProductController extends Controller
         try {
             // Hapus semua gambar
             foreach ($imagesToDelete as $imagePath) {
-                Storage::disk('public')->delete($imagePath);
+                $fullPath = public_path($imagePath);
+                if (file_exists($fullPath)) {
+                    unlink($fullPath);
+                }
             }
             
             $product->delete();

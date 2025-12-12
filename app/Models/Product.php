@@ -10,10 +10,8 @@ class Product extends Model
 {
     use HasFactory, HasUuids;
 
-    // penamaan tabel di database
     protected $table = 'products';
 
-    // kolom dapat diisi insert
     protected $fillable = [
         'seller_id',
         'category_id',
@@ -22,16 +20,16 @@ class Product extends Model
         'price',
         'stock',
         'images',
+        'avg_rating',
+        'review_count',
     ];
 
-    // casting sesuai migrasi tabel
     protected $casts = [
         'price'  => 'double',
-        // images stored as JSON array in DB (cast to array for convenience)
         'images' => 'array',
+        'avg_rating' => 'float',
     ];
 
-    // relasi model lain
     public function seller()
     {
         return $this->belongsTo(Seller::class);
@@ -50,5 +48,70 @@ class Product extends Model
     public function reviewAndRatings()
     {
         return $this->hasMany(Review::class, 'product_id');
+    }
+
+    /**
+     * Update rating average dan count dari reviews
+     */
+    public function updateRating()
+    {
+        $avgRating = $this->reviews()->avg('rating') ?? 0;
+        $reviewCount = $this->reviews()->count();
+
+        $this->update([
+            'avg_rating' => round($avgRating, 1),
+            'review_count' => $reviewCount,
+        ]);
+
+        return $this;
+    }
+
+    /**
+     * Accessor untuk rating dengan bintang display
+     */
+    public function getStarDisplayAttribute()
+    {
+        $rating = floor($this->avg_rating);
+        return str_repeat('★', $rating) . str_repeat('☆', 5 - $rating);
+    }
+
+    /**
+     * Helper: Get rating percentage (0-100)
+     */
+    public function getRatingPercentageAttribute()
+    {
+        return $this->avg_rating ? ($this->avg_rating / 5) * 100 : 0;
+    }
+
+    /**
+     * Scope: Filter produk dengan rating minimum
+     */
+    public function scopeMinRating($query, $minRating)
+    {
+        return $query->where('avg_rating', '>=', $minRating);
+    }
+
+    /**
+     * Scope: Filter produk dengan rating maximum
+     */
+    public function scopeMaxRating($query, $maxRating)
+    {
+        return $query->where('avg_rating', '<=', $maxRating);
+    }
+
+    /**
+     * Scope: Urutkan produk berdasarkan rating (tertinggi)
+     */
+    public function scopeByRating($query)
+    {
+        return $query->orderBy('avg_rating', 'desc')->orderBy('review_count', 'desc');
+    }
+
+    /**
+     * Scope: Filter produk yang sudah ada reviews
+     */
+    public function scopeWithReviews($query)
+    {
+        return $query->where('review_count', '>', 0);
     }
 }

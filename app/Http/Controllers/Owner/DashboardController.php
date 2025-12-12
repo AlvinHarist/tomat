@@ -25,18 +25,16 @@ class DashboardController extends Controller
         $totalReviews = Review::count();
 
         // 3. SRS: Sebaran jumlah produk berdasarkan kategori [cite: 67]
-        // Kita ambil Top 5 kategori dengan produk terbanyak untuk tabel bawah
+        // Ambil semua kategori yang diurutkan berdasarkan jumlah produk (view akan menampilkan 5 pertama)
         $productByCategory = Category::withCount('products')
             ->orderBy('products_count', 'desc')
-            ->take(5)
             ->get();
 
-        // 4. SRS: Sebaran jumlah toko berdasarkan Lokasi propinsi [cite: 67]
-        // Kita ambil Top 5 provinsi
+        // 4. SRS: Sebaran jumlah toko berdasarkan Lokasi provinsi [cite: 67]
+        // Ambil sebaran toko per provinsi (view akan menampilkan 5 pertama)
         $sellerByLocation = Seller::select('pic_province', DB::raw('count(*) as total'))
             ->groupBy('pic_province')
             ->orderBy('total', 'desc')
-            ->take(5)
             ->get();
 
         // 5. Grafik Pengunjung (Berdasarkan aktivitas Review per Bulan)

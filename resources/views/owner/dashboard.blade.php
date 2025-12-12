@@ -16,38 +16,7 @@
          style="display: none;">
     </div>
 
-    <aside class="sidebar">
-        <div class="user-profile">
-            <div class="user-info">
-                <div class="user-name">{{ Auth::guard('owner')->user()->name ?? 'Owner' }}</div>
-                <div class="user-role">Owner</div>
-            </div>
-            <div class="avatar"></div>
-        </div>
-
-        <div class="menu-title">MENU</div>
-        <nav class="nav-links">
-           <a href="{{ route('owner.dashboard') }}" class="{{ request()->routeIs('owner.dashboard') ? 'active' : '' }}">
-                <i class="fas fa-home"></i> Dashboard
-            </a>
-        
-            <a href="{{ route('owner.sellers.index') }}" class="{{ request()->routeIs('owner.sellers.*') ? 'active' : '' }}">
-                <i class="fas fa-store"></i> Seller
-            </a>
-            <a href="#"><i class="fas fa-box-open"></i> Categories</a>
-            <a href="#"><i class="fas fa-cubes"></i> Products</a>
-            <a href="#"><i class="fas fa-cog"></i> Reports</a>
-            
-            <form action="{{ route('owner.logout') }}" method="POST" style="margin-top: 20px;">
-                @csrf
-                <button type="submit" style="background:none; border:none; color:#777; cursor:pointer; font-size:0.9rem; padding:12px 15px; display:flex; align-items:center;">
-                    <i class="fas fa-sign-out-alt" style="margin-right:15px;"></i> Logout
-                </button>
-            </form>
-        </nav>
-
-        <div class="logo">ToMaT</div>
-    </aside>
+    @include('owner.sidebar')
 
     <main class="main-content">
         <h1 class="page-title">Dashboard Pemilik</h1>
@@ -87,19 +56,26 @@
         </div>
 
         <div class="bottom-grid">
-            
+
             <div class="table-card">
                 <div class="table-header">
                     <span>Category</span>
                     <span>Product Count</span>
                 </div>
-                @foreach($productByCategory as $cat)
-                <div class="list-item">
-                    <span>{{ $cat->name }}</span>
-                    <span>{{ $cat->products_count }}</span>
+                
+                <div id="category-list">
+                    @foreach($productByCategory as $cat)
+                        {{-- Gunakan $loop->index. Jika index ke-5 (item ke-6) atau lebih, sembunyikan --}}
+                        <div class="list-item {{ $loop->index >= 5 ? 'hidden-row' : '' }}">
+                            <span>{{ $cat->name }}</span>
+                            <span>{{ $cat->products_count }}</span>
+                        </div>
+                    @endforeach
                 </div>
-                @endforeach
-                <a href="#" class="more-link">More...</a>
+
+                @if($productByCategory->count() > 5)
+                    <a href="javascript:void(0)" class="more-link" onclick="showMore('category-list', this)">More...</a>
+                @endif
             </div>
 
             <div class="table-card">
@@ -107,13 +83,19 @@
                     <span>Location</span>
                     <span>Seller Count</span>
                 </div>
-                @foreach($sellerByLocation as $loc)
-                <div class="list-item">
-                    <span>{{ $loc->pic_province }}</span>
-                    <span>{{ $loc->total }}</span>
+
+                <div id="location-list">
+                    @foreach($sellerByLocation as $loc)
+                        <div class="list-item {{ $loop->index >= 5 ? 'hidden-row' : '' }}">
+                            <span>{{ $loc->pic_province }}</span>
+                            <span>{{ $loc->total }}</span>
+                        </div>
+                    @endforeach
                 </div>
-                @endforeach
-                <a href="#" class="more-link">More...</a>
+
+                @if($sellerByLocation->count() > 5)
+                    <a href="javascript:void(0)" class="more-link" onclick="showMore('location-list', this)">More...</a>
+                @endif
             </div>
 
         </div>
@@ -137,7 +119,7 @@
                         datasets: [{
                             label: 'Visitors',
                             data: visitorsData,
-                            backgroundColor: '#4CAF50',
+                            backgroundColor: '#21BD38',
                             borderRadius: 5,
                             barThickness: 15
                         }]
@@ -153,6 +135,21 @@
                 });
             }
         });
+        function showMore(containerId, btnElement) {
+            // 1. Cari container listnya
+            const container = document.getElementById(containerId);
+            
+            // 2. Cari semua baris yang tersembunyi
+            const hiddenRows = container.querySelectorAll('.hidden-row');
+            
+            // 3. Tampilkan semua baris tersebut
+            hiddenRows.forEach(row => {
+                row.classList.remove('hidden-row');
+            });
+
+            // 4. Sembunyikan tombol "More" karena semua data sudah tampil
+            btnElement.style.display = 'none';
+        }
     </script>
 
 </body>

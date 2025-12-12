@@ -52,6 +52,7 @@
         .rating-stars {
             color: #FFA500;
         }
+        
     </style>
 </head>
 <body>

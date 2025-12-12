@@ -34,7 +34,7 @@ class DashboardController extends Controller
         // Get monthly site visitors data (simulated data)
         $monthlyVisitors = $this->getMonthlyVisitors();
         
-        // Get reviewer counts by province (DIBATASI 3 BARIS UNTUK DASHBOARD)
+        // Get reviewer counts by province (dibatasi 3 baris untuk dashboard)
         $reviewersByProvince = $this->getReviewersByProvince($seller->id, 3);
         
         // Get products with details (stock, category, comments, rating)
@@ -62,13 +62,16 @@ class DashboardController extends Controller
             return redirect()->route('seller.login')->with('error', 'Data seller tidak ditemukan.');
         }
 
-        // Ambil semua data reviewer tanpa limit (FULL LIST)
+        // Ambil semua data reviewer tanpa limit (full list)
         $reviewers = $this->getReviewersByProvince($seller->id);
 
         // Render view di resources/views/seller/province-index.blade.php
-        return view('seller.province-index', ['reviewers' => $reviewers]);
+        return view('seller.province-index', compact('reviewers'));
     }
 
+    /**
+     * Mengambil data pengunjung bulanan simulasi.
+     */
     private function getMonthlyVisitors()
     {
         // Simulated monthly visitors data (this should be replaced with actual analytics)
@@ -116,6 +119,9 @@ class DashboardController extends Controller
         return $reviewers;
     }
     
+    /**
+     * Mengambil produk dengan detail untuk tampilan dashboard.
+     */
     private function getProductsWithDetails($sellerId)
     {
         // Get products with stock, category, comments count, and rating

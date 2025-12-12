@@ -24,25 +24,7 @@
 </head>
 <body>
 
-    <aside class="sidebar">
-        <div class="user-profile">
-            <div class="user-info">
-                <div class="user-name">{{ Auth::guard('owner')->user()->name ?? 'Owner' }}</div>
-                <div class="user-role">Owner</div>
-            </div>
-            <div class="avatar"></div>
-        </div>
-
-        <div class="menu-title">MENU</div>
-        <nav class="nav-links">
-            <a href="{{ route('owner.dashboard') }}"><i class="fas fa-home"></i> Dashboard</a>
-            <a href="{{ route('owner.sellers.index') }}" class="active"><i class="fas fa-store"></i> Seller</a>
-            <a href="#"><i class="fas fa-box-open"></i> Categories</a>
-            <a href="#"><i class="fas fa-cubes"></i> Products</a>
-            <a href="#"><i class="fas fa-cog"></i> Reports</a>
-        </nav>
-        <div class="logo">ToMaT</div>
-    </aside>
+    @include('owner.sidebar')
 
     <main class="main-content">
         <h1 class="page-title">Manajemen Penjual</h1>
