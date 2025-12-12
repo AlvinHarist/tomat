@@ -25,7 +25,7 @@
             <div class="text-center mb-8">
                 <h1 class="text-3xl font-bold text-green-600 mb-2">ToMaT</h1>
                 <h2 class="text-2xl font-semibold text-gray-800">Registrasi Toko Baru</h2>
-                <p class="text-gray-600 mt-2">Sudah punya akun? <a href="{{ route('seller.login') }}" class="text-green-600 hover:underline font-medium">Masuk</a></p>
+                <p class="text-gray-600 mt-2">Sudah punya akun? <a href="{{ route('login') }}" class="text-green-600 hover:underline font-medium">Masuk</a></p>
             </div>
             
             <form method="POST" action="{{ route('register.store') }}" enctype="multipart/form-data" class="space-y-5" id="registerForm" novalidate>                

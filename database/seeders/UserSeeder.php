@@ -19,7 +19,7 @@ class UserSeeder extends Seeder
                 'name' => 'Admin Platform',
                 'email' => 'admin@tomat.com',
                 'password' => Hash::make('password'),
-                'role' => 'platform',
+                'role' => 'owner',
             ],
             [
                 'id' => 2,

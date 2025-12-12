@@ -180,7 +180,7 @@ class RegisterController extends Controller
 
             DB::commit();
 
-            return redirect()->route('seller.login')
+            return redirect()->route('login')
                 ->with('status', 'Registrasi berhasil! Mohon tunggu verifikasi dari admin.');
 
         } catch (\Throwable $e) {

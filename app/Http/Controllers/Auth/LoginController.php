@@ -83,7 +83,7 @@ class LoginController extends Controller
         $user = Auth::user();
 
         // ================= OWNER =================
-        if ($user->role === 'platform') {
+        if ($user->role === 'owner') {
             return redirect()->route('owner.dashboard');
         }
 
@@ -118,6 +118,6 @@ class LoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login');
+        return redirect()->route('home');
     }
 }

@@ -1,36 +1,32 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Auth\RegisterController;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
+
+use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReviewController;
+
 use App\Http\Controllers\Owner\ReportController;
 use App\Http\Controllers\Owner\CategoryController;
-use App\Http\Controllers\Owner\Auth\LoginController as OwnerLoginController;
 use App\Http\Controllers\Owner\DashboardController as OwnerDashboardController;
-use App\Mail\SendTestEmail;
 
+use App\Http\Controllers\Seller\DashboardController as SellerDashboardController;
+use App\Http\Controllers\Seller\ProductController as SellerProductController;
+use App\Http\Controllers\Seller\ReportController as SellerReportController;
+use App\Http\Controllers\Owner\SellerController as OwnerSellerController;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
 */
 
-// Rute untuk menampilkan halaman formulir
+// =====================
+// REGISTER (SELLER REGISTRATION PAGE)
+// =====================
 Route::get('/', [RegisterController::class, 'showRegistrationForm'])->name('register');
-
-// Rute untuk memproses data saat formulir di-submit
 Route::post('/', [RegisterController::class, 'store'])->name('register.store');
 
 // API endpoints for dependent dropdown
@@ -38,102 +34,103 @@ Route::get('/api/cities/{provinceCode}', [RegisterController::class, 'getCities'
 Route::get('/api/districts/{cityCode}', [RegisterController::class, 'getDistricts'])->name('api.districts');
 Route::get('/api/villages/{districtCode}', [RegisterController::class, 'getVillages'])->name('api.villages');
 
-// login seller and owner
-Route::get('/login', [App\Http\Controllers\Auth\LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'login'])->name('login.submit');
-Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
+// =====================
+// AUTH (UNIFIED LOGIN)
+// =====================
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [LoginController::class, 'login'])->name('login.submit');
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-// Seller Routes
+// =====================
+// SELLER ROUTES
+// =====================
 Route::prefix('seller')->name('seller.')->group(function () {
-    // Status Page
+
+    // Status Page (public)
     Route::get('/status/{status}', function ($status) {
         return view('seller.status', ['status' => strtoupper($status)]);
     })->name('status');
-    
-    // Protected Routes
-    Route::middleware(['auth', 'verified'])->group(function () {
-        Route::get('/dashboard', [App\Http\Controllers\Seller\DashboardController::class, 'index'])->name('dashboard');
-        
-        // --- Seller Functionality Routes ---
-        
-        // Rute Halaman Daftar Lengkap Reviewer (Dipanggil oleh tombol "More...")
-        Route::get('/reviewers/province', [App\Http\Controllers\Seller\DashboardController::class, 'reviewersByProvinceIndex'])
-             ->name('reviewers.by-province.index'); 
-        
+
+    // Protected Seller Routes
+    Route::middleware(['auth', 'verified', 'role:seller'])->group(function () {
+
+        Route::get('/dashboard', [SellerDashboardController::class, 'index'])->name('dashboard');
+
+        Route::get('/reviewers/province', [SellerDashboardController::class, 'reviewersByProvinceIndex'])
+            ->name('reviewers.by-province.index');
+
         // Products
-        Route::get('/products', [App\Http\Controllers\Seller\ProductController::class, 'index'])->name('products.index');
-        Route::get('/products/create', [App\Http\Controllers\Seller\ProductController::class, 'create'])->name('products.create');
-        Route::post('/products', [App\Http\Controllers\Seller\ProductController::class, 'store'])->name('products.store');
-        Route::get('/products/{id}/edit', [App\Http\Controllers\Seller\ProductController::class, 'edit'])->name('products.edit');
-        Route::put('/products/{id}', [App\Http\Controllers\Seller\ProductController::class, 'update'])->name('products.update');
-        Route::delete('/products/{id}', [App\Http\Controllers\Seller\ProductController::class, 'destroy'])->name('products.destroy');
-        
+        Route::get('/products', [SellerProductController::class, 'index'])->name('products.index');
+        Route::get('/products/create', [SellerProductController::class, 'create'])->name('products.create');
+        Route::post('/products', [SellerProductController::class, 'store'])->name('products.store');
+        Route::get('/products/{id}/edit', [SellerProductController::class, 'edit'])->name('products.edit');
+        Route::put('/products/{id}', [SellerProductController::class, 'update'])->name('products.update');
+        Route::delete('/products/{id}', [SellerProductController::class, 'destroy'])->name('products.destroy');
+
         // Reports
-    Route::prefix('reports')->name('reports.')->group(function () {
-        Route::get('/', [App\Http\Controllers\Seller\ReportController::class, 'index'])->name('index');
+        Route::prefix('reports')->name('reports.')->group(function () {
+            Route::get('/', [SellerReportController::class, 'index'])->name('index');
 
-        // Products By Stock
-        Route::get('/stock/filter', [App\Http\Controllers\Seller\ReportController::class, 'productsByStockFilter'])->name('products-by-stock.filter');
-        Route::get('/stock', [App\Http\Controllers\Seller\ReportController::class, 'productsByStock'])->name('stock');
+            Route::get('/stock/filter', [SellerReportController::class, 'productsByStockFilter'])->name('products-by-stock.filter');
+            Route::get('/stock', [SellerReportController::class, 'productsByStock'])->name('stock');
 
-        // Products By Rating
-        Route::get('/rating/filter', [App\Http\Controllers\Seller\ReportController::class, 'productsByRatingFilter'])->name('products-by-rating.filter');
-        Route::get('/rating', [App\Http\Controllers\Seller\ReportController::class, 'productsByRating'])->name('rating');
+            Route::get('/rating/filter', [SellerReportController::class, 'productsByRatingFilter'])->name('products-by-rating.filter');
+            Route::get('/rating', [SellerReportController::class, 'productsByRating'])->name('rating');
 
-        // Products Need Restock
-        Route::get('/restock/filter', [App\Http\Controllers\Seller\ReportController::class, 'productsNeedRestockFilter'])->name('products-need-restock.filter');
-        Route::get('/restock', [App\Http\Controllers\Seller\ReportController::class, 'productsNeedRestock'])->name('restock');
-    });
+            Route::get('/restock/filter', [SellerReportController::class, 'productsNeedRestockFilter'])->name('products-need-restock.filter');
+            Route::get('/restock', [SellerReportController::class, 'productsNeedRestock'])->name('restock');
         });
+    });
 });
 
-Route::prefix('owner')->name('owner.')->group(function () {
-    // Dashboard (Protected by auth:owner middleware)
-    Route::get('/dashboard', [OwnerDashboardController::class, 'index'])->name('dashboard')->middleware('auth');
+// =====================
+// OWNER ROUTES
+// =====================
+Route::prefix('owner')->name('owner.')->middleware(['auth', 'role:owner'])->group(function () {
 
-    Route::get('/sellers', [App\Http\Controllers\Owner\SellerController::class, 'index'])->name('sellers.index');
-    Route::get('/sellers/{id}', [App\Http\Controllers\Owner\SellerController::class, 'show'])->name('sellers.show');
-    Route::post('/sellers/{id}/status', [App\Http\Controllers\Owner\SellerController::class, 'updateStatus'])->name('sellers.updateStatus');
+    Route::get('/dashboard', [OwnerDashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('/sellers', [OwnerSellerController::class, 'index'])->name('sellers.index');
+    Route::get('/sellers/{id}', [OwnerSellerController::class, 'show'])->name('sellers.show');
+    Route::post('/sellers/{id}/status', [OwnerSellerController::class, 'updateStatus'])->name('sellers.updateStatus');
 
     // Reports
-    // Menu Utama Laporan
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
-
-    // Action Print PDF
     Route::get('/reports/seller-status', [ReportController::class, 'reportSellerStatus'])->name('reports.seller_status');
     Route::get('/reports/seller-province', [ReportController::class, 'reportSellerProvince'])->name('reports.seller_province');
     Route::get('/reports/product-rating', [ReportController::class, 'reportProductRating'])->name('reports.product_rating');
 
-    // Rute Kategori
+    // Categories
     Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
     Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
     Route::put('/categories/{id}', [CategoryController::class, 'update'])->name('categories.update');
     Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])->name('categories.destroy');
 });
 
-// Rute Verifikasi Email
+// =====================
+// EMAIL VERIFICATION
+// =====================
+
+// Note: route ini mengarahkan ke /login (bukan seller.login)
 Route::get('/email/verify/{id}/{hash}', function (Request $request, $id, $hash) {
     $user = \App\Models\User::findOrFail($id);
 
-    // Verify hash
     if (!hash_equals($hash, sha1($user->email))) {
         abort(403, 'Invalid verification link.');
     }
 
-    // Check if already verified
     if ($user->email_verified_at) {
-        return redirect()->route('seller.login')->with('status', 'Email sudah terverifikasi sebelumnya.');
+        return redirect()->route('login')->with('status', 'Email sudah terverifikasi sebelumnya.');
     }
 
-    // Mark as verified
     $user->email_verified_at = now();
     $user->save();
 
-    return redirect()->route('seller.login')->with('status', 'Email berhasil diverifikasi! Silakan login.');
+    return redirect()->route('login')->with('status', 'Email berhasil diverifikasi! Silakan login.');
 })->middleware('signed')->name('verification.verify');
 
 Route::get('/email/verify', function () {
-    return redirect()->route('seller.login')->with('status', 'Silakan cek email Anda untuk link verifikasi.');
+    return redirect()->route('login')->with('status', 'Silakan cek email Anda untuk link verifikasi.');
 })->name('verification.notice');
 
 Route::post('/email/verification-notification', function (Request $request) {
@@ -141,13 +138,9 @@ Route::post('/email/verification-notification', function (Request $request) {
     return back()->with('message', 'Verification link sent!');
 })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
-
-// Route::get('send-mail', function() {
-//     $message = 'Salam Tomat';
-//     Mail::to('alvin.harist502@gmail.com')->send(new SendTestEmail($message));
-// });
-
-### route product public(tanpa middleware auth/verif)
+// =====================
+// PUBLIC PRODUCT ROUTES (NO AUTH)
+// =====================
 Route::get('/home', [ProductController::class, 'index'])->name('home');
 Route::get('/search', [ProductController::class, 'search'])->name('search');
 Route::resource('product', ProductController::class)->except(['index']);
