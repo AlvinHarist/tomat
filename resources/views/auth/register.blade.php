@@ -23,7 +23,16 @@
         <!-- Right Panel (Form) -->
         <div class="w-full md:w-1/2 p-8 md:p-12 overflow-y-auto max-h-screen">
             <div class="text-center mb-8">
-                <h1 class="text-3xl font-bold text-green-600 mb-2">ToMaT</h1>
+                <h1 class="text-3xl font-bold text-green-600 mb-2 tomato-logo">
+                    ToMaT
+                </h1>
+
+                <style>
+                    .tomato-logo {
+                        font-family: "Brush Script MT", "Brush Script Std", cursive;
+                    }
+                </style>
+
                 <h2 class="text-2xl font-semibold text-gray-800">Registrasi Toko Baru</h2>
                 <p class="text-gray-600 mt-2">Sudah punya akun? <a href="{{ route('login') }}" class="text-green-600 hover:underline font-medium">Masuk</a></p>
             </div>

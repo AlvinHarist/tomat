@@ -61,7 +61,7 @@
                     </div>
                     <div class="ml-4">
                         <h3 class="text-lg font-semibold text-gray-800">Laporan Rating</h3>
-                        <p class="text-sm text-gray-500">SRS-MartPlace-13</p>
+            
                     </div>
                 </div>
 

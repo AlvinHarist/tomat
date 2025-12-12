@@ -28,7 +28,7 @@ class ReportController extends Controller
             'title' => $title,
             'period' => "Periode: $start - $end", // <-- INI KUNCI AGAR ERROR HILANG
             'date' => Carbon::now()->format('d-m-Y'),
-            'processor' => Auth::guard('owner')->user()->name ?? 'Administrator'
+            'processor' => auth()->user()->name ?? 'Administrator'
         ];
     }
 
@@ -39,9 +39,11 @@ class ReportController extends Controller
         $request->validate(['start_date' => 'required|date', 'end_date' => 'required|date']);
 
         // Filter Query
-        $data = Seller::whereBetween('created_at', [$request->start_date, $request->end_date . ' 23:59:59'])
-                      ->orderByRaw("FIELD(status, 'ACTIVE', 'PENDING', 'REJECTED')")
-                      ->get();
+        $data = Seller::with('user')
+    ->whereBetween('created_at', [$request->start_date, $request->end_date . ' 23:59:59'])
+    ->orderByRaw("FIELD(status, 'ACTIVE', 'PENDING', 'REJECTED')")
+    ->get();
+
 
         // Gunakan Helper getMeta
         $meta = $this->getMeta('Laporan Status Penjual', $request);

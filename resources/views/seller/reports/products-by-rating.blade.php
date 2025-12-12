@@ -70,7 +70,7 @@
         <thead>
             <tr>
                 <th style="width: 5%;">No</th>
-                <th style="width: 30%;">Nama Produk</th>
+                <th style="width: 30%;">Produk</th>
                 <th style="width: 20%;">Kategori</th>
                 <th style="width: 20%;">Harga</th>
                 <th style="width: 15%;">Rating</th>

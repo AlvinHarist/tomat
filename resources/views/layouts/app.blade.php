@@ -14,17 +14,18 @@
 </head>
 
 <body class="bg-gray-100">
-
     <!-- HEADER -->
     <header class="bg-white shadow-md">
         <div class="container mx-auto px-4 py-3 flex items-center justify-between gap-4">
 
             <!-- Nama App -->
-            <div class="font-pacifico text-2xl font-semibold text-green-600">
-                <a href="{{ route('home') }}">
-                    {{ config('app.name', 'MyApp') }}
-                </a>
-            </div>
+            <h1 class="tomato-logo text-3xl text-green-600">ToMaT</h1>
+
+            <style>
+            .tomato-logo {
+                font-family: "Brush Script MT", cursive;
+            }
+            </style>
 
             <!-- Search Bar -->
             <div class="flex-1 max-w-2xl">
@@ -66,7 +67,7 @@
 
             <!-- Auth Buttons -->
             <div class="flex items-center gap-3">
-              <a href="#"
+              <a href="{{ route('login') }}"
                 class="px-6 py-2 text-sm font-medium rounded-full
                         border border-green-500 text-green-500 bg-white
                         hover:bg-green-50">
