@@ -13,33 +13,24 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $user = Auth::guard('web')->user();
-        
-        // Get seller record from sellers table based on pic_email
-        $seller = \App\Models\Seller::where('pic_email', $user->email)->first();
-        
+        $user = auth()->user();
+        $seller = $user->seller;
+
         if (!$seller) {
-            return redirect()->route('seller.login')->with('error', 'Data seller tidak ditemukan.');
+            return redirect()->route('login')->with('error', 'Data seller tidak ditemukan.');
         }
-        
-        // Get seller's products count
+
         $productsCount = Product::where('seller_id', $seller->id)->count();
-        
-        // Get total reviews for seller's products
+
         $totalReviews = DB::table('reviews')
             ->join('products', 'reviews.product_id', '=', 'products.id')
             ->where('products.seller_id', $seller->id)
             ->count();
-        
-        // Get monthly site visitors data (simulated data)
+
         $monthlyVisitors = $this->getMonthlyVisitors();
-        
-        // Get reviewer counts by province (dibatasi 3 baris untuk dashboard)
         $reviewersByProvince = $this->getReviewersByProvince($seller->id, 3);
-        
-        // Get products with details (stock, category, comments, rating)
         $products = $this->getProductsWithDetails($seller->id);
-        
+
         return view('seller.dashboard', compact(
             'seller',
             'productsCount',
@@ -49,20 +40,16 @@ class DashboardController extends Controller
             'products'
         ));
     }
-    
-    /**
-     * Metode baru: Menampilkan halaman penuh daftar reviewer per provinsi.
-     */
+
     public function reviewersByProvinceIndex()
     {
-        $user = Auth::guard('web')->user();
-        $seller = \App\Models\Seller::where('pic_email', $user->email)->first();
+        $user = auth()->user();
+        $seller = $user->seller;
 
         if (!$seller) {
-            return redirect()->route('seller.login')->with('error', 'Data seller tidak ditemukan.');
+            return redirect()->route('login')->with('error', 'Data seller tidak ditemukan.');
         }
 
-        // Ambil semua data reviewer tanpa limit
         $reviewers = $this->getReviewersByProvince($seller->id);
 
         return view('seller.province-index', compact('reviewers'));

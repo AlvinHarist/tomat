@@ -40,11 +40,6 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
-
-        'owner' => [
-        'driver' => 'session',
-        'provider' => 'admins', // Kita akan buat provider ini di bawah
-        ],
     ],
 
     /*
@@ -68,11 +63,6 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
-        ],
-
-        'admins' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\Owner::class,
         ],
     ],
 

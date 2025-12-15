@@ -50,7 +50,7 @@
     
     <!-- Logout -->
     <div class="p-4 border-t border-gray-200">
-        <form method="POST" action="{{ route('seller.logout') }}">
+        <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit" class="w-full flex items-center px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors">
                 <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
