@@ -26,8 +26,8 @@ use App\Http\Controllers\Owner\SellerController as OwnerSellerController;
 // =====================
 // REGISTER (SELLER REGISTRATION PAGE)
 // =====================
-Route::get('/', [RegisterController::class, 'showRegistrationForm'])->name('register');
-Route::post('/', [RegisterController::class, 'store'])->name('register.store');
+Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::post('/register', [RegisterController::class, 'store'])->name('register.store');
 
 // API endpoints for dependent dropdown
 Route::get('/api/cities/{provinceCode}', [RegisterController::class, 'getCities'])->name('api.cities');
@@ -141,7 +141,7 @@ Route::post('/email/verification-notification', function (Request $request) {
 // =====================
 // PUBLIC PRODUCT ROUTES (NO AUTH)
 // =====================
-Route::get('/home', [ProductController::class, 'index'])->name('home');
+Route::get('/', [ProductController::class, 'index'])->name('home');
 Route::get('/search', [ProductController::class, 'search'])->name('search');
 Route::resource('product', ProductController::class)->except(['index']);
 Route::post('/review', [ReviewController::class, 'store'])->name('review.store');

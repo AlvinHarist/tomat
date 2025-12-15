@@ -13,12 +13,10 @@
 @extends('layouts.app')
 
 @section('content')
-    {{-- WRAPPER HALAMAN: light = gray lembut, dark = gradient --}}
     <div class="min-h-screen w-full  
                 bg-gray-50 
                 dark:bg-gradient-to-b dark:from-slate-950 dark:via-slate-900 dark:to-emerald-950/90">
 
-        {{-- GENERAL CATEGORY NAV (PARENT) - TAB STYLE --}}
         <section class="max-w-7xl mx-auto pt-10 px-4 lg:px-0">
             <div class="border-b border-gray-200 dark:border-slate-700 pb-2 overflow-x-auto">
                 <div class="flex items-center gap-4 min-w-max">
@@ -45,7 +43,6 @@
             </div>
         </section>
 
-        {{-- HERO: PREMIUM FADE SLIDER + SEARCH BAR + SPECIFIC CATEGORY --}}
         <section class="max-w-7xl mx-auto mt-4 px-4 lg:px-0">
             <div
                 class="relative w-full rounded-3xl overflow-hidden
@@ -53,7 +50,6 @@
                        dark:border-white/10 dark:bg-gradient-to-br dark:from-white/10 dark:via-white/5 dark:to-emerald-500/10 
                        dark:shadow-2xl dark:backdrop-blur-2xl"
             >
-                {{-- SLIDER BACKGROUND (FADE + KEN BURNS) --}}
                 <div class="relative w-full h-64 md:h-80 lg:h-96">
                     <div id="hero-slides" class="absolute inset-0">
                         @foreach ($banners as $banner)
@@ -67,24 +63,20 @@
                         @endforeach
                     </div>
 
-                    {{-- overlay gradient agar text & search terbaca --}}
                     <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/10
                                 dark:from-slate-950/85 dark:via-slate-950/40 dark:to-transparent"></div>
 
-                    {{-- subtle top light in light mode --}}
                     <div class="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-white/30 to-transparent dark:from-transparent"></div>
 
-                    {{-- HERO CONTENT --}}
                     <div class="relative z-10 h-full flex flex-col items-center justify-center px-4">
                         <div class="max-w-2xl text-center space-y-3">
                             <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-white drop-shadow-sm">
                                 Change your wardrobe. Find exciting goods.
                             </h1>
                             <p class="text-sm md:text-base text-gray-100/90">
-                                Cari produk, jasa, atau hobi baru yang bikin harimu lebih seru.
+                                Find new products, services, or hobbies that will make your day more exciting.
                             </p>
 
-                            {{-- SEARCH BAR --}}
                             <form action="{{ route('search') }}" method="GET" class="mt-4">
                                 <div class="relative max-w-xl mx-auto">
                                     <input
@@ -99,7 +91,6 @@
                                                focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
                                     >
 
-                                    {{-- ICON SEARCH --}}
                                     <svg 
                                         class="hidden md:block absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-500" 
                                         fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -107,7 +98,6 @@
                                               d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1 0 5.64 5.64a7.5 7.5 0 0 0 10.61 10.61Z"/>
                                     </svg>
 
-                                    {{-- BUTTON ARROW --}}
                                     <button type="submit"
                                         class="absolute right-2 top-1/2 -translate-y-1/2
                                                w-9 h-9 rounded-full bg-emerald-500 text-white
@@ -129,7 +119,6 @@
                                 </div>
                             </form>
 
-                            {{-- SPECIFIC CATEGORIES + LIHAT SEMUA --}}
                             <div class="mt-4 flex flex-wrap justify-center gap-2">
                                 @foreach ($specificCategories as $item)
                                     <a href="{{ route('search', [
@@ -145,7 +134,6 @@
                                     </a>
                                 @endforeach
 
-                                {{-- TOMBOL LIHAT SEMUA KATEGORI --}}
                                 <button
                                     type="button"
                                     id="open-category-modal"
@@ -153,7 +141,7 @@
                                            bg-transparent border border-white/80 text-white
                                            hover:bg-white/10 hover:border-emerald-300
                                            transition">
-                                    Lihat semua kategori
+                                    View all categories
                                 </button>
                             </div>
                         </div>
@@ -162,7 +150,6 @@
             </div>
         </section>
 
-        {{-- MODAL SEMUA KATEGORI (STYLED) --}}
         <div 
             id="category-modal"
             class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4
@@ -173,7 +160,6 @@
                         dark:bg-gradient-to-br dark:from-slate-900 dark:via-slate-950 dark:to-emerald-950/90 
                         dark:border-white/10">
 
-                {{-- Close button --}}
                 <button 
                     id="close-category-modal"
                     class="absolute top-4 right-4 w-9 h-9 rounded-full bg-gray-100 border border-gray-300 flex items-center justify-center hover:bg-gray-200 transition
@@ -182,12 +168,11 @@
                     <span class="text-gray-600 dark:text-gray-200 text-sm">✕</span>
                 </button>
 
-                {{-- Title --}}
                 <div class="mb-5 flex items-center justify-between gap-3">
                     <div>
                         <h2 class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">Semua Kategori</h2>
                         <p class="text-xs md:text-sm text-gray-500 mt-1 dark:text-emerald-100/80">
-                            Jelajahi kategori berdasarkan jenis dan subkategori.
+                            Browse categories by type and subcategory.
                         </p>
                     </div>
                 </div>
@@ -203,7 +188,6 @@
                         <div class="bg-gray-50 border border-gray-200 rounded-2xl p-4 md:p-5 hover:shadow-md transition
                                     dark:bg-white/5 dark:border-white/15 dark:hover:shadow-xl dark:hover:border-emerald-300/50 dark:backdrop-blur-2xl">
 
-                            {{-- Parent header --}}
                             <div class="flex items-center justify-between gap-3 mb-3">
                                 <div class="flex items-center gap-3">
                                     <div class="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center text-sm font-semibold text-emerald-700 border border-emerald-200
@@ -225,7 +209,6 @@
                                 </div>
                             </div>
 
-                            {{-- Level 1 & 2 --}}
                             @if ($children->isNotEmpty())
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     @foreach ($children as $child)
@@ -243,7 +226,6 @@
                                                 {{ $child->name }}
                                             </a>
 
-                                            {{-- Grandchild (max depth 3) --}}
                                             @if ($grandChildren->isNotEmpty())
                                                 <div class="mt-2 flex flex-wrap gap-1.5 ml-4">
                                                     @foreach ($grandChildren as $grand)
@@ -263,7 +245,7 @@
                                 </div>
                             @else
                                 <p class="text-xs text-gray-500 italic dark:text-emerald-100/70">
-                                    Belum ada subkategori.
+                                    There are no subcategories yet.
                                 </p>
                             @endif
                         </div>
@@ -272,7 +254,6 @@
             </div>
         </div>
 
-        {{-- PRODUCT SECTION --}}
         <section class="max-w-7xl mx-auto space-y-4 mt-10 px-4 lg:px-0">
             <div class="flex items-center justify-between">
                 <div>
@@ -305,7 +286,7 @@
                         @include('components.product-cards', ['products' => $products])
                     @else
                         <p class="text-gray-500 dark:text-emerald-50/90 text-sm col-span-full">
-                            Tidak ada produk.
+                            No product.
                         </p>
                     @endif
                 </div>
@@ -338,7 +319,6 @@
 
 @push('styles')
 <style>
-    /* Premium hero fade + Ken Burns */
     .hero-slide {
         opacity: 0;
         transition: opacity 800ms ease-out;
@@ -379,7 +359,6 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // PREMIUM HERO BACKGROUND SLIDER (FADE + KEN BURNS)
     const slides = Array.from(document.querySelectorAll('.hero-slide'));
     let index = 0;
 
@@ -396,11 +375,10 @@ document.addEventListener('DOMContentLoaded', function () {
             setInterval(() => {
                 index = (index + 1) % slides.length;
                 setActiveSlide(index);
-            }, 8000); // 8 detik per slide
+            }, 8000);
         }
     }
 
-    // LOAD MORE PRODUCT
     const loadMoreBtn = document.getElementById('load-more');
     const productGrid = document.getElementById('product-grid');
 
@@ -451,7 +429,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // CATEGORY MODAL
     const modal    = document.getElementById('category-modal');
     const openBtn  = document.getElementById('open-category-modal');
     const closeBtn = document.getElementById('close-category-modal');
