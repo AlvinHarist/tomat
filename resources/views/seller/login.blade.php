@@ -77,12 +77,6 @@
                     </div>
                 </div>
 
-                <!-- Remember Me -->
-                <div class="flex items-center">
-                    <input type="checkbox" name="remember" id="remember" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
-                    <label for="remember" class="ml-2 block text-sm text-gray-700">Ingat saya</label>
-                </div>
-
                 <div class="pt-2">
                     <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">
                         Masuk
