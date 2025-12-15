@@ -151,7 +151,7 @@
 
                 </button>
 
-                <a href="{{ route('seller.login') }}"
+                <a href="{{ route('login') }}"
                    class="theme-transition px-5 py-2 text-sm font-medium rounded-full
                           border border-green-500 text-green-600 
                           bg-white hover:bg-green-50
