@@ -57,7 +57,10 @@
     </div>
 
     <div class="info-section">
-        <p><strong>Nama Seller:</strong> {{ $seller->pic_name }}</p>
+        <p>
+            <strong>Nama Seller:</strong> 
+            {{ $seller->pic_name ?? (Auth::check() ? Auth::user()->name : 'Nama Seller Tidak Diketahui') }}
+        </p>
         <p><strong>Tanggal Cetak:</strong> {{ $date }}</p>
         <p><strong>Rentang Produk Dibuat:</strong> {{ $filterDate }}</p>
     </div>
@@ -66,12 +69,12 @@
         <thead>
             <tr>
                 <th style="width: 5%;">No</th>
-                <th style="width: 25%;">Nama Produk</th>
-                <th style="width: 20%;">Kategori</th>
-                <th style="width: 20%;">Harga</th>
-                <th style="width: 15%;">Stock</th>
-                <th style="width: 15%;">Status</th>
-            </tr>
+                <th style="width: 30%;">Produk</th> 
+                <th style="width: 15%;">Kategori</th>
+                <th style="width: 15%;">Harga</th>
+                <th style="width: 15%;">Rating</th>
+                <th style="width: 10%;">Stock</th>
+                </tr>
         </thead>
         <tbody>
             @forelse($products as $index => $product)
@@ -80,25 +83,21 @@
                 <td>{{ $product->name }}</td>
                 <td>{{ $product->category->name ?? '-' }}</td>
                 <td class="text-right">Rp {{ number_format($product->price, 0, ',', '.') }}</td>
-                <td class="text-center">{{ $product->stock }}</td>
+                
                 <td class="text-center">
-                    @if($product->stock < 10)
-                        <span style="color: red; font-weight: bold;">Stok Menipis</span>
-                    @elseif($product->stock < 50)
-                        <span style="color: orange;">Stok Sedang</span>
-                    @else
-                        <span style="color: green;">Stok Aman</span>
-                    @endif
+                    {{ number_format($product->reviews_avg_rating ?? 0, 1) }} 
                 </td>
-            </tr>
+                
+                <td class="text-center">{{ $product->stock }}</td>
+                
+                </tr>
             @empty
             <tr>
-                <td colspan="6" class="text-center">Tidak ada data produk</td>
-            </tr>
+                <td colspan="6" class="text-center">Tidak ada data produk</td> </tr>
             @endforelse
         </tbody>
     </table>
-
+    
     <div style="margin-top: 40px;">
         <p><strong>Total Produk:</strong> {{ $products->count() }}</p>
     </div>

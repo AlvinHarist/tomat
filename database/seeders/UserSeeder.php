@@ -23,7 +23,7 @@ class UserSeeder extends Seeder
             ],
             [
                 'id' => 2,
-                'name' => 'Budi Penjual',
+                'name' => 'Budi',
                 'email' => 'budi@toko.com',
                 'password' => Hash::make('password'),
                 'role' => 'seller',
