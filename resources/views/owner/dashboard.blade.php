@@ -11,10 +11,15 @@
 </head>
 <body>
 
-    <div id="chart-data-source" 
-         data-stats="{{ json_encode($chartData) }}" 
-         style="display: none;">
+    <div id="chart-data-source"
+        data-visitors='@json($chartData)'
+        data-products-by-category='@json($productByCategory->map(fn($c)=>["name"=>$c->name,"count"=>$c->products_count]))'
+        data-stores-by-province='@json($sellerByProvince)'
+        data-seller-status='@json(["active"=>$activeSellers,"inactive"=>$nonActiveSellers])'
+        data-engagement='@json(["commenters"=>$commentersCount,"raters"=>$ratersCount])'
+        style="display:none;">
     </div>
+
 
     @include('owner.sidebar')
 
@@ -55,102 +60,143 @@
             <canvas id="visitorsChart" height="80"></canvas>
         </div>
 
-        <div class="bottom-grid">
-
-            <div class="table-card">
-                <div class="table-header">
-                    <span>Category</span>
-                    <span>Product Count</span>
+       <div class="chart-grid">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <div class="chart-title">SEBARAN PRODUK PER KATEGORI</div>
                 </div>
-                
-                <div id="category-list">
-                    @foreach($productByCategory as $cat)
-                        {{-- Gunakan $loop->index. Jika index ke-5 (item ke-6) atau lebih, sembunyikan --}}
-                        <div class="list-item {{ $loop->index >= 5 ? 'hidden-row' : '' }}">
-                            <span>{{ $cat->name }}</span>
-                            <span>{{ $cat->products_count }}</span>
-                        </div>
-                    @endforeach
-                </div>
-
-                @if($productByCategory->count() > 5)
-                    <a href="javascript:void(0)" class="more-link" onclick="showMore('category-list', this)">More...</a>
-                @endif
+                <canvas id="productsByCategoryChart" height="110"></canvas>
             </div>
 
-            <div class="table-card">
-                <div class="table-header">
-                    <span>Location</span>
-                    <span>Seller Count</span>
+            <div class="chart-container">
+                <div class="chart-header">
+                    <div class="chart-title">SEBARAN TOKO PER PROVINSI</div>
                 </div>
-
-                <div id="location-list">
-                    @foreach($sellerByLocation as $loc)
-                        <div class="list-item {{ $loop->index >= 5 ? 'hidden-row' : '' }}">
-                            <span>{{ $loc->pic_province }}</span>
-                            <span>{{ $loc->total }}</span>
-                        </div>
-                    @endforeach
-                </div>
-
-                @if($sellerByLocation->count() > 5)
-                    <a href="javascript:void(0)" class="more-link" onclick="showMore('location-list', this)">More...</a>
-                @endif
+                <canvas id="storesByProvinceChart" height="110"></canvas>
             </div>
 
+            <div class="chart-container">
+                <div class="chart-header">
+                    <div class="chart-title">SELLER AKTIF vs TIDAK AKTIF</div>
+                </div>
+                <canvas id="sellerStatusChart" height="110"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-header">
+                    <div class="chart-title">PENGUNJUNG (KOMENTAR & RATING)</div>
+                </div>
+                <canvas id="engagementChart" height="110"></canvas>
+            </div>
         </div>
+
     </main>
-
+    
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // 1. Ambil elemen tersembunyi tadi
+        document.addEventListener('DOMContentLoaded', function () {
             const dataSource = document.getElementById('chart-data-source');
+            if (!dataSource) return;
 
-            // 2. Ambil isinya (data-stats) dan ubah dari teks JSON menjadi Objek/Array JS
-            if (dataSource) {
-                const visitorsData = JSON.parse(dataSource.getAttribute('data-stats'));
+            const visitors = JSON.parse(dataSource.getAttribute('data-visitors') || '[]');
+            const products = JSON.parse(dataSource.getAttribute('data-products-by-category') || '[]');
+            const stores   = JSON.parse(dataSource.getAttribute('data-stores-by-province') || '[]');
+            const status   = JSON.parse(dataSource.getAttribute('data-seller-status') || '{}');
+            const engage   = JSON.parse(dataSource.getAttribute('data-engagement') || '{}');
 
-                // 3. Buat Chart seperti biasa
-                const ctx = document.getElementById('visitorsChart').getContext('2d');
-                const visitorsChart = new Chart(ctx, {
+            // 1) Visitors
+            const vctx = document.getElementById('visitorsChart');
+            if (vctx) {
+                new Chart(vctx.getContext('2d'), {
                     type: 'bar',
                     data: {
-                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                        labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
                         datasets: [{
                             label: 'Visitors',
-                            data: visitorsData,
+                            data: visitors,
                             backgroundColor: '#21BD38',
                             borderRadius: 5,
                             barThickness: 15
+                        }]
+                    },
+                    options: { responsive: true, plugins: { legend: { display: false } } }
+                });
+            }
+
+            // 2) Sebaran produk per kategori
+            const pc = document.getElementById('productsByCategoryChart');
+            if (pc) {
+                new Chart(pc.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: products.map(x => x.name),
+                        datasets: [{ data: products.map(x => x.count), borderRadius: 5, backgroundColor: '#21BD38'}]
+                    },
+                    options: { responsive: true, plugins: { legend: { display: false } } }
+                });
+            }
+
+            // 3) Sebaran toko per provinsi
+            const sp = document.getElementById('storesByProvinceChart');
+            if (sp) {
+                new Chart(sp.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: stores.map(x => x.name),
+                        datasets: [{
+                            data: stores.map(x => x.count),
+                            borderRadius: 5,
+                            backgroundColor: '#21BD38'
                         }]
                     },
                     options: {
                         responsive: true,
                         plugins: { legend: { display: false } },
                         scales: {
-                            y: { beginAtZero: true, grid: { color: '#f0f0f0' } },
-                            x: { grid: { display: false } }
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1,
+                                    precision: 0
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    maxRotation: 60,
+                                    minRotation: 60
+                                }
+                            }
                         }
                     }
                 });
             }
+
+
+            // 4) Seller aktif vs tidak aktif
+            const ss = document.getElementById('sellerStatusChart');
+            if (ss) {
+                new Chart(ss.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Aktif', 'Tidak Aktif'],
+                        datasets: [{ data: [status.active || 0, status.inactive || 0], backgroundColor: ['#21BD38', '#bd2121ff'] }]
+                    },
+                    options: { responsive: true }
+                });
+            }
+
+            // 5) Pengunjung komentar & rating
+            const ec = document.getElementById('engagementChart');
+            if (ec) {
+                new Chart(ec.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Komentar', 'Rating'],
+                        datasets: [{ data: [engage.commenters || 0, engage.raters || 0], borderRadius: 5, backgroundColor: '#21BD38'}]
+                    },
+                    options: { responsive: true, plugins: { legend: { display: false } } }
+                });
+            }
         });
-        function showMore(containerId, btnElement) {
-            // 1. Cari container listnya
-            const container = document.getElementById(containerId);
-            
-            // 2. Cari semua baris yang tersembunyi
-            const hiddenRows = container.querySelectorAll('.hidden-row');
-            
-            // 3. Tampilkan semua baris tersebut
-            hiddenRows.forEach(row => {
-                row.classList.remove('hidden-row');
-            });
-
-            // 4. Sembunyikan tombol "More" karena semua data sudah tampil
-            btnElement.style.display = 'none';
-        }
     </script>
-
 </body>
 </html>
