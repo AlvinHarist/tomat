@@ -21,11 +21,8 @@ class ReportController extends Controller
         return view('seller.reports.index');
     }
     
-    // --- Metode untuk Menampilkan Halaman Filter Tanggal ---
+    // --- Metode untuk Menampilkan Halaman Filter Tanggal (Tidak perlu perubahan) ---
 
-    /**
-     * Tampilkan halaman filter untuk Laporan Stock
-     */
     public function productsByStockFilter()
     {
         return view('seller.reports.filter-page', [
@@ -34,9 +31,6 @@ class ReportController extends Controller
         ]);
     }
 
-    /**
-     * Tampilkan halaman filter untuk Laporan Rating
-     */
     public function productsByRatingFilter()
     {
         return view('seller.reports.filter-page', [
@@ -45,9 +39,6 @@ class ReportController extends Controller
         ]);
     }
 
-    /**
-     * Tampilkan halaman filter untuk Laporan Produk Segera Dipesan
-     */
     public function productsNeedRestockFilter()
     {
         return view('seller.reports.filter-page', [
@@ -63,25 +54,30 @@ class ReportController extends Controller
      */
     public function productsByStock(Request $request)
     {
-        $user = Auth::guard('web')->user();
-        $seller = Seller::where('pic_email', $user->email)->first();
+        // PERBAIKAN 1/3: Mengganti pic_email dengan relasi user->seller
+        $user = auth()->user();
+        $seller = $user->seller;
+        
+        if (!$seller) {
+             return redirect()->route('login')->with('error', 'Data seller tidak ditemukan.');
+        }
 
+        // PERBAIKAN: Menambahkan withAvg untuk kolom Rating di laporan
         $query = Product::where('seller_id', $seller->id)
             ->with('category')
+            ->withAvg('reviews', 'rating')
             ->orderBy('stock', 'desc');
 
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
 
         if ($startDate && $endDate) {
-            // Filter berdasarkan tanggal produk dibuat (created_at)
             $query->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
         }
 
         $products = $query->get();
         $filterDateString = ($startDate && $endDate) ? "($startDate s/d $endDate)" : '(Keseluruhan Tanggal)';
 
-        // Cek apakah ada produk pada rentang tanggal yang difilter
         if ($products->isEmpty() && $startDate && $endDate) {
             return redirect()->route('seller.reports.products-by-stock.filter')
                 ->with('error', 'Laporan tidak bisa dicetak. Tidak ada produk yang ditambahkan pada rentang tanggal ' . $startDate . ' sampai ' . $endDate . '.');
@@ -91,7 +87,7 @@ class ReportController extends Controller
             'products' => $products,
             'seller' => $seller,
             'date' => now()->format('d-m-Y H:i:s'),
-            'filterDate' => $filterDateString // Variabel baru untuk tampilan PDF
+            'filterDate' => $filterDateString
         ]);
         
         $filename = 'Laporan-Produk-Stock-' . ($startDate && $endDate ? "$startDate-$endDate" : now()->format('d-m-Y')) . '.pdf';
@@ -104,31 +100,33 @@ class ReportController extends Controller
      */
     public function productsByRating(Request $request)
     {
-        $user = Auth::guard('web')->user();
-        $seller = Seller::where('pic_email', $user->email)->first();
+        // PERBAIKAN 2/3: Mengganti pic_email dengan relasi user->seller
+        $user = auth()->user();
+        $seller = $user->seller;
         
+        if (!$seller) {
+             return redirect()->route('login')->with('error', 'Data seller tidak ditemukan.');
+        }
+
+        // PERBAIKAN: Menggunakan withAvg daripada menghitung avg di memory
         $query = Product::where('seller_id', $seller->id)
-            ->with(['category', 'reviewAndRatings']);
+            ->with('category')
+            ->withAvg('reviews', 'rating')
+            ->orderByDesc('reviews_avg_rating'); // Sortir berdasarkan hasil average rating
 
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
 
         if ($startDate && $endDate) {
-            // Filter berdasarkan tanggal produk dibuat (created_at)
             $query->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
         }
 
-        // Ambil produk dan hitung rata-rata rating (di memory)
-        $products = $query->get()
-            ->map(function($product) {
-                $product->avg_rating = $product->reviewAndRatings->avg('rating') ?? 0;
-                return $product;
-            })
-            ->sortByDesc('avg_rating');
+        $products = $query->get(); // Ambil produk
+        
+        // Logika map dan sortByDesc dihapus karena sudah dilakukan di query dengan withAvg/orderByDesc
 
         $filterDateString = ($startDate && $endDate) ? "($startDate s/d $endDate)" : '(Keseluruhan Tanggal)';
 
-        // Cek apakah ada produk pada rentang tanggal yang difilter
         if ($products->isEmpty() && $startDate && $endDate) {
             return redirect()->route('seller.reports.products-by-rating.filter')
                 ->with('error', 'Laporan tidak bisa dicetak. Tidak ada produk yang ditambahkan pada rentang tanggal ' . $startDate . ' sampai ' . $endDate . '.');
@@ -151,20 +149,26 @@ class ReportController extends Controller
      */
     public function productsNeedRestock(Request $request)
     {
-        $user = Auth::guard('web')->user();
-        $seller = Seller::where('pic_email', $user->email)->first();
+        // PERBAIKAN 3/3: Mengganti pic_email dengan relasi user->seller
+        $user = auth()->user();
+        $seller = $user->seller;
         
+        if (!$seller) {
+             return redirect()->route('login')->with('error', 'Data seller tidak ditemukan.');
+        }
+
         // Query utama: Produk dengan stok kurang dari 10
+        // Tambahkan withAvg jika laporan ini juga memerlukan data rating
         $query = Product::where('seller_id', $seller->id)
             ->where('stock', '<', 10)
             ->with('category')
+            ->withAvg('reviews', 'rating') // Ditambahkan untuk kelengkapan data laporan
             ->orderBy('stock', 'asc');
         
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
         
         if ($startDate && $endDate) {
-            // Filter query utama berdasarkan tanggal produk dibuat (created_at)
             $query->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
         }
 
@@ -173,23 +177,20 @@ class ReportController extends Controller
         
         // Cek apakah ada produk pada rentang tanggal yang difilter
         if ($products->isEmpty() && $startDate && $endDate) {
-            // Cek apakah memang ada produk yang ditambahkan di rentang tgl tersebut
             $totalProductsInDateRange = Product::where('seller_id', $seller->id)
                 ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
                 ->count();
             
             if ($totalProductsInDateRange === 0) {
-                // Tidak ada produk yang di-upload sama sekali di rentang tanggal ini
                 return redirect()->route('seller.reports.products-need-restock.filter')
                     ->with('error', 'Laporan tidak bisa dicetak. Tidak ada produk yang ditambahkan pada rentang tanggal ' . $startDate . ' sampai ' . $endDate . '.');
             } else {
-                // Ada produk, tapi stoknya aman (tidak ada yang perlu restock)
                 return redirect()->route('seller.reports.products-need-restock.filter')
                     ->with('warning', 'Semua produk yang ditambahkan pada rentang tanggal ' . $startDate . ' sampai ' . $endDate . ' memiliki stok yang aman.');
             }
         }
 
-        // Group by category
+        // Group by category (untuk tampilan laporan need-restock)
         $productsByCategory = $products->groupBy('category.name');
 
         $pdf = Pdf::loadView('seller.reports.products-need-restock', [

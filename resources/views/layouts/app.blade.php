@@ -26,11 +26,9 @@
                 }
             }
 
-            // Toggle + animasi
             window.toggleTheme = function () {
                 const html = document.documentElement;
 
-                // aktifkan animasi transisi warna sementara
                 html.classList.add("theme-transition");
                 setTimeout(() => html.classList.remove("theme-transition"), 300);
 
@@ -47,7 +45,6 @@
            dark:bg-gradient-to-b dark:from-slate-950 dark:via-slate-900 dark:to-emerald-950/90
            dark:text-slate-50"
 >
-    <!-- HEADER -->
     <header
         class="theme-transition sticky top-0 z-40
                bg-white/95 border-b border-gray-200 shadow-sm
@@ -57,7 +54,6 @@
         <div class="max-w-7xl mx-auto px-4 py-3 
                     flex items-center justify-between gap-6">
 
-            <!-- LEFT: LOGO -->
             <div class="flex-shrink-0 font-pacifico text-2xl font-semibold 
                         text-green-600 dark:text-emerald-300 drop-shadow">
                 <a href="{{ route('home') }}">
@@ -65,7 +61,6 @@
                 </a>
             </div>
 
-            <!-- MIDDLE: SEARCH BAR (SEMBUNYI DI HALAMAN HOME) -->
             @if (!request()->routeIs('home'))
                 <div class="flex-1 flex justify-center">
                     <form action="{{ route('search') }}" method="GET" class="w-full max-w-xl">
@@ -86,7 +81,6 @@
                                     dark:focus:ring-emerald-400 dark:focus:border-emerald-400"
                             >
 
-                            <!-- icon search -->
                             <svg class="absolute left-4 top-1/2 -translate-y-1/2 
                                     w-5 h-5 text-gray-400 dark:text-emerald-300/80"
                                 fill="none" stroke="currentColor" stroke-width="2"
@@ -96,7 +90,6 @@
                             </svg>
                         </div>
 
-                        {{-- Kirim semua filter aktif --}}
                         @foreach (['category','province','min_price','max_price','rating'] as $filter)
                             @if (request($filter))
                                 <input type="hidden" name="{{ $filter }}" value="{{ request($filter) }}">
@@ -105,28 +98,23 @@
                     </form>
                 </div>
             @else
-                {{-- Supaya header tetap seimbang di /home, kasih spacer kecil --}}
                 <div class="flex-1"></div>
             @endif
 
-            <!-- RIGHT: TOGGLE + AUTH BUTTONS -->
             <div class="flex items-center gap-3 flex-shrink-0">
 
-                <!-- THEME SWITCH — MORPHING SUN <-> MOON -->
                 <button onclick="toggleTheme()"
                     class="relative w-14 h-8 flex items-center rounded-full
                            bg-gray-300 dark:bg-slate-800
                            border border-gray-400/60 dark:border-emerald-400/40
                            transition-all duration-500 ease-out overflow-hidden">
 
-                    <!-- BACKGROUND RAYS for sun -->
                     <span class="sun-rays absolute inset-0 flex justify-center items-center
                                 pointer-events-none transition-all duration-500
                                 opacity-100 dark:opacity-0">
                         <span class="w-10 h-10 bg-yellow-400/40 rounded-full blur-xl"></span>
                     </span>
 
-                    <!-- MORPHING HANDLE (DIPINDAH SEDIKIT DARI BORDER KIRI) -->
                     <span class="morph-icon absolute left-1 top-1/2 -translate-y-1/2
                                 w-6 h-6 bg-yellow-400 rounded-full shadow-md
                                 flex items-center justify-center
@@ -138,11 +126,9 @@
                                 dark:shadow-[0_0_12px_rgba(16,185,129,0.5)]
                                 dark:rotate-12">
                         
-                        <!-- VISIBLE SUN DOT -->
                         <span class="sun-dot block w-2 h-2 bg-yellow-200 rounded-full
                                     transition-all duration-500 dark:scale-0"></span>
 
-                        <!-- VISIBLE MOON CUTOUT -->
                         <span class="moon-cut absolute block w-4 h-4 bg-slate-800 dark:bg-transparent
                                     rounded-full -right-1 -top-1 opacity-0
                                     transition-all duration-500
@@ -151,7 +137,7 @@
 
                 </button>
 
-                <a href="{{ route('seller.login') }}"
+                <a href="{{ route('login') }}"
                    class="theme-transition px-5 py-2 text-sm font-medium rounded-full
                           border border-green-500 text-green-600 
                           bg-white hover:bg-green-50
@@ -160,7 +146,7 @@
                           dark:border-emerald-300/80 dark:text-emerald-100 
                           dark:bg-white/5 dark:hover:bg-emerald-500/10 dark:hover:border-emerald-300
                           dark:backdrop-blur-xl">
-                    Masuk
+                    Login
                 </a>
 
                 <a href="{{ route('register') }}"
@@ -171,13 +157,12 @@
                           dark:bg-emerald-500 dark:hover:bg-emerald-600
                           dark:shadow-[0_0_25px_rgba(16,185,129,0.5)]
                           dark:hover:shadow-[0_0_35px_rgba(16,185,129,0.7)]">
-                    Daftar
+                    Register
                 </a>
             </div>
         </div>
     </header>
 
-    <!-- CONTENT WITH LOCATION DROPDOWN -->
     <main class="w-full pt-4 pb-10 min-h-[60vh] relative">
         @php
             $provinces = [
@@ -195,11 +180,9 @@
             $currentProvince = request('province', 'All Location');
         @endphp
 
-        <!-- DROPDOWN LOKASI (FLOATING CHIP) -->
         <div class="max-w-7xl mx-auto px-4">
             <div class="flex justify-end">
                 <div class="relative" x-data="{ open: false }">
-                    <!-- BUTTON DROPDOWN -->
                     <button 
                         @click="open = !open"
                         class="theme-transition inline-flex items-center gap-2 px-3 py-1.5 rounded-full
@@ -227,7 +210,6 @@
                         </svg>
                     </button>
 
-                    <!-- DROPDOWN LIST -->
                     <div 
                         x-show="open" 
                         @click.outside="open = false"
@@ -267,13 +249,11 @@
             </div>
         </div>
 
-        <!-- CONTENT SLOT -->
         <div class="-mt-16">
             @yield('content')
         </div>
     </main>
 
-    <!-- FOOTER -->
     <footer
         class="theme-transition py-4 border-t bg-white border-gray-200
                text-gray-600 text-xs sm:text-sm

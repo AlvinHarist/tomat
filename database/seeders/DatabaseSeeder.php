@@ -15,13 +15,12 @@ class DatabaseSeeder extends Seeder
         DB::table('reviews')->truncate();
         DB::table('products')->truncate();
         DB::table('categories')->truncate();
-        DB::table('owners')->truncate();
         DB::table('sellers')->truncate();
 
         Schema::enableForeignKeyConstraints();
 
         $this->call([
-            OwnerSeeder::class,
+            UserSeeder::class,
             CategorySeeder::class,
             SellerSeeder::class,
             ProductSeeder::class,

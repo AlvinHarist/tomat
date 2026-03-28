@@ -41,8 +41,8 @@
                 @foreach($data as $index => $item)
                 <tr>
                     <td>{{ $index + 1 }}</td>
-                    <td>{{ $item->pic_email }}</td>
-                    <td>{{ $item->pic_name }}</td>
+                    <td>{{ $item->user->email ?? '-' }}</td>
+                    <td>{{ $item->user->name ?? '-' }}</td>
                     <td>{{ $item->store_name }}</td>
                     <td>
                         @if($item->status == 'ACTIVE') Aktif
@@ -52,7 +52,7 @@
                     </td>
                 </tr>
                 @endforeach
-            </tbody>
+                </tbody>
         </table>
     @endif
 </body>

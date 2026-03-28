@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Owner;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Seller;
 use App\Models\Product;
 use App\Models\Category;
@@ -12,58 +13,88 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
+    public function __construct()
+    {
+        // Check if user is owner
+        $this->middleware(function ($request, $next) {
+            $user = Auth::user();
+            if (!$user || $user->role !== 'owner') {
+                abort(403, 'Unauthorized');
+            }
+            return $next($request);
+        });
+    }
     public function index()
     {
-        // 1. SRS: Jumlah User Penjual Aktif dan Tidak Aktif [cite: 67]
         $activeSellers = Seller::where('status', 'ACTIVE')->count();
         $nonActiveSellers = Seller::whereIn('status', ['PENDING', 'REJECTED'])->count();
 
-        // 2. Data Kartu Atas (Total Produk, Kategori, Review)
         $totalProducts = Product::count();
         $totalCategories = Category::count();
-        // SRS: Jumlah pengunjung yang memberikan komentar dan rating [cite: 67]
         $totalReviews = Review::count();
 
-        // 3. SRS: Sebaran jumlah produk berdasarkan kategori [cite: 67]
-        // Ambil semua kategori yang diurutkan berdasarkan jumlah produk (view akan menampilkan 5 pertama)
+        $commentersCount = Review::whereNotNull('comment')
+            ->where('comment', '!=', '')
+            ->distinct('email')
+            ->count('email');
+
+        $ratersCount = Review::whereNotNull('rating')
+            ->distinct('email')
+            ->count('email');
+
+        $reviewsByMonth = Review::selectRaw('MONTH(created_at) as m, COUNT(*) as total')
+            ->whereYear('created_at', now()->year)
+            ->groupBy('m')
+            ->pluck('total', 'm');
+
         $productByCategory = Category::withCount('products')
-            ->orderBy('products_count', 'desc')
+            ->orderByDesc('products_count')
             ->get();
 
-        // 4. SRS: Sebaran jumlah toko berdasarkan Lokasi provinsi [cite: 67]
-        // Ambil sebaran toko per provinsi (view akan menampilkan 5 pertama)
         $sellerByLocation = Seller::select('pic_province', DB::raw('count(*) as total'))
             ->groupBy('pic_province')
             ->orderBy('total', 'desc')
             ->get();
 
-        // 5. Grafik Pengunjung (Berdasarkan aktivitas Review per Bulan)
-        // Ini untuk mengisi chart "Site Visitors" sesuai desain
-        $visitorStats = Review::select(
-            DB::raw('MONTH(created_at) as month'), 
-            DB::raw('count(*) as total')
-        )
-        ->whereYear('created_at', date('Y'))
-        ->groupBy('month')
-        ->orderBy('month')
-        ->pluck('total', 'month')
-        ->all();
+        $allProvinces = [
+            'Aceh','Sumatera Utara','Sumatera Barat','Riau','Jambi','Sumatera Selatan',
+            'Bengkulu','Lampung','Kepulauan Bangka Belitung','Kepulauan Riau',
+            'DKI Jakarta','Jawa Barat','Jawa Tengah','DI Yogyakarta','Jawa Timur','Banten',
+            'Bali','Nusa Tenggara Barat','Nusa Tenggara Timur',
+            'Kalimantan Barat','Kalimantan Tengah','Kalimantan Selatan','Kalimantan Timur','Kalimantan Utara',
+            'Sulawesi Utara','Sulawesi Tengah','Sulawesi Selatan','Sulawesi Tenggara','Gorontalo','Sulawesi Barat',
+            'Maluku','Maluku Utara',
+            'Papua','Papua Barat','Papua Tengah','Papua Pegunungan','Papua Selatan','Papua Barat Daya'
+        ];
 
-        // Siapkan array data untuk chart (Jan-Des)
+        $sellerMap = $sellerByLocation->pluck('total', 'pic_province');
+
+        $sellerByProvince = collect($allProvinces)->map(function ($prov) use ($sellerMap) {
+            return [
+                'name'  => $prov,
+                'count' => (int) ($sellerMap[$prov] ?? 0)
+            ];
+        });
+
+
         $chartData = [];
-        for ($i = 1; $i <= 12; $i++) {
-            $chartData[] = $visitorStats[$i] ?? 0;
+        for ($month = 1; $month <= 12; $month++) {
+            $chartData[] = (int) ($reviewsByMonth[$month] ?? 0);
         }
 
         return view('owner.dashboard', compact(
-            'activeSellers', 
-            'nonActiveSellers', 
-            'totalProducts', 
-            'totalCategories', 
+            'activeSellers',
+            'nonActiveSellers',
+            'totalProducts',
+            'totalCategories',
             'totalReviews',
+            'commentersCount',
+            'ratersCount',
             'productByCategory',
             'sellerByLocation',
+            'sellerByProvince',
             'chartData'
         ));
     }
+
 }

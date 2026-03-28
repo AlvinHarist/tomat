@@ -3,12 +3,10 @@
 @section('content')
 <div class="max-w-6xl mx-auto space-y-10 mt-12">
 
-    {{-- BREADCRUMB --}}
     <div class="max-w-6xl mx-auto mt-6">
         <x-breadcrumb :items="$breadcrumbs" />
     </div>
 
-    {{-- CONTAINER 1: gambar + deskripsi + spesifikasi --}}
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
         @php
@@ -20,11 +18,9 @@
             $firstImage = $hasImages ? $images[0] : null;
         @endphp
 
-        {{-- Gambar (gallery) --}}
         <div class="md:col-span-1 rounded-xl border border-gray-200/70 bg-white shadow-sm p-4
                     dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-2xl dark:shadow-2xl">
 
-            {{-- Gambar utama --}}
             <div class="w-full aspect-square flex items-center justify-center rounded-lg overflow-hidden
                         bg-gray-50 dark:bg-slate-900/60">
                 @if ($hasImages)
@@ -44,7 +40,6 @@
                 @endif
             </div>
 
-            {{-- Thumbnail scrollable --}}
             @if ($hasImages && count($images) > 1)
                 <div class="flex gap-2 overflow-x-auto pb-2 mt-3" id="thumbnailStrip">
                     @foreach ($images as $index => $img)
@@ -66,11 +61,9 @@
             @endif
         </div>
 
-        {{-- Deskripsi + spesifikasi --}}
         <div class="md:col-span-2 rounded-xl border border-gray-200/70 bg-white shadow-sm p-6 space-y-6
                     dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-2xl dark:shadow-2xl">
 
-            {{-- Nama + harga + rating + stock --}}
             <div>
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-slate-50">
                     {{ $product->name }}
@@ -105,17 +98,17 @@
 
                         @if($reviewCount > 0)
                             <span class="text-gray-400 dark:text-slate-500">•</span>
-                            <span class="text-gray-600 dark:text-slate-200">{{ $reviewCount }} ulasan</span>
+                            <span class="text-gray-600 dark:text-slate-200">{{ $reviewCount }} review</span>
                         @endif
 
                         <span class="text-gray-400 dark:text-slate-500">•</span>
                         <span class="text-gray-700 dark:text-slate-200">
-                            {{ optional($product->seller)->pic_province ?? 'Lokasi tidak diketahui' }}
+                            {{ optional($product->seller)->pic_province ?? 'Location unknown' }}
                         </span>
                     </div>
                 @else
                     <div class="text-sm text-gray-500 dark:text-slate-400 mt-2">
-                        Belum ada rating
+                        There are no ratings yet
                     </div>
                 @endif
 
@@ -127,37 +120,35 @@
                                         : 'bg-red-50 text-red-700 dark:bg-red-500/15 dark:text-red-200' }}">
                         Stok:
                         <span class="ml-1 font-semibold">
-                            {{ $product->stock > 0 ? $product->stock . ' unit' : 'Habis' }}
+                            {{ $product->stock > 0 ? $product->stock . ' unit' : 'Sold out' }}
                         </span>
                     </span>
 
                     @if($product->stock > 0 && $product->stock <= 5)
                         <span class="text-xs text-red-500 dark:text-red-300 font-semibold">
-                            Stok hampir habis!
+                            Stock is almost out!
                         </span>
                     @endif
                 </div>
             </div>
 
-            {{-- Deskripsi --}}
             <div>
                 <h2 class="text-lg font-semibold mb-2 text-gray-900 dark:text-slate-50">
-                    Deskripsi Produk
+                    Product Description
                 </h2>
                 <p class="text-gray-700 dark:text-slate-200 leading-relaxed">
                     {{ $product->description }}
                 </p>
             </div>
 
-            {{-- Info penjual --}}
             @if ($product->seller)
                 <div class="mt-4 p-4 rounded-lg border border-gray-200 bg-gray-50
                             dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-xl">
                     <h3 class="text-sm font-semibold text-gray-800 dark:text-slate-100 mb-1">
-                        Tertarik dengan produk ini?
+                        Interested in this product?
                     </h3>
                     <p class="text-xs text-gray-500 dark:text-slate-400 mb-3">
-                        Hubungi penjual untuk tanya stok, nego harga, atau detail lainnya.
+                        Contact the seller to ask about stock, negotiate prices, or other details.
                     </p>
 
                     <div class="space-y-1 text-sm">
@@ -177,27 +168,26 @@
                                 href="mailto:{{ $product->seller->pic_email }}"
                                 class="ml-1 text-blue-600 dark:text-blue-300 hover:underline"
                             >
-                                {{ $product->seller->pic_email }}
+                                {{ $sellerEmail }}
                             </a>
                         </div>
                     </div>
                 </div>
             @else
                 <div class="mt-4 text-xs text-gray-400 dark:text-slate-500">
-                    Informasi penjual tidak tersedia.
+                    Seller information not available.
                 </div>
             @endif
 
         </div>
     </div>
 
-    {{-- CONTAINER 2: REVIEW & RATING --}}
     <div class="rounded-xl border border-gray-200/70 bg-white shadow-sm p-6 space-y-6
                 dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-2xl dark:shadow-2xl">
 
         <div class="flex items-center justify-between gap-4">
             <h2 class="text-xl font-semibold text-gray-900 dark:text-slate-50">
-                Ulasan & Rating
+                Review & Rating
             </h2>
 
             <button
@@ -206,13 +196,12 @@
                        hover:bg-green-700 transition
                        dark:bg-emerald-500 dark:hover:bg-emerald-600"
             >
-                + Tulis Ulasan
+                + Leave a review
             </button>
         </div>
 
         @if ($avgRating)
             <div class="flex items-center justify-between flex-wrap gap-4">
-                {{-- Rata-rata rating --}}
                 <div class="flex items-center gap-4">
                     <div class="text-4xl font-bold text-yellow-500">
                         {{ number_format($avgRating, 1) }}
@@ -229,20 +218,18 @@
                             @endfor
                         </div>
                         <p class="text-sm text-gray-500 dark:text-slate-300">
-                            Dari {{ $product->reviews->count() }} ulasan
+                            {{ $product->reviews->count() }} review
                             @if($selectedRating)
                                 <span class="text-gray-400 dark:text-slate-400">
-                                    • Menampilkan hanya bintang {{ $selectedRating }}
-                                    ({{ $filteredReviews->count() }} ulasan)
+                                    • Shows only {{ $selectedRating }} stars
+                                    ({{ $filteredReviews->count() }} review)
                                 </span>
                             @endif
                         </p>
                     </div>
                 </div>
 
-                {{-- FILTER BERDASARKAN BINTANG --}}
                 <div class="flex items-center gap-2">
-                    {{-- Tombol "Semua" --}}
                     <a href="{{ route('product.show', $product->id) }}"
                        class="px-3 py-1.5 text-xs sm:text-sm rounded-full border
                               @if($selectedRating)
@@ -252,10 +239,9 @@
                                   bg-green-600 text-white border-green-600
                                   dark:bg-emerald-500 dark:border-emerald-500 dark:text-white
                               @endif">
-                        Semua
+                        All
                     </a>
 
-                    {{-- Tombol 5 → 1 bintang --}}
                     @for ($star = 5; $star >= 1; $star--)
                         <a href="{{ request()->fullUrlWithQuery(['rating' => $star]) }}"
                            class="px-3 py-1.5 text-xs sm:text-sm rounded-full border inline-flex items-center gap-1
@@ -274,13 +260,12 @@
             </div>
         @else
             <p class="text-gray-500 dark:text-slate-300">
-                Belum ada rating.
+                There are no ratings yet.
             </p>
         @endif
 
         <hr class="border-t border-gray-200 dark:border-slate-700">
 
-        {{-- DAFTAR ULASAN (TERFILTER) --}}
         <div class="space-y-4">
             @forelse ($filteredReviews as $review)
                 <div class="border border-gray-200 rounded-lg p-4 bg-gray-50
@@ -311,23 +296,21 @@
             @empty
                 <p class="text-gray-500 dark:text-slate-300">
                     @if($selectedRating)
-                        Belum ada ulasan dengan rating {{ $selectedRating }} bintang.
+                        There are no reviews yet with a rating of {{ $selectedRating }} stars.
                     @else
-                        Belum ada ulasan.
+                        There are no reviews yet.
                     @endif
                 </p>
             @endforelse
         </div>
     </div>
-
-    {{-- MODAL TAMBAH ULASAN --}}
+\
     <div
         id="reviewModal"
         class="fixed inset-0 bg-black/40 dark:bg-black/60 flex items-center justify-center z-50 hidden"
     >
         <div class="bg-white rounded-xl shadow-lg w-full max-w-lg mx-4 relative
                     dark:bg-slate-900 dark:text-slate-50 dark:border dark:border-white/10">
-            {{-- Tombol close --}}
             <button
                 type="button"
                 id="closeReviewModal"
@@ -339,7 +322,7 @@
 
             <div class="p-6 space-y-4">
                 <h3 class="text-lg font-semibold text-gray-800 dark:text-slate-50 mb-2">
-                    Tulis Ulasan untuk {{ $product->name }}
+                    Write review for {{ $product->name }}
                 </h3>
 
                 <form
@@ -354,7 +337,7 @@
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-slate-200 mb-1">
-                            Nama Lengkap
+                            Full name
                         </label>
                         <input
                             type="text"
@@ -369,7 +352,7 @@
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-slate-200 mb-1">
-                            No. Handphone / WhatsApp
+                            Phone number / WhatsApp
                         </label>
                         <input
                             type="text"
@@ -399,7 +382,7 @@
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-slate-200 mb-1">
-                            Provinsi
+                            Province
                         </label>
 
                         <select
@@ -410,7 +393,6 @@
                             required
                         >
                             <option value="" disabled selected>Pilih provinsi</option>
-                            {{-- daftar provinsi seperti sebelumnya --}}
                             <option value="Aceh">Aceh</option>
                             <option value="Sumatera Utara">Sumatera Utara</option>
                             <option value="Sumatera Barat">Sumatera Barat</option>
@@ -457,7 +439,6 @@
                         </select>
                     </div>
 
-                    {{-- RATING: BINTANG KLIKABLE --}}
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-slate-200 mb-1">
                             Rating
@@ -479,13 +460,13 @@
                         </div>
 
                         <p class="text-xs text-gray-500 dark:text-slate-400 mt-1" id="ratingHint">
-                            Klik jumlah bintang untuk memberi rating.
+                            Click on the number of stars to rate it.
                         </p>
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-slate-200 mb-1">
-                            Komentar
+                            Comment
                         </label>
                         <textarea
                             name="comment"
@@ -505,14 +486,14 @@
                             class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 text-sm hover:bg-gray-50
                                    dark:border-slate-600 dark:text-slate-100 dark:hover:bg-slate-800"
                         >
-                            Batal
+                            Cancel
                         </button>
                         <button
                             type="submit"
                             class="px-4 py-2 rounded-lg bg-green-600 text-white text-sm font-semibold hover:bg-green-700
                                    dark:bg-emerald-500 dark:hover:bg-emerald-600"
                         >
-                            Kirim Ulasan
+                            Send review
                         </button>
                     </div>
                 </form>
@@ -520,11 +501,9 @@
         </div>
     </div>
 
-
-    {{-- CONTAINER 3: PRODUK REKOMENDASI --}}
     <div class="space-y-4 mt-6">
         <h2 class="text-xl font-semibold text-gray-800 dark:text-slate-50">
-            Lainnya di toko ini
+            More from this shop
         </h2>
 
         <div id="recommendation-grid"
@@ -533,7 +512,7 @@
                 @include('components.product-cards', ['products' => $recommendations])
             @else
                 <p class="text-gray-500 dark:text-slate-300 text-sm col-span-full">
-                    Belum ada produk lain di toko ini.
+                    There are no other products in this shop yet.
                 </p>
             @endif
         </div>
@@ -553,7 +532,7 @@
                            dark:hover:bg-emerald-500/90 dark:hover:text-white dark:hover:shadow-xl 
                            dark:backdrop-blur-xl"
                 >
-                    Tampilkan lebih banyak
+                    Show more
                 </button>
             </div>
         @endif
@@ -570,7 +549,6 @@
         const modal     = document.getElementById('reviewModal');
         const form      = modal ? modal.querySelector('form') : null;
 
-        // ============ GALLERY IMAGE ============
         const mainImage    = document.getElementById('mainProductImage');
         const thumbButtons = document.querySelectorAll('.product-thumb-btn');
 
@@ -592,7 +570,6 @@
             });
         });
 
-        // ============ RATING & MODAL ============
         const ratingInput     = document.getElementById('ratingInput');
         const ratingStarsWrap = document.getElementById('ratingStars');
         const ratingHint      = document.getElementById('ratingHint');
@@ -606,11 +583,9 @@
             stars.forEach(star => {
                 const starValue = parseInt(star.dataset.value, 10);
                 if (starValue <= value) {
-                    // Selected star - force yellow in both light and dark mode
                     star.classList.add('!text-yellow-400');
                     star.classList.remove('text-gray-300', 'dark:text-slate-600');
                 } else {
-                    // Unselected star - back to default
                     star.classList.remove('!text-yellow-400');
                     star.classList.add('text-gray-300', 'dark:text-slate-600');
                 }
@@ -660,7 +635,6 @@
             });
         }
 
-        // ============ LOAD MORE RECOMMENDATIONS ============
         const recGrid       = document.getElementById('recommendation-grid');
         const loadMoreRecBtn = document.getElementById('load-more-recommendations');
 
@@ -707,12 +681,11 @@
             });
         }
 
-        // ============ SWEETALERT ============
         @if (session('success'))
         if (window.Swal) {
             Swal.fire({
                 icon: 'success',
-                title: 'Berhasil',
+                title: 'Success',
                 text: '{{ session('success') }}',
                 timer: 3000,
                 showConfirmButton: false
@@ -724,7 +697,7 @@
         if (window.Swal) {
             Swal.fire({
                 icon: 'error',
-                title: 'Gagal',
+                title: 'Failed',
                 text: '{{ session('error') }}',
             }).then(() => {
                 openModal();
@@ -736,7 +709,7 @@
         if (window.Swal) {
             Swal.fire({
                 icon: 'error',
-                title: 'Form tidak valid',
+                title: 'Form not valid',
                 text: '{{ $errors->first() }}',
             }).then(() => {
                 openModal();

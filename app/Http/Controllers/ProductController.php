@@ -222,8 +222,10 @@ class ProductController extends Controller
         $product->load([
             'category.parent.parent',
             'reviews',
-            'seller',
+            'seller.user:id,email',
         ]);
+
+        $sellerEmail = $product->seller?->user?->email;
 
         // Kumpulkan jejak kategori dari root → current category
         $categoryBreadcrumbs = $product->category
@@ -283,6 +285,7 @@ class ProductController extends Controller
             'recommendations' => $recommendations,
             'breadcrumbs'     => $breadcrumbs,
             'seller'          => $product->seller,
+            'sellerEmail'     => $sellerEmail,
         ]);
     }
 

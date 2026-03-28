@@ -2,20 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Foundation\Auth\User as Authenticatable; // <-- PENTING: Pakai ini, bukan Model biasa
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Concerns\HasUuids; // <-- PENTING: Untuk UUID
+use Illuminate\Support\Str;
 
 class Owner extends Authenticatable
 {
-    use HasFactory, Notifiable, HasUuids;
+    use HasFactory, Notifiable;
 
-    // Pastikan nama tabel sesuai dengan yang ada di database Anda (lihat log migrasi tadi)
-    protected $table = 'owners'; 
-    
-    protected $primaryKey = 'id';
-    public $incrementing = false; // Karena UUID bukan angka urut
+    public $incrementing = false; // UUID
     protected $keyType = 'string';
 
     protected $fillable = [
@@ -32,4 +28,15 @@ class Owner extends Authenticatable
     protected $casts = [
         'password' => 'hashed',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (empty($model->{$model->getKeyName()})) {
+                $model->{$model->getKeyName()} = (string) Str::uuid();
+            }
+        });
+    }
 }

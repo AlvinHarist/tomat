@@ -16,12 +16,7 @@ class Authenticate extends Middleware
             return null;
         }
 
-        // Check if request is for owner routes
-        if ($request->is('owner/*')) {
-            return route('owner.login');
-        }
-
-        // Default to seller login
-        return route('seller.login');
+        // Redirect to unified login page
+        return route('login');
     }
 }

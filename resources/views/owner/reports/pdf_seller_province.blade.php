@@ -42,7 +42,7 @@
                 <tr>
                     <td>{{ $index + 1 }}</td>
                     <td>{{ $item->store_name }}</td>
-                    <td>{{ $item->pic_name }}</td>
+                    <td>{{ $item->user->name ?? '-' }}</td>
                     <td>{{ $item->pic_province }}</td>
                 </tr>
                 @endforeach
