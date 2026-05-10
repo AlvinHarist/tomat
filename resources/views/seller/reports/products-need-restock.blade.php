@@ -74,7 +74,8 @@
   </div>
 
   <div class="info-section">
-    <p><strong>Nama Seller:</strong> {{ $seller->pic_name }}</p>
+    {{-- <p><strong>Nama Seller:</strong> {{ $seller->pic_name }}</p> --}}
+    <p><strong>Nama Seller:</strong> {{ $seller->store_name }}</p>
     <p><strong>Tanggal Cetak:</strong> {{ $date }}</p>
     <p><strong>Rentang Produk Dibuat:</strong> {{ $filterDate }}</p>
     <p><strong>Kriteria Stok:</strong> Produk dengan stok kurang dari 2</p>
