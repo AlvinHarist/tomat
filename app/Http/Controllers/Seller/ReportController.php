@@ -62,7 +62,7 @@ class ReportController extends Controller
              return redirect()->route('login')->with('error', 'Data seller tidak ditemukan.');
         }
 
-        // PERBAIKAN: Menambahkan withAvg untuk kolom Rating di laporan
+        // Menambahkan withAvg untuk kolom Rating di laporan
         $query = Product::where('seller_id', $seller->id)
             ->with('category')
             ->withAvg('reviews', 'rating')
@@ -100,7 +100,7 @@ class ReportController extends Controller
      */
     public function productsByRating(Request $request)
     {
-        // PERBAIKAN 2/3: Mengganti pic_email dengan relasi user->seller
+        // Mengganti pic_email dengan relasi user->seller
         $user = auth()->user();
         $seller = $user->seller;
         
@@ -108,7 +108,7 @@ class ReportController extends Controller
              return redirect()->route('login')->with('error', 'Data seller tidak ditemukan.');
         }
 
-        // PERBAIKAN: Menggunakan withAvg daripada menghitung avg di memory
+        // Menggunakan withAvg daripada menghitung avg di memory
         $query = Product::where('seller_id', $seller->id)
             ->with('category')
             ->withAvg('reviews', 'rating')
@@ -123,7 +123,6 @@ class ReportController extends Controller
 
         $products = $query->get(); // Ambil produk
         
-        // Logika map dan sortByDesc dihapus karena sudah dilakukan di query dengan withAvg/orderByDesc
 
         $filterDateString = ($startDate && $endDate) ? "($startDate s/d $endDate)" : '(Keseluruhan Tanggal)';
 
@@ -149,7 +148,7 @@ class ReportController extends Controller
      */
     public function productsNeedRestock(Request $request)
     {
-        // PERBAIKAN 3/3: Mengganti pic_email dengan relasi user->seller
+        // Mengganti pic_email dengan relasi user->seller
         $user = auth()->user();
         $seller = $user->seller;
         
@@ -157,10 +156,9 @@ class ReportController extends Controller
              return redirect()->route('login')->with('error', 'Data seller tidak ditemukan.');
         }
 
-        // Query utama: Produk dengan stok kurang dari 10
-        // Tambahkan withAvg jika laporan ini juga memerlukan data rating
+        // Query utama: Produk dengan stok kurang dari 2
         $query = Product::where('seller_id', $seller->id)
-            ->where('stock', '<', 10)
+            ->where('stock', '<', 2)
             ->with('category')
             ->withAvg('reviews', 'rating') // Ditambahkan untuk kelengkapan data laporan
             ->orderBy('stock', 'asc');
