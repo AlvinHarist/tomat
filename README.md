@@ -1,66 +1,93 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+﻿# ToMaT Marketplace
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi marketplace sederhana berbasis Laravel. Repo ini adalah sebuah web app marketplace tanpa fitur transaksi atau pembayaran. Fokus core app adalah iklan produk, review pengguna, manajemen seller, dan dashboard laporan.
 
-## About Laravel
+## Deskripsi
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Aplikasi dibangun dengan Laravel 10 dan PHP 8.1.
+- Penyimpanan data model menggunakan Eloquent ORM.
+- Tidak ada fitur transaksi, checkout, atau payment gateway. Aplikasi hanya menyediakan listing produk dan review.
+- Ada dua peran utama:
+    - `seller`: penjual yang mendaftarkan toko dan mengunggah produk.
+    - `owner`: admin yang memverifikasi seller dan mengelola kategori serta laporan.
+- Alur utama:
+    1. Seller mendaftar melalui halaman registrasi dengan data PIC dan bukti KTP.
+    2. Owner memverifikasi status seller (`PENDING`, `ACTIVE`, `REJECTED`).
+    3. Produk seller tampil di halaman publik dan bisa dicari.
+    4. User publik dapat memberi review dan rating tanpa login.
+- Review otomatis memperbarui `avg_rating` dan `review_count` produk setiap kali review dibuat, diubah, atau dihapus.
+- Kategori mendukung struktur hirarkis parent/child dan dipakai untuk filter pencarian.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Fitur Utama
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Public product listing dan search/filter:
+    - pencarian teks (`q`)
+    - kategori berjenjang
+    - filter harga
+    - filter provinsi seller
+    - filter minimum rating
+- Seller panel:
+    - CRUD produk
+    - upload sampai 10 gambar produk
+    - dashboard statistik produk, review, dan distribusi reviewer
+    - laporan PDF untuk stok, rating, dan restock
+- Owner panel:
+    - verifikasi seller
+    - daftar seller dan detail KTP
+    - manajemen kategori hirarkis
+    - laporan statistik seller/product/review
+- Pendaftaran seller menggunakan paket `laravolt/indonesia` untuk dropdown provinsi/kota/kecamatan/kelurahan.
+- Autentikasi dan email verification menggunakan Laravel built-in.
 
-## Learning Laravel
+## Struktur Domain
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- `User`
+    - atribut penting: `name`, `email`, `password`, `role`, `email_verified_at`
+    - role utama: `seller`, `owner`
+- `Seller`
+    - relasi `user_id` ke `users`
+    - menyimpan profil toko dan detail PIC, alamat, KTP, status verifikasi
+    - menggunakan UUID sebagai primary key
+- `Product`
+    - relasi ke `seller` dan `category`
+    - menyimpan `images` sebagai array JSON
+    - atribut rating: `avg_rating`, `review_count`
+- `Category`
+    - hirarki parent / children
+    - mendukung query descendant recursive untuk filter seluruh subkategori
+- `Review`
+    - `product_id`, `name`, `phone`, `email`, `province`, `rating`, `comment`
+    - rating wajib antara 1 dan 5
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## Tech Stack
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- PHP 8.1
+- Laravel 10.x
+- Laravel Sanctum
+- Laravel Dompdf
+- Tailwind CSS 4
+- Vite
+- Axios
+- SweetAlert2
+- laravolt/indonesia
+- PHPUnit / Laravel Pint untuk testing dan tooling
 
-## Laravel Sponsors
+## Definisi & Singkatan
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- `PIC`: Person In Charge (penanggung jawab toko / kontak seller)
+- `CRUD`: Create, Read, Update, Delete
+- `ROLE`: sistem peran untuk akses; `seller` untuk penjual, `owner` untuk admin/verifikator
+- `PENDING`: status seller menunggu verifikasi owner
+- `ACTIVE`: status seller disetujui dan dapat masuk panel seller
+- `REJECTED`: status seller ditolak, bisa melakukan registrasi ulang
+- `UUID`: Universally Unique Identifier, dipakai untuk `sellers` dan `reviews`
+- `avg_rating`: rata-rata nilai bintang produk
+- `review_count`: jumlah total ulasan produk
+- `ToMaT`: nama repo/aplikasi marketplace
 
-### Premium Partners
+## Catatan Khusus
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- Aplikasi berfokus pada listing produk dan review, bukan transaksi.
+- Verifikasi email dilakukan dengan signed route `verification.verify`.
+- Gambar produk disimpan di public storage dan folder `images/products`.
+- Kategori bisa ditambahkan, diubah, dan dihapus dari panel owner.
