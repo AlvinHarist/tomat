@@ -136,7 +136,7 @@
                                 <div id="images-preview-grid">
                                     @foreach($product->images as $image)
                                     <div class="preview-item existing-image" data-path="{{ $image }}">
-                                        <img src="{{ asset('storage/' . $image) }}">
+                                        <img src="{{ asset($image) }}">
                                         <button type="button" onclick="markForDeletion('{{ $image }}', this)" class="remove-btn" title="Hapus foto ini">
                                             <i class="fas fa-times"></i>
                                         </button>

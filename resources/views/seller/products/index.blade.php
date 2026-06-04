@@ -64,7 +64,7 @@
                                     <td style="padding: 15px 20px;">
                                         <div style="display: flex; align-items: center;">
                                             @if($product->images && is_array($product->images) && count($product->images) > 0)
-                                            <img src="{{ asset('storage/' . $product->images[0]) }}" alt="{{ $product->name }}" class="file-preview" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover; margin-right: 15px;">
+                                            <img src="{{ asset($product->images[0]) }}" alt="{{ $product->name }}" class="file-preview" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover; margin-right: 15px;">
                                             @else
                                             <div style="width: 40px; height: 40px; border-radius: 8px; background: #eee; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
                                                 <i class="fas fa-image" style="color: #ccc; font-size: 1.2rem;"></i>
